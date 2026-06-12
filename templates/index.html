@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container">
+  <h1 data-i18n="app_title">八字自动排盘系统</h1>
+  <p class="subtitle" data-i18n="intro">请输入出生信息，系统将基于太阳时进行专业排盘。</p>
+
+  <section>
+    <h2 data-i18n="what_is_bazi_title">什么是八字？</h2>
+    <p data-i18n="what_is_bazi_p1"></p>
+    <p data-i18n="what_is_bazi_p2"></p>
+  </section>
+
+  <form method="post">
+    <label data-i18n="name">姓名</label><br>
+    <input type="text" name="name" style="width: 100%; padding: 8px; margin-top: 5px; box-sizing: border-box;"><br><br>
+
+    <label data-i18n="birth_country">出生国家</label><br>
+    <select name="birth_country">
+        <option value="CN" data-i18n="country_cn">中国</option>
+        <option value="JP" data-i18n="country_jp">日本</option>
+        <option value="VN" data-i18n="country_vn">越南</option>
+        <option value="LK" data-i18n="country_lk">斯里兰卡</option>
+        <option value="MM" data-i18n="country_mm">缅甸</option>
+    </select><br><br>
+
+    <label data-i18n="birth_city">出生城市</label><br>
+    <input type="text" name="birth_city" data-i18n-placeholder="birth_city_placeholder" style="width: 100%; padding: 8px; margin-top: 5px; box-sizing: border-box;"><br><br>
+
+    <label data-i18n="birth_date">出生日期</label><br>
+    <input type="date" name="birth_date"><br><br>
+
+    <label data-i18n="birth_time">出生时间</label><br>
+    <input type="time" name="birth_time"><br>
+
+    <label>
+        <input type="checkbox" name="unknown_time">
+        <span data-i18n="unknown_birth_time">不知道具体出生时间</span>
+    </label><br><br>
+
+    <label data-i18n="gender">性别</label><br>
+    <input type="radio" name="gender" value="male">
+    <span data-i18n="male">男</span>
+    <input type="radio" name="gender" value="female">
+    <span data-i18n="female">女</span><br><br>
+
+    <button type="submit" class="primary-btn" data-i18n="start">开始排盘</button>
+  </form>
+
+  <div class="footer-links">
+    <a href="/explain" data-i18n="system_explain">系统说明</a> |
+    <a href="/history" data-i18n="history_link">历史记录</a>
+  </div>
+</div>
+
+{% endblock %}

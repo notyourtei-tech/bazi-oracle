@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title data-i18n="app_title">BaZi</title>
+
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+
+  <!-- ===== i18n core ===== -->
+  <script>
+    let I18N = {};
+    let currentLang = localStorage.getItem("lang") || "zh";
+
+    async function loadLang(lang) {
+      const res = await fetch(`/static/i18n/${lang}.json`);
+      I18N = await res.json();
+      currentLang = lang;
+      localStorage.setItem("lang", lang);
+      applyI18N();
+    }
+
+    function applyI18N() {
+      document.querySelectorAll("[data-i18n]").forEach(el => {
+        const key = el.getAttribute("data-i18n");
+        if (I18N[key]) el.innerText = I18N[key];
+      });
+      document.querySelectorAll("[data-i18n-placeholder]").forEach(el => {
+        const key = el.getAttribute("data-i18n-placeholder");
+        if (I18N[key]) el.placeholder = I18N[key];
+      });
+      document.querySelectorAll("[title-i18n]").forEach(el => {
+        const key = el.getAttribute("title-i18n");
+        if (I18N[key]) el.title = I18N[key];
+      });
+      if (window.onLangApplied) {
+        try { window.onLangApplied(); } catch(e) {}
+      }
+    }
+
+    window.addEventListener("DOMContentLoaded", () => {
+      loadLang(currentLang);
+    });
+  </script>
+  <script>
+    function attachButtonEffects() {
+      document.querySelectorAll(".primary-btn").forEach(btn => {
+        btn.addEventListener("mouseenter", () => {
+          btn.classList.add("btn-shine");
+        });
+        btn.addEventListener("mouseleave", () => {
+          btn.classList.remove("btn-shine");
+        });
+        btn.addEventListener("click", (e) => {
+          const rect = btn.getBoundingClientRect();
+          const ripple = document.createElement("span");
+          ripple.className = "btn-ripple";
+          const x = e.clientX - rect.left;
+          const y = e.clientY - rect.top;
+          ripple.style.left = x + "px";
+          ripple.style.top = y + "px";
+          btn.appendChild(ripple);
+          setTimeout(()=>ripple.remove(), 600);
+        });
+      });
+    }
+    window.addEventListener("DOMContentLoaded", attachButtonEffects);
+  </script>
+</head>
+
+<body>
+
+<!-- ===== Language Switcher (ALL pages) ===== -->
+<div class="lang-switch">
+  <button class="lang-btn" onclick="loadLang('zh')">中</button>
+  <button class="lang-btn" onclick="loadLang('ja')">日</button>
+  <button class="lang-btn" onclick="loadLang('en')">EN</button>
+  <button class="lang-btn" onclick="loadLang('vi')">VI</button>
+</div>
+
+{% block content %}{% endblock %}
+
+</body>
+</html>

@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+
+{% block content %}
+<section class="card">
+  <h1 class="card-title">{{ t.history_title }}</h1>
+
+  {% if not rows %}
+    <p class="empty">{{ t.history_none }}</p>
+  {% else %}
+    <table class="history-table">
+      <thead>
+      <tr>
+        <th>{{ t.history_id }}</th>
+        <th>{{ t.history_method }}</th>
+        <th>{{ t.history_question }}</th>
+        <th>{{ t.history_hex }}</th>
+        <th>{{ t.history_time }}</th>
+      </tr>
+      </thead>
+      <tbody>
+      {% for r in rows %}
+        <tr onclick="location.href='{{ url_for('view', hid=r[0], lang=lang) }}'">
+          <td>{{ r[0] }}</td>
+          <td>
+            {% if r[1] == 'coin' %}{{ t.method_name_coin }}
+            {% elif r[1] == 'time' %}{{ t.method_name_time }}
+            {% elif r[1] == 'number' %}{{ t.method_name_number }}
+            {% else %}{{ r[1] }}{% endif %}
+          </td>
+          <td>{{ r[2] or '-' }}</td>
+          <td>{{ r[3] + 1 }}</td>
+          <td>{{ r[4] }}</td>
+        </tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  {% endif %}
+</section>
+{% endblock %}

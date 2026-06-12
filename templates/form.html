@@ -1,0 +1,110 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="container">
+  <div class="card">
+    <h2 class="h2">{{ T["form_title"] }}</h2>
+    <p class="muted">{{ T["form_tip"] }}</p>
+
+    {% if error %}
+      <div class="warn">{{ error }}</div>
+    {% endif %}
+
+    <form method="POST" action="/calc">
+
+      <div class="grid-2">
+        <div class="input-block">
+          <label>{{ T["name"] }}</label>
+          <input name="name" placeholder="{{ T['name_ph'] }}">
+        </div>
+
+        <div class="input-block">
+          <label>{{ T["gender"] }}</label>
+          <select name="gender">
+            <option value="1">{{ T["male"] }}</option>
+            <option value="0">{{ T["female"] }}</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="grid-3">
+        <div class="input-block">
+          <label>{{ T["birth_year"] }}</label>
+          <input name="year" type="number" placeholder="1999" required>
+        </div>
+        <div class="input-block">
+          <label>{{ T["birth_month"] }}</label>
+          <input name="month" type="number" placeholder="8" required>
+        </div>
+        <div class="input-block">
+          <label>{{ T["birth_day"] }}</label>
+          <input name="day" type="number" placeholder="14" required>
+        </div>
+      </div>
+
+      <div class="input-block">
+        <label>{{ T["birth_time"] }}</label>
+        <select name="hour">
+          <option value="-1">{{ T["unknown_time"] }}</option>
+          {% for i in range(24) %}
+            <option value="{{ i }}">{{ "%02d"|format(i) }}:00</option>
+          {% endfor %}
+        </select>
+        <div class="muted small">{{ T["unknown_time_help"] }}</div>
+      </div>
+
+      <div class="grid-2">
+        <div class="input-block">
+          <label>{{ T["birth_country"] }}</label>
+          <select name="country" id="countrySel">
+            <option value="中国">{{ T["country_china"] }}</option>
+            <option value="日本">{{ T["country_japan"] }}</option>
+            <option value="越南">{{ T["country_vietnam"] }}</option>
+            <option value="缅甸">{{ T["country_myanmar"] }}</option>
+            <option value="斯里兰卡">{{ T["country_srilanka"] }}</option>
+          </select>
+          <div class="muted small">{{ T["solar_time_tip"] }}</div>
+        </div>
+
+        <div class="input-block">
+          <label>{{ T["birth_region"] }}</label>
+          <select name="region" id="regionSel"></select>
+          <div class="muted small">{{ T["region_tip"] }}</div>
+        </div>
+      </div>
+
+      <button class="btn">{{ T["submit"] }}</button>
+    </form>
+  </div>
+</div>
+
+<script>
+  const REGION_MAP = {
+    "中国": ["北京","上海","广东","四川","云南"],
+    "日本": ["东京","大阪","北海道","福冈","冲绳"],
+    "越南": ["河内","胡志明","岘港","海防","芽庄"],
+    "缅甸": ["仰光","曼德勒","内比都","勃固","毛淡棉"],
+    "斯里兰卡": ["科伦坡","康提","加勒","贾夫纳","亭可马里"]
+  };
+
+  const cSel = document.getElementById("countrySel");
+  const rSel = document.getElementById("regionSel");
+
+  function loadRegions() {
+    const c = cSel.value;
+    const list = REGION_MAP[c] || [];
+    rSel.innerHTML = "";
+    list.forEach((x, idx)=>{
+      const opt = document.createElement("option");
+      opt.value = x;
+      opt.textContent = x;
+      if(idx===0) opt.selected = true;
+      rSel.appendChild(opt);
+    });
+  }
+
+  cSel.addEventListener("change", loadRegions);
+  loadRegions();
+</script>
+
+{% endblock %}

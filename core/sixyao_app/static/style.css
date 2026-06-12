@@ -1,0 +1,240 @@
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  background: #000;
+  color: #ffd75a;
+}
+
+.top-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 24px;
+  border-bottom: 1px solid #444;
+  background: #050505;
+}
+
+.logo {
+  font-size: 22px;
+  font-weight: 700;
+}
+
+.main-nav {
+  display: flex;
+  gap: 16px;
+}
+
+.nav-link {
+  color: #ffd75a;
+  text-decoration: none;
+  font-size: 14px;
+}
+
+.nav-link:hover {
+  text-decoration: underline;
+}
+
+.lang-switch {
+  display: flex;
+  gap: 6px;
+}
+
+.lang-btn {
+  border: 1px solid #ffd75a;
+  padding: 3px 10px;
+  border-radius: 6px;
+  font-size: 12px;
+  text-decoration: none;
+  color: #ffd75a;
+}
+
+.lang-btn.active,
+.lang-btn:hover {
+  background: #ffd75a;
+  color: #000;
+}
+
+.page {
+  padding: 24px;
+}
+
+.card {
+  max-width: 900px;
+  margin: 0 auto 32px;
+  border: 1px solid #ffd75a;
+  border-radius: 12px;
+  padding: 24px 28px 32px;
+  background: #050505;
+}
+
+.card-title {
+  margin-top: 0;
+  margin-bottom: 12px;
+  font-size: 22px;
+}
+
+.sub-info {
+  font-size: 14px;
+  margin-bottom: 10px;
+}
+
+.summary {
+  font-size: 13px;
+  opacity: 0.9;
+  margin-bottom: 20px;
+}
+
+.form {
+  margin-top: 10px;
+}
+
+.form-row {
+  margin-bottom: 16px;
+}
+
+.form-row-center {
+  text-align: center;
+}
+
+.form-label {
+  display: block;
+  font-size: 14px;
+  margin-bottom: 6px;
+}
+
+.radio-group label {
+  display: block;
+  font-size: 14px;
+  margin-bottom: 4px;
+}
+
+.text-input,
+.textarea {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 8px 10px;
+  border-radius: 8px;
+  border: 1px solid #ffd75a;
+  background: #000;
+  color: #ffd75a;
+  font-size: 14px;
+}
+
+.textarea {
+  resize: vertical;
+}
+
+.btn-primary {
+  padding: 8px 22px;
+  border-radius: 999px;
+  border: none;
+  background: #ffd75a;
+  color: #000;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.btn-primary:hover {
+  filter: brightness(1.05);
+}
+
+/* 六爻图 */
+
+.gua-wrapper {
+  margin: 20px 0 10px;
+}
+
+.gua-box {
+  display: inline-block;
+  padding: 10px 18px;
+  border-radius: 10px;
+  border: 1px solid #ffd75a;
+  background: #000;
+}
+
+.gua-line {
+  display: flex;
+  align-items: center;
+  margin: 4px 0;
+}
+
+.line-inner {
+  height: 8px;
+  border-radius: 4px;
+  margin-right: 10px;
+}
+
+.line-inner.yang {
+  width: 120px;
+  background: linear-gradient(to right, #ffd75a, #ffb000);
+}
+
+.line-inner.yin {
+  width: 120px;
+  background: transparent;
+  border-top: 3px solid #ffd75a;
+  border-bottom: 3px solid #ffd75a;
+  box-sizing: border-box;
+}
+
+.liuchin-tag {
+  font-size: 12px;
+  margin-right: 6px;
+}
+
+.moving-mark {
+  font-size: 12px;
+  color: #ffb000;
+}
+
+/* 运势块 */
+
+.section-title {
+  margin-top: 24px;
+  margin-bottom: 10px;
+  font-size: 18px;
+}
+
+.luck-block {
+  border: 1px solid #ffd75a;
+  border-radius: 10px;
+  padding: 10px 14px;
+  margin-bottom: 10px;
+}
+
+.luck-title {
+  margin: 0 0 6px;
+  font-size: 15px;
+}
+
+.luck-block p {
+  margin: 2px 0;
+  font-size: 13px;
+}
+
+.empty {
+  font-size: 14px;
+  opacity: 0.8;
+}
+
+/* 历史表格 */
+
+.history-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+.history-table th,
+.history-table td {
+  border-bottom: 1px solid #444;
+  padding: 6px 4px;
+}
+
+.history-table tr {
+  cursor: pointer;
+}
+
+.history-table tr:hover {
+  background: #151515;
+}

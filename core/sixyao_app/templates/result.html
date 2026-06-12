@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+
+{% block content %}
+<section class="card">
+  <h1 class="card-title">{{ t.result_title }}</h1>
+
+  <p class="sub-info">
+    {{ t.hex_title_prefix }}{{ hex_no }}{{ t.hex_title_suffix }}
+    {% if question %}
+      ｜ {{ t.question_label }}：{{ question }}
+    {% endif %}
+  </p>
+
+  <p class="summary">{{ t.summary_notice }}</p>
+
+  <!-- 六爻图 -->
+  <div class="gua-wrapper">
+    <div class="gua-box">
+      {% for i in range(5, -1, -1) %}
+        <div class="gua-line">
+          <div class="line-inner {% if lines[i] == 1 %}yang{% else %}yin{% endif %}"></div>
+          <span class="liuchin-tag">{{ liuchin[i] }}</span>
+          {% if (i+1) in moving %}
+            <span class="moving-mark">✶</span>
+          {% endif %}
+        </div>
+      {% endfor %}
+    </div>
+  </div>
+
+  <!-- 五大运势 -->
+  <h2 class="section-title">{{ t.five_luck }}</h2>
+
+  {% for key, block in analysis.items() %}
+    <div class="luck-block">
+      <h3 class="luck-title">{{ block.title[lang] }}</h3>
+      <p><strong>{{ t.now }}</strong> {{ block.now[lang] }}</p>
+      <p><strong>{{ t.future }}</strong> {{ block.future[lang] }}</p>
+      <p><strong>{{ t.advice }}</strong> {{ block.advice[lang] }}</p>
+    </div>
+  {% endfor %}
+
+</section>
+{% endblock %}

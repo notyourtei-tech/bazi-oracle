@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html>
+<head><title>用户中心</title></head>
+<body>
+<h2>我的命盘</h2>
+
+<ul>
+{% for c in charts %}
+  <li>{{ c.name }}（可继续加：查看 / 历史验证）</li>
+{% endfor %}
+</ul>
+
+<a href="/">新建命盘</a>
+</body>
+</html>

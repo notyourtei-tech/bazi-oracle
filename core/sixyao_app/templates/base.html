@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="{{ lang }}">
+<head>
+  <meta charset="UTF-8">
+  <title>{{ t.app_title }}</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+<header class="top-bar">
+  <div class="logo">{{ t.app_title }}</div>
+  <nav class="main-nav">
+    <a href="{{ url_for('index', lang=lang) }}" class="nav-link">{{ t.nav_home }}</a>
+    <a href="{{ url_for('history', lang=lang) }}" class="nav-link">{{ t.nav_history }}</a>
+  </nav>
+  <div class="lang-switch">
+    <a href="{{ lang_urls['zh'] }}" class="lang-btn {% if lang == 'zh' %}active{% endif %}">中文</a>
+    <a href="{{ lang_urls['ja'] }}" class="lang-btn {% if lang == 'ja' %}active{% endif %}">日本語</a>
+    <a href="{{ lang_urls['en'] }}" class="lang-btn {% if lang == 'en' %}active{% endif %}">EN</a>
+    <a href="{{ lang_urls['vi'] }}" class="lang-btn {% if lang == 'vi' %}active{% endif %}">VI</a>
+  </div>
+</header>
+
+<main class="page">
+  {% block content %}{% endblock %}
+</main>
+</body>
+</html>

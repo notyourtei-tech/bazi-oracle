@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% block content %}
+
+<h1 data-i18n="history_title">历史记录</h1>
+
+{% if history %}
+  <ul>
+  {% for h in history %}
+    {% set res = h.get_result() %}
+    <li style="margin-bottom: 20px; border-bottom: 1px solid #ccc; padding-bottom: 10px;">
+      <strong>{{ h.created_at.strftime('%Y-%m-%d %H:%M:%S') }}</strong><br>
+      <strong><span data-i18n="name_label">姓名</span>:</strong> 
+      {% if h.name %}
+        {{ h.name }}
+      {% else %}
+        <span data-i18n="unnamed">未命名</span>
+      {% endif %}
+      <br>
+      <strong><span data-i18n="bazi_label">八字</span>:</strong> 
+      <span data-i18n="year_pillar">年柱</span>:{{ res.bazi.year }} 
+      <span data-i18n="month_pillar">月柱</span>:{{ res.bazi.month }} 
+      <span data-i18n="day_pillar">日柱</span>:{{ res.bazi.day }} 
+      <span data-i18n="hour_pillar">时柱</span>:{{ res.bazi.hour }}
+    </li>
+  {% endfor %}
+  </ul>
+{% else %}
+  <p data-i18n="no_history">暂无历史记录</p>
+{% endif %}
+
+<a href="/" data-i18n="back">返回</a>
+
+{% endblock %}

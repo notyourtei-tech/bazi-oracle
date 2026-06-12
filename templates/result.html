@@ -1,0 +1,175 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container">
+<h1 data-i18n="result_title">八字分析结果</h1>
+
+<div id="baziWrap">
+  <div class="bazi-grid">
+    {% for pillar_key in ['year', 'month', 'day', 'hour'] %}
+      {% set pillar = result.bazi_detail[pillar_key] %}
+      <div class="bazi-pillar">
+        <div class="label" data-i18n="{{ pillar_key }}_pillar"></div>
+        
+        {% if pillar.gan != '-' %}
+            <!-- Na Yin -->
+            <div class="nayin-badge" data-i18n="{{ pillar.nayin_key }}"></div>
+            
+            <div class="gan {{ 'wx-' + (pillar.gan_wx or '') }}">{{ pillar.gan }}</div>
+            
+            <div class="zhi {{ 'wx-' + (pillar.zhi_wx or '') }} {{ 'kongwang' if pillar.is_kw else '' }}">
+                {{ pillar.zhi }}
+                {% if pillar.is_kw %}<span class="kw-tag" data-i18n="kongwang">空</span>{% endif %}
+            </div>
+
+            <!-- Hidden Stems & Sub-stars -->
+            <div class="hidden-stems">
+                {% for stem in pillar.hidden_stems %}
+                    {% set idx = loop.index0 %}
+                    <div class="stem-row">
+                        <span class="sub-star" data-i18n="{{ pillar.sub_stars[idx].key }}"></span>
+                        <span class="stem-char {{ 'wx-' + (pillar.hidden_stems_wx[idx] or '') }}">{{ stem }}</span>
+                    </div>
+                {% endfor %}
+            </div>
+
+            <!-- Shensha -->
+            <div class="pillar-shensha">
+                {% for s in pillar.shensha %}
+                    <span class="shensha-tag" data-i18n="{{ s.name_key }}" title-i18n="{{ s.desc_key }}"></span>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="gan">-</div>
+            <div class="zhi">-</div>
+        {% endif %}
+      </div>
+    {% endfor %}
+  </div>
+  <button class="primary-btn zoom-toggle" id="zoomBtn" data-i18n="zoom_bazi">放大展示</button>
+</div>
+
+<!-- 五行强弱 -->
+<details open class="year-card">
+  <summary data-i18n="wuxing_strength_title">五行强弱</summary>
+  <div class="wuxing-chart-container">
+      {% for wx, score in result.wuxing_strength.items() %}
+      <div class="wuxing-progress-item">
+          <div class="wuxing-label">
+              <span data-i18n="wuxing_{{ wx }}"></span>
+              <span class="wuxing-score">{{ score }}</span>
+          </div>
+          <div class="progress-track">
+              <!-- Score usually ranges 0-100 or so, we cap it visual at 100% but relative strength matters. 
+                   Assuming max score is around 50-100. Let's use score directly as % or scale it. 
+                   If score is raw count, maybe max is higher. Let's assume standard Bazi scores. 
+                   Let's assume max is around 100 for safety, or relative. 
+                   Let's use a safe multiplier, e.g. score. -->
+              <div class="progress-fill wx-bg-{{ wx }}" style="width: {{ score }}%; max-width: 100%;"></div>
+          </div>
+      </div>
+      {% endfor %}
+  </div>
+</details>
+
+<!-- 神煞信息 (汇总) -->
+<details open class="year-card">
+  <summary data-i18n="shensha_title">神煞信息</summary>
+      <ul class="shensha-list">
+    {% for s in result.shensha %}
+      <li>
+        <strong data-i18n="{{ s.name_key }}" class="shensha-name"></strong> 
+        (<span data-i18n="{{ (s.pillar_key | replace('pillar_', '')) ~ '_pillar' }}"></span>): 
+        <span data-i18n="{{ s.desc_key }}"></span>
+      </li>
+    {% else %}
+      <li data-i18n="shensha_none">无明显神煞</li>
+    {% endfor %}
+  </ul>
+</details>
+
+<!-- 性格与身强 -->
+<details open class="year-card">
+  <summary data-i18n="personality_title">性格与用神</summary>
+  <div class="analysis-section">
+      <p><strong data-i18n="body_strength_label">身强身弱：</strong><span data-i18n="{{ result.personality.body_strength_key }}"></span> - <span data-i18n="{{ result.personality.body_strength_desc_key }}"></span></p>
+      <p><strong data-i18n="personality_label">性格特征：</strong><span data-i18n="{{ result.personality.personality_key }}"></span></p>
+      <p><strong data-i18n="strength_label">优势：</strong><span data-i18n="{{ result.personality.strength_key }}"></span></p>
+      <p><strong data-i18n="core_risk_label">核心风险：</strong><span data-i18n="{{ result.personality.risk_key }}"></span></p>
+  </div>
+  
+  <div class="advice-section" style="margin-top: 15px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 10px;">
+      <h4 data-i18n="general_advice_title">综合建议</h4>
+      <ul>
+        <li><strong data-i18n="career_advice_label">事业建议：</strong> <span data-i18n="{{ result.personality.career_advice_key }}"></span></li>
+        <li><strong data-i18n="relationship_advice_label">感情建议：</strong> <span data-i18n="{{ result.personality.relationship_advice_key }}"></span></li>
+        <li><strong data-i18n="risk_advice_label">风险提示：</strong> <span data-i18n="{{ result.personality.risk_advice_key }}"></span></li>
+      </ul>
+  </div>
+
+  <div class="advice-section" style="margin-top: 15px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 10px;">
+    <h4 data-i18n="body_strength_advice_title">身强身弱指导</h4>
+    <ul>
+        <li><strong data-i18n="career_direction_label">适合就业方向：</strong> <span data-i18n="{{ result.personality.body_strength_career_key }}"></span></li>
+        <li><strong data-i18n="daily_action_label">日常需要做的事：</strong> <span data-i18n="{{ result.personality.body_strength_daily_key }}"></span></li>
+        <li><strong data-i18n="caution_label">需要小心的事情：</strong> <span data-i18n="{{ result.personality.body_strength_caution_key }}"></span></li>
+    </ul>
+  </div>
+
+  {% if result.personality.wuxing_advice %}
+  <div class="advice-section" style="margin-top: 15px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 10px;">
+    <h4 data-i18n="wuxing_advice_title">五行平衡建议</h4>
+    <ul>
+        <li><strong data-i18n="supplement_label">建议补充：</strong> <span data-i18n="{{ result.personality.wuxing_advice.supplement_key }}"></span></li>
+        <li><strong data-i18n="control_label">建议克制：</strong> <span data-i18n="{{ result.personality.wuxing_advice.control_key }}"></span></li>
+    </ul>
+  </div>
+  {% endif %}
+</details>
+
+<!-- 大运与流年详解 -->
+<details class="year-card">
+  <summary data-i18n="dayun_title">大运分析</summary>
+  <p>
+    <span data-i18n="qiyun_start">起运</span>：{{ result.qiyun.qiyun_time }}，
+    <span data-i18n="direction">方向</span>：<span data-i18n="{{ 'direction_forward' if result.qiyun.direction=='forward' else 'direction_backward' }}"></span>
+  </p>
+
+  {% for d in result.dayun %}
+    <div class="dayun-block" style="border-left: 3px solid var(--accent-color); padding-left: 15px; margin-bottom: 25px; background: rgba(0,0,0,0.2); padding: 15px; border-radius: 5px;">
+      <h3 style="color: var(--accent-color); margin-top: 0;">{{ d.start_year }}–{{ d.end_year }}年：{{ d.gz }}大运（<span data-i18n="{{ d.theme_key }}"></span>）</h3>
+      <p class="dayun-desc"><em data-i18n="{{ d.desc_key }}"></em></p>
+      <p><strong data-i18n="advice_label">建议：</strong><span data-i18n="{{ d.advice_key }}"></span></p>
+      
+      <details>
+        <summary style="cursor: pointer; color: var(--text-secondary);"><span data-i18n="view_liunian_details">查看此大运流年详情</span> ({{ d.start_year }}-{{ d.end_year }})</summary>
+        <div class="liunian-list" style="margin-top: 10px;">
+        {% for ln in d.liunian_list %}
+          <div class="liunian-item" style="margin-top: 10px; background: rgba(255,255,255,0.05); padding: 10px; border-radius: 4px; border: 1px solid rgba(255,255,255,0.1);">
+            <h4 style="margin: 0 0 5px 0;">{{ ln.year }} {{ ln.gz }}年：<span data-i18n="{{ ln.theme_key }}"></span></h4>
+            
+            <div style="margin-bottom: 8px;">
+                <span data-i18n="{{ ln.desc_key }}"></span>
+            </div>
+            <div style="margin-bottom: 8px;">
+                <strong data-i18n="event_hint_label">可能事件：</strong><span data-i18n="{{ ln.event_hint_key }}"></span>
+            </div>
+          </div>
+        {% endfor %}
+        </div>
+      </details>
+    </div>
+  {% endfor %}
+</details>
+
+<div class="footer-links">
+  <a href="/" data-i18n="back">返回</a>
+</div>
+</div>
+<script>
+  const zoomBtn = document.getElementById('zoomBtn');
+  const wrap = document.getElementById('baziWrap');
+  zoomBtn.addEventListener('click', ()=>{
+    wrap.classList.toggle('zoom-on');
+  });
+</script>
+{% endblock %}

@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="{{ session.get('lang','zh') }}">
+<head>
+    <meta charset="utf-8">
+    <title>{{ t("glossary") }}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+<div class="container">
+
+    <div class="lang-switch">
+        <a href="?lang=zh">{{ t("lang_zh") }}</a> |
+        <a href="?lang=ja">{{ t("lang_ja") }}</a> |
+        <a href="?lang=en">{{ t("lang_en") }}</a> |
+        <a href="?lang=vi">{{ t("lang_vi") }}</a>
+    </div>
+
+    <h1>{{ t("glossary") }}</h1>
+
+    <table>
+        <tr>
+            <th>{{ t("term_cn") }}</th>
+            <th>{{ t("term_en") }}</th>
+        </tr>
+        <tr>
+            <td>{{ t("term_yongshen") }}</td>
+            <td>{{ t("term_yongshen_en") }}</td>
+        </tr>
+        <tr>
+            <td>{{ t("term_dayun") }}</td>
+            <td>{{ t("term_dayun_en") }}</td>
+        </tr>
+    </table>
+
+    <a href="{{ url_for('index') }}">{{ t("back") }}</a>
+
+</div>
+</body>
+</html>

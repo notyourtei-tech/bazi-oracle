@@ -1,0 +1,29 @@
+<script>
+let LANG_DATA = {};
+let currentLang = localStorage.getItem("lang") || "zh";
+
+async function loadLang(lang) {
+  const res = await fetch(`/static/lang/${lang}.json`);
+  LANG_DATA = await res.json();
+  applyLang();
+  localStorage.setItem("lang", lang);
+}
+
+function applyLang() {
+  document.querySelectorAll("[data-i18n]").forEach(el => {
+    const key = el.dataset.i18n;
+    if (LANG_DATA[key]) {
+      el.innerText = LANG_DATA[key];
+    }
+  });
+}
+
+function setLang(lang) {
+  currentLang = lang;
+  loadLang(lang);
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+  loadLang(currentLang);
+});
+</script>
