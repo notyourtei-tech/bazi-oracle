@@ -1,12 +1,15 @@
 <!DOCTYPE html>
-<html>
+<html lang="zh">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="theme-color" content="#0a0a0f">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <title data-i18n="app_title">BaZi</title>
 
   <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 
-  <!-- ===== i18n core ===== -->
   <script>
     let I18N = {};
     let currentLang = localStorage.getItem("lang") || "zh";
@@ -17,6 +20,9 @@
       currentLang = lang;
       localStorage.setItem("lang", lang);
       applyI18N();
+      document.querySelectorAll('.lang-btn').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.lang === lang);
+      });
     }
 
     function applyI18N() {
@@ -39,45 +45,75 @@
 
     window.addEventListener("DOMContentLoaded", () => {
       loadLang(currentLang);
-    });
-  </script>
-  <script>
-    function attachButtonEffects() {
-      document.querySelectorAll(".primary-btn").forEach(btn => {
-        btn.addEventListener("mouseenter", () => {
-          btn.classList.add("btn-shine");
-        });
-        btn.addEventListener("mouseleave", () => {
-          btn.classList.remove("btn-shine");
-        });
-        btn.addEventListener("click", (e) => {
-          const rect = btn.getBoundingClientRect();
-          const ripple = document.createElement("span");
-          ripple.className = "btn-ripple";
-          const x = e.clientX - rect.left;
-          const y = e.clientY - rect.top;
-          ripple.style.left = x + "px";
-          ripple.style.top = y + "px";
-          btn.appendChild(ripple);
-          setTimeout(()=>ripple.remove(), 600);
-        });
+      document.querySelectorAll('.lang-btn').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.lang === currentLang);
       });
-    }
-    window.addEventListener("DOMContentLoaded", attachButtonEffects);
+    });
   </script>
 </head>
 
 <body>
 
-<!-- ===== Language Switcher (ALL pages) ===== -->
-<div class="lang-switch">
-  <button class="lang-btn" onclick="loadLang('zh')">中</button>
-  <button class="lang-btn" onclick="loadLang('ja')">日</button>
-  <button class="lang-btn" onclick="loadLang('en')">EN</button>
-  <button class="lang-btn" onclick="loadLang('vi')">VI</button>
+<!-- 加载动画 -->
+<div class="loading-overlay" id="loadingOverlay">
+  <div class="loading-spinner"></div>
+  <div class="loading-text" data-i18n="loading_text">排盘中...</div>
 </div>
 
+<!-- 顶部导航 -->
+<nav class="top-nav">
+  <a href="/" class="nav-brand">
+    <div class="nav-brand-icon">☯</div>
+    <span class="nav-brand-text" data-i18n="app_title_short">八字排盘</span>
+  </a>
+  
+  <div class="nav-actions">
+    <a href="/" class="nav-link {% if request.path == '/' %}active{% endif %}" data-i18n="nav_home">首页</a>
+    <a href="/history" class="nav-link {% if request.path == '/history' %}active{% endif %}" data-i18n="nav_history">历史</a>
+    <a href="/explain" class="nav-link {% if request.path == '/explain' %}active{% endif %}" data-i18n="nav_learn">了解</a>
+    
+    <div class="lang-switch">
+      <button class="lang-btn" data-lang="zh" onclick="loadLang('zh')">中</button>
+      <button class="lang-btn" data-lang="ja" onclick="loadLang('ja')">日</button>
+      <button class="lang-btn" data-lang="en" onclick="loadLang('en')">EN</button>
+      <button class="lang-btn" data-lang="ko" onclick="loadLang('ko')">한</button>
+      <button class="lang-btn" data-lang="vi" onclick="loadLang('vi')">VI</button>
+    </div>
+  </div>
+</nav>
+
 {% block content %}{% endblock %}
+
+<!-- 底部导航（移动端） -->
+<nav class="bottom-nav">
+  <div class="bottom-nav-content">
+    <a href="/" class="nav-item {% if request.path == '/' %}active{% endif %}">
+      <span class="nav-item-icon">☰</span>
+      <span data-i18n="nav_home">首页</span>
+    </a>
+    <a href="/" class="nav-item">
+      <span class="nav-item-icon">☯</span>
+      <span data-i18n="nav_bazi">排盘</span>
+    </a>
+    <a href="/history" class="nav-item {% if request.path == '/history' %}active{% endif %}">
+      <span class="nav-item-icon">📋</span>
+      <span data-i18n="nav_history">历史</span>
+    </a>
+    <a href="/explain" class="nav-item {% if request.path == '/explain' %}active{% endif %}">
+      <span class="nav-item-icon">💡</span>
+      <span data-i18n="nav_learn">了解</span>
+    </a>
+  </div>
+</nav>
+
+<script>
+function showLoading() {
+  document.getElementById('loadingOverlay').classList.add('active');
+}
+function hideLoading() {
+  document.getElementById('loadingOverlay').classList.remove('active');
+}
+</script>
 
 </body>
 </html>

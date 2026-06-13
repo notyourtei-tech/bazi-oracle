@@ -1,55 +1,363 @@
 {% extends "base.html" %}
 {% block content %}
 <div class="container">
-  <h1 data-i18n="app_title">八字自动排盘系统</h1>
-  <p class="subtitle" data-i18n="intro">请输入出生信息，系统将基于太阳时进行专业排盘。</p>
-
-  <section>
-    <h2 data-i18n="what_is_bazi_title">什么是八字？</h2>
-    <p data-i18n="what_is_bazi_p1"></p>
-    <p data-i18n="what_is_bazi_p2"></p>
-  </section>
-
-  <form method="post">
-    <label data-i18n="name">姓名</label><br>
-    <input type="text" name="name" style="width: 100%; padding: 8px; margin-top: 5px; box-sizing: border-box;"><br><br>
-
-    <label data-i18n="birth_country">出生国家</label><br>
-    <select name="birth_country">
-        <option value="CN" data-i18n="country_cn">中国</option>
-        <option value="JP" data-i18n="country_jp">日本</option>
-        <option value="VN" data-i18n="country_vn">越南</option>
-        <option value="LK" data-i18n="country_lk">斯里兰卡</option>
-        <option value="MM" data-i18n="country_mm">缅甸</option>
-    </select><br><br>
-
-    <label data-i18n="birth_city">出生城市</label><br>
-    <input type="text" name="birth_city" data-i18n-placeholder="birth_city_placeholder" style="width: 100%; padding: 8px; margin-top: 5px; box-sizing: border-box;"><br><br>
-
-    <label data-i18n="birth_date">出生日期</label><br>
-    <input type="date" name="birth_date"><br><br>
-
-    <label data-i18n="birth_time">出生时间</label><br>
-    <input type="time" name="birth_time"><br>
-
-    <label>
-        <input type="checkbox" name="unknown_time">
-        <span data-i18n="unknown_birth_time">不知道具体出生时间</span>
-    </label><br><br>
-
-    <label data-i18n="gender">性别</label><br>
-    <input type="radio" name="gender" value="male">
-    <span data-i18n="male">男</span>
-    <input type="radio" name="gender" value="female">
-    <span data-i18n="female">女</span><br><br>
-
-    <button type="submit" class="primary-btn" data-i18n="start">开始排盘</button>
-  </form>
-
-  <div class="footer-links">
-    <a href="/explain" data-i18n="system_explain">系统说明</a> |
-    <a href="/history" data-i18n="history_link">历史记录</a>
+  
+  <!-- 标题区域 -->
+  <div class="page-header animate-fade">
+    <h1 class="page-title" data-i18n="app_title">八字自动排盘系统</h1>
+    <p class="page-subtitle" data-i18n="intro">基于真太阳时的专业排盘，AI 深度解读您的命盘</p>
   </div>
+
+  {% if session.get('user_id') and user_chart %}
+  <!-- 登录用户：今日运势仪表盘 -->
+  <div class="card animate-slide" style="background: linear-gradient(135deg, rgba(212,168,67,0.08), rgba(212,168,67,0.02));">
+    <div class="card-header">
+      <div class="card-title">
+        <span class="card-title-icon">🌟</span>
+        我的今日运势
+      </div>
+    </div>
+    <div id="myFortuneDashboard">
+      <div class="skeleton skeleton-text" style="width: 60%;"></div>
+    </div>
+  </div>
+
+  <!-- 我的命盘 -->
+  <div class="card animate-slide">
+    <div class="card-header">
+      <div class="card-title">
+        <span class="card-title-icon">☯</span>
+        我的命盘
+      </div>
+      <a href="/history" style="color: var(--gold); font-size: 13px; text-decoration: none;">查看全部 →</a>
+    </div>
+    <div style="display: flex; gap: 12px; flex-wrap: wrap;">
+      {% for chart in user_chart %}
+      <div style="flex: 1; min-width: 200px; padding: 12px; background: var(--bg-secondary); border-radius: var(--radius-md); border: 1px solid var(--border);">
+        <div style="font-size: 14px; font-weight: 600; margin-bottom: 4px;">{{ chart.name or '未命名' }}</div>
+        <div style="font-size: 12px; color: var(--text-muted);">{{ chart.birth_date }}</div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+  {% endif %}
+
+  <!-- 快捷入口 -->
+  <div class="actions-grid animate-slide" style="margin-bottom: 24px;">
+    <a href="/history" class="action-card">
+      <div class="action-icon">📋</div>
+      <span class="action-label" data-i18n="nav_history">历史记录</span>
+    </a>
+    <a href="/explain" class="action-card">
+      <div class="action-icon">📖</div>
+      <span class="action-label" data-i18n="nav_learn">了解八字</span>
+    </a>
+  </div>
+
+  <!-- 排盘表单 -->
+  <div class="card animate-slide">
+    <div class="card-header">
+      <div class="card-title">
+        <span class="card-title-icon">✦</span>
+        <span data-i18n="start_analysis">开始排盘</span>
+      </div>
+    </div>
+
+    <form method="post" onsubmit="showLoading()">
+      <div class="form-section">
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label" data-i18n="name">姓名</label>
+            <input type="text" name="name" class="form-input" placeholder="请输入您的姓名">
+          </div>
+          <div class="form-group">
+            <label class="form-label" data-i18n="gender">性别</label>
+            <div class="form-radio-group">
+              <label class="form-radio" onclick="selectRadio(this, 'gender', 'male')">
+                <input type="radio" name="gender" value="male">
+                <span>♂</span>
+                <span data-i18n="male">男</span>
+              </label>
+              <label class="form-radio" onclick="selectRadio(this, 'gender', 'female')">
+                <input type="radio" name="gender" value="female">
+                <span>♀</span>
+                <span data-i18n="female">女</span>
+              </label>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label" data-i18n="birth_country">出生国家</label>
+            <select name="birth_country" class="form-select">
+              <optgroup label="亚洲">
+                <option value="CN">中国</option>
+                <option value="JP">日本</option>
+                <option value="KR">韩国</option>
+                <option value="TW">台湾</option>
+                <option value="HK">香港</option>
+                <option value="MO">澳门</option>
+                <option value="VN">越南</option>
+                <option value="TH">泰国</option>
+                <option value="PH">菲律宾</option>
+                <option value="MY">马来西亚</option>
+                <option value="SG">新加坡</option>
+                <option value="ID">印度尼西亚</option>
+                <option value="MM">缅甸</option>
+                <option value="LK">斯里兰卡</option>
+                <option value="IN">印度</option>
+                <option value="NP">尼泊尔</option>
+                <option value="BD">孟加拉国</option>
+                <option value="PK">巴基斯坦</option>
+              </optgroup>
+              <optgroup label="欧美">
+                <option value="US">美国</option>
+                <option value="CA">加拿大</option>
+                <option value="GB">英国</option>
+                <option value="DE">德国</option>
+                <option value="FR">法国</option>
+                <option value="RU">俄罗斯</option>
+                <option value="AU">澳大利亚</option>
+              </optgroup>
+              <optgroup label="其他">
+                <option value="BR">巴西</option>
+                <option value="MX">墨西哥</option>
+                <option value="EG">埃及</option>
+                <option value="ZA">南非</option>
+                <option value="NG">尼日利亚</option>
+                <option value="TR">土耳其</option>
+                <option value="SA">沙特阿拉伯</option>
+                <option value="AE">阿联酋</option>
+              </optgroup>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label" data-i18n="birth_city">出生城市</label>
+            <input type="text" name="birth_city" class="form-input" data-i18n-placeholder="birth_city_placeholder" placeholder="选填，提高精度">
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label" data-i18n="birth_date">出生日期</label>
+            <input type="date" name="birth_date" class="form-input" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label" data-i18n="birth_time">出生时间</label>
+            <input type="time" name="birth_time" class="form-input">
+          </div>
+        </div>
+
+        <label class="form-checkbox">
+          <input type="checkbox" name="unknown_time">
+          <span data-i18n="unknown_birth_time">不知道具体出生时间</span>
+        </label>
+      </div>
+
+      <button type="submit" class="btn btn-primary btn-block btn-lg">
+        <span data-i18n="start">开始排盘</span>
+        <span>→</span>
+      </button>
+    </form>
+  </div>
+
+  <!-- 双人合盘入口 -->
+  <div class="card animate-slide" style="cursor: pointer;" onclick="showCompatibility()">
+    <div class="card-header">
+      <div class="card-title">
+        <span class="card-title-icon">💑</span>
+        <span data-i18n="compatibility">双人合盘</span>
+      </div>
+      <span style="color: var(--text-muted); font-size: 14px;">→</span>
+    </div>
+    <p style="color: var(--text-secondary); font-size: 14px;" data-i18n="compatibility_short_desc">分析两人的八字缘分，了解五行互补性与感情运势</p>
+  </div>
+
+  <!-- 合盘弹窗 -->
+  <div id="compatibilityModal" class="modal-overlay">
+    <div class="modal" style="max-width: 560px;">
+      <button class="modal-close" onclick="closeModal()">×</button>
+      <div class="modal-title" data-i18n="compatibility_title">双人合盘分析</div>
+      <div class="modal-desc" data-i18n="compatibility_desc">请输入两个人的出生信息</div>
+      
+      <form id="compatibilityForm" onsubmit="submitCompatibility(event)">
+        <div style="margin-bottom: 20px;">
+          <div style="font-size: 14px; font-weight: 600; color: var(--gold); margin-bottom: 12px;">👤 第一个人</div>
+          <div class="form-row">
+            <div class="form-group">
+              <input type="text" name="name1" class="form-input" placeholder="姓名">
+            </div>
+            <div class="form-group">
+              <select name="country1" class="form-select">
+                <option value="CN">中国</option>
+                <option value="JP">日本</option>
+                <option value="KR">韩国</option>
+                <option value="VN">越南</option>
+                <option value="US">美国</option>
+                <option value="GB">英国</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <input type="date" name="date1" class="form-input" required>
+            </div>
+            <div class="form-group">
+              <input type="time" name="time1" class="form-input">
+            </div>
+          </div>
+        </div>
+        
+        <div style="margin-bottom: 20px;">
+          <div style="font-size: 14px; font-weight: 600; color: var(--gold); margin-bottom: 12px;">👤 第二个人</div>
+          <div class="form-row">
+            <div class="form-group">
+              <input type="text" name="name2" class="form-input" placeholder="姓名">
+            </div>
+            <div class="form-group">
+              <select name="country2" class="form-select">
+                <option value="CN">中国</option>
+                <option value="JP">日本</option>
+                <option value="KR">韩国</option>
+                <option value="VN">越南</option>
+                <option value="US">美国</option>
+                <option value="GB">英国</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <input type="date" name="date2" class="form-input" required>
+            </div>
+            <div class="form-group">
+              <input type="time" name="time2" class="form-input">
+            </div>
+          </div>
+        </div>
+        
+        <button type="submit" class="btn btn-primary btn-block">开始合盘分析</button>
+      </form>
+      
+      <div id="compatibilityResult" style="margin-top: 20px;"></div>
+    </div>
+  </div>
+
 </div>
 
+<script>
+function selectRadio(el, name, value) {
+  el.closest('.form-radio-group').querySelectorAll('.form-radio').forEach(r => r.classList.remove('selected'));
+  el.classList.add('selected');
+  el.querySelector('input[type="radio"]').checked = true;
+}
+
+function showCompatibility() {
+  document.getElementById('compatibilityModal').classList.add('active');
+}
+
+function closeModal() {
+  document.getElementById('compatibilityModal').classList.remove('active');
+}
+
+async function submitCompatibility(e) {
+  e.preventDefault();
+  const form = e.target;
+  const resultDiv = document.getElementById('compatibilityResult');
+  resultDiv.innerHTML = '<div class="skeleton skeleton-text" style="width: 80%;"></div><div class="skeleton skeleton-text" style="width: 60%;"></div>';
+  
+  try {
+    // 先排盘第一个人
+    const res1 = await fetch('/', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: new URLSearchParams({
+        name: form.name1.value,
+        birth_country: form.country1.value,
+        birth_date: form.date1.value,
+        birth_time: form.time1.value || '',
+        gender: 'male'
+      })
+    });
+    const html1 = await res1.text();
+    const parser = new DOMParser();
+    const doc1 = parser.parseFromString(html1, 'text/html');
+    
+    // 再排盘第二个人
+    const res2 = await fetch('/', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: new URLSearchParams({
+        name: form.name2.value,
+        birth_country: form.country2.value,
+        birth_date: form.date2.value,
+        birth_time: form.time2.value || '',
+        gender: 'female'
+      })
+    });
+    const html2 = await res2.text();
+    const doc2 = parser.parseFromString(html2, 'text/html');
+    
+    // 提取结果中的 baziResult 变量
+    const script1 = html1.match(/const baziResult = ({.*?});/s);
+    const script2 = html2.match(/const baziResult = ({.*?});/s);
+    
+    if (script1 && script2) {
+      const result1 = JSON.parse(script1[1]);
+      const result2 = JSON.parse(script2[1]);
+      
+      const compRes = await fetch('/api/compatibility', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ result1, result2 })
+      });
+      const comp = await compRes.json();
+      
+      resultDiv.innerHTML = `
+        <div style="text-align: center; padding: 20px;">
+          <div style="font-size: 48px; margin-bottom: 8px;">${comp.emoji}</div>
+          <div style="font-size: 20px; font-weight: 700; color: var(--gold); margin-bottom: 4px;">${comp.overall_score}分</div>
+          <div style="font-size: 16px; margin-bottom: 16px;">${comp.level_text}</div>
+          <div style="font-size: 14px; color: var(--text-secondary); line-height: 1.8;">${comp.analysis}</div>
+          <div style="margin-top: 16px; padding: 12px; background: rgba(212,168,67,0.1); border-radius: 8px; font-size: 14px;">
+            💡 ${comp.advice}
+          </div>
+        </div>
+      `;
+    }
+  } catch (err) {
+    resultDiv.innerHTML = '<p style="color: var(--text-muted); text-align: center;">分析失败，请稍后重试</p>';
+  }
+}
+
+// 加载用户今日运势
+{% if session.get('user_id') and daily_fortune %}
+document.addEventListener('DOMContentLoaded', function() {
+  const fortune = {{ daily_fortune | tojson }};
+  const container = document.getElementById('myFortuneDashboard');
+  if (container && fortune) {
+    container.innerHTML = `
+      <div class="fortune-card" style="background: transparent; border: none;">
+        <div class="fortune-score" style="background: ${fortune.color}20; color: ${fortune.color}; width: 72px; height: 72px;">
+          <div class="fortune-score-num" style="font-size: 28px;">${fortune.score}</div>
+          <div class="fortune-score-label" style="font-size: 11px;">${fortune.level_text}</div>
+        </div>
+        <div class="fortune-info">
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <div class="fortune-title" style="font-size: 16px;">${fortune.day_ganzhi}日</div>
+            <span style="font-size: 12px; color: var(--text-muted);">今日运势</span>
+          </div>
+          <div class="fortune-summary" style="margin: 6px 0;">${fortune.summary}</div>
+          <div class="fortune-tips" style="flex-wrap: wrap; gap: 10px;">
+            <span>🎨 幸运色: ${fortune.lucky_color}</span>
+            <span>🔢 幸运数: ${fortune.lucky_number}</span>
+            <span>🧭 吉方: ${fortune.lucky_direction}</span>
+          </div>
+        </div>
+      </div>
+    `;
+  }
+});
+{% endif %}
+</script>
 {% endblock %}

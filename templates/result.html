@@ -1,175 +1,334 @@
 {% extends "base.html" %}
 {% block content %}
 <div class="container">
-<h1 data-i18n="result_title">八字分析结果</h1>
-
-<div id="baziWrap">
-  <div class="bazi-grid">
-    {% for pillar_key in ['year', 'month', 'day', 'hour'] %}
-      {% set pillar = result.bazi_detail[pillar_key] %}
-      <div class="bazi-pillar">
-        <div class="label" data-i18n="{{ pillar_key }}_pillar"></div>
-        
-        {% if pillar.gan != '-' %}
-            <!-- Na Yin -->
-            <div class="nayin-badge" data-i18n="{{ pillar.nayin_key }}"></div>
-            
-            <div class="gan {{ 'wx-' + (pillar.gan_wx or '') }}">{{ pillar.gan }}</div>
-            
-            <div class="zhi {{ 'wx-' + (pillar.zhi_wx or '') }} {{ 'kongwang' if pillar.is_kw else '' }}">
-                {{ pillar.zhi }}
-                {% if pillar.is_kw %}<span class="kw-tag" data-i18n="kongwang">空</span>{% endif %}
-            </div>
-
-            <!-- Hidden Stems & Sub-stars -->
-            <div class="hidden-stems">
-                {% for stem in pillar.hidden_stems %}
-                    {% set idx = loop.index0 %}
-                    <div class="stem-row">
-                        <span class="sub-star" data-i18n="{{ pillar.sub_stars[idx].key }}"></span>
-                        <span class="stem-char {{ 'wx-' + (pillar.hidden_stems_wx[idx] or '') }}">{{ stem }}</span>
-                    </div>
-                {% endfor %}
-            </div>
-
-            <!-- Shensha -->
-            <div class="pillar-shensha">
-                {% for s in pillar.shensha %}
-                    <span class="shensha-tag" data-i18n="{{ s.name_key }}" title-i18n="{{ s.desc_key }}"></span>
-                {% endfor %}
-            </div>
-        {% else %}
-            <div class="gan">-</div>
-            <div class="zhi">-</div>
-        {% endif %}
-      </div>
-    {% endfor %}
-  </div>
-  <button class="primary-btn zoom-toggle" id="zoomBtn" data-i18n="zoom_bazi">放大展示</button>
-</div>
-
-<!-- 五行强弱 -->
-<details open class="year-card">
-  <summary data-i18n="wuxing_strength_title">五行强弱</summary>
-  <div class="wuxing-chart-container">
-      {% for wx, score in result.wuxing_strength.items() %}
-      <div class="wuxing-progress-item">
-          <div class="wuxing-label">
-              <span data-i18n="wuxing_{{ wx }}"></span>
-              <span class="wuxing-score">{{ score }}</span>
-          </div>
-          <div class="progress-track">
-              <!-- Score usually ranges 0-100 or so, we cap it visual at 100% but relative strength matters. 
-                   Assuming max score is around 50-100. Let's use score directly as % or scale it. 
-                   If score is raw count, maybe max is higher. Let's assume standard Bazi scores. 
-                   Let's assume max is around 100 for safety, or relative. 
-                   Let's use a safe multiplier, e.g. score. -->
-              <div class="progress-fill wx-bg-{{ wx }}" style="width: {{ score }}%; max-width: 100%;"></div>
-          </div>
-      </div>
-      {% endfor %}
-  </div>
-</details>
-
-<!-- 神煞信息 (汇总) -->
-<details open class="year-card">
-  <summary data-i18n="shensha_title">神煞信息</summary>
-      <ul class="shensha-list">
-    {% for s in result.shensha %}
-      <li>
-        <strong data-i18n="{{ s.name_key }}" class="shensha-name"></strong> 
-        (<span data-i18n="{{ (s.pillar_key | replace('pillar_', '')) ~ '_pillar' }}"></span>): 
-        <span data-i18n="{{ s.desc_key }}"></span>
-      </li>
-    {% else %}
-      <li data-i18n="shensha_none">无明显神煞</li>
-    {% endfor %}
-  </ul>
-</details>
-
-<!-- 性格与身强 -->
-<details open class="year-card">
-  <summary data-i18n="personality_title">性格与用神</summary>
-  <div class="analysis-section">
-      <p><strong data-i18n="body_strength_label">身强身弱：</strong><span data-i18n="{{ result.personality.body_strength_key }}"></span> - <span data-i18n="{{ result.personality.body_strength_desc_key }}"></span></p>
-      <p><strong data-i18n="personality_label">性格特征：</strong><span data-i18n="{{ result.personality.personality_key }}"></span></p>
-      <p><strong data-i18n="strength_label">优势：</strong><span data-i18n="{{ result.personality.strength_key }}"></span></p>
-      <p><strong data-i18n="core_risk_label">核心风险：</strong><span data-i18n="{{ result.personality.risk_key }}"></span></p>
-  </div>
   
-  <div class="advice-section" style="margin-top: 15px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 10px;">
-      <h4 data-i18n="general_advice_title">综合建议</h4>
-      <ul>
-        <li><strong data-i18n="career_advice_label">事业建议：</strong> <span data-i18n="{{ result.personality.career_advice_key }}"></span></li>
-        <li><strong data-i18n="relationship_advice_label">感情建议：</strong> <span data-i18n="{{ result.personality.relationship_advice_key }}"></span></li>
-        <li><strong data-i18n="risk_advice_label">风险提示：</strong> <span data-i18n="{{ result.personality.risk_advice_key }}"></span></li>
-      </ul>
+  <div class="page-header animate-fade">
+    <h1 class="page-title" data-i18n="result_title">八字分析结果</h1>
   </div>
 
-  <div class="advice-section" style="margin-top: 15px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 10px;">
-    <h4 data-i18n="body_strength_advice_title">身强身弱指导</h4>
-    <ul>
-        <li><strong data-i18n="career_direction_label">适合就业方向：</strong> <span data-i18n="{{ result.personality.body_strength_career_key }}"></span></li>
-        <li><strong data-i18n="daily_action_label">日常需要做的事：</strong> <span data-i18n="{{ result.personality.body_strength_daily_key }}"></span></li>
-        <li><strong data-i18n="caution_label">需要小心的事情：</strong> <span data-i18n="{{ result.personality.body_strength_caution_key }}"></span></li>
-    </ul>
-  </div>
-
-  {% if result.personality.wuxing_advice %}
-  <div class="advice-section" style="margin-top: 15px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 10px;">
-    <h4 data-i18n="wuxing_advice_title">五行平衡建议</h4>
-    <ul>
-        <li><strong data-i18n="supplement_label">建议补充：</strong> <span data-i18n="{{ result.personality.wuxing_advice.supplement_key }}"></span></li>
-        <li><strong data-i18n="control_label">建议克制：</strong> <span data-i18n="{{ result.personality.wuxing_advice.control_key }}"></span></li>
-    </ul>
-  </div>
-  {% endif %}
-</details>
-
-<!-- 大运与流年详解 -->
-<details class="year-card">
-  <summary data-i18n="dayun_title">大运分析</summary>
-  <p>
-    <span data-i18n="qiyun_start">起运</span>：{{ result.qiyun.qiyun_time }}，
-    <span data-i18n="direction">方向</span>：<span data-i18n="{{ 'direction_forward' if result.qiyun.direction=='forward' else 'direction_backward' }}"></span>
-  </p>
-
-  {% for d in result.dayun %}
-    <div class="dayun-block" style="border-left: 3px solid var(--accent-color); padding-left: 15px; margin-bottom: 25px; background: rgba(0,0,0,0.2); padding: 15px; border-radius: 5px;">
-      <h3 style="color: var(--accent-color); margin-top: 0;">{{ d.start_year }}–{{ d.end_year }}年：{{ d.gz }}大运（<span data-i18n="{{ d.theme_key }}"></span>）</h3>
-      <p class="dayun-desc"><em data-i18n="{{ d.desc_key }}"></em></p>
-      <p><strong data-i18n="advice_label">建议：</strong><span data-i18n="{{ d.advice_key }}"></span></p>
-      
-      <details>
-        <summary style="cursor: pointer; color: var(--text-secondary);"><span data-i18n="view_liunian_details">查看此大运流年详情</span> ({{ d.start_year }}-{{ d.end_year }})</summary>
-        <div class="liunian-list" style="margin-top: 10px;">
-        {% for ln in d.liunian_list %}
-          <div class="liunian-item" style="margin-top: 10px; background: rgba(255,255,255,0.05); padding: 10px; border-radius: 4px; border: 1px solid rgba(255,255,255,0.1);">
-            <h4 style="margin: 0 0 5px 0;">{{ ln.year }} {{ ln.gz }}年：<span data-i18n="{{ ln.theme_key }}"></span></h4>
-            
-            <div style="margin-bottom: 8px;">
-                <span data-i18n="{{ ln.desc_key }}"></span>
-            </div>
-            <div style="margin-bottom: 8px;">
-                <strong data-i18n="event_hint_label">可能事件：</strong><span data-i18n="{{ ln.event_hint_key }}"></span>
-            </div>
+  <!-- 四柱展示 -->
+  <div class="card animate-slide">
+    <div class="card-header">
+      <div class="card-title">
+        <span class="card-title-icon">☯</span>
+        <span data-i18n="bazi_overview">四柱八字</span>
+      </div>
+    </div>
+    <div id="baziWrap">
+      <div class="pillars-grid">
+        {% for pillar_key in ['year', 'month', 'day', 'hour'] %}
+          {% set pillar = result.bazi_detail[pillar_key] %}
+          <div class="pillar-card">
+            <div class="pillar-label" data-i18n="{{ pillar_key }}_pillar"></div>
+            {% if pillar.gan != '-' %}
+              <div class="pillar-nayin" data-i18n="{{ pillar.nayin_key }}"></div>
+              <div class="pillar-gan {{ 'wx-' + (pillar.gan_wx or '') }}">{{ pillar.gan }}</div>
+              <div class="pillar-zhi {{ 'wx-' + (pillar.zhi_wx or '') }}">{{ pillar.zhi }}</div>
+              <div class="shensha-tags">
+                {% for s in pillar.shensha %}
+                  <span class="shensha-tag" data-i18n="{{ s.name_key }}" title-i18n="{{ s.desc_key }}"></span>
+                {% endfor %}
+              </div>
+            {% else %}
+              <div class="pillar-gan">-</div>
+              <div class="pillar-zhi">-</div>
+            {% endif %}
           </div>
         {% endfor %}
-        </div>
-      </details>
+      </div>
     </div>
-  {% endfor %}
-</details>
+  </div>
 
-<div class="footer-links">
-  <a href="/" data-i18n="back">返回</a>
+  <!-- AI 智能分析 -->
+  <div class="ai-section animate-slide">
+    <div class="ai-header">
+      <div class="ai-title">✨ <span data-i18n="ai_analysis_title">AI 智能分析</span></div>
+      <span class="ai-tag">DeepSeek</span>
+    </div>
+    <div class="ai-content" id="aiContent">
+      <p style="color: var(--text-muted);" data-i18n="ai_loading">正在生成个性化分析...</p>
+    </div>
+  </div>
+
+  <!-- 五行强弱 -->
+  <div class="card animate-slide">
+    <div class="card-header">
+      <div class="card-title">
+        <span class="card-title-icon">📊</span>
+        <span data-i18n="wuxing_strength_title">五行强弱</span>
+      </div>
+    </div>
+    <div class="wuxing-bars">
+      {% for wx, score in result.wuxing_strength.items() %}
+      <div class="wuxing-bar">
+        <span class="wuxing-label wx-{{ wx }}" data-i18n="wuxing_{{ wx }}"></span>
+        <div class="wuxing-track">
+          <div class="wuxing-fill wuxing-fill-{{ wx }}" style="width: {{ score }}%;"></div>
+        </div>
+        <span class="wuxing-value">{{ score|int }}</span>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+
+  <!-- 性格与用神 -->
+  <div class="card animate-slide">
+    <div class="card-header">
+      <div class="card-title">
+        <span class="card-title-icon">👤</span>
+        <span data-i18n="personality_title">性格与用神</span>
+      </div>
+    </div>
+    <div style="display: flex; flex-direction: column; gap: 14px;">
+      <div>
+        <div style="color: var(--text-muted); font-size: 12px; margin-bottom: 4px;" data-i18n="body_strength_label">身强身弱</div>
+        <div style="font-size: 15px;">
+          <span data-i18n="{{ result.personality.body_strength_key }}"></span>
+          <span style="color: var(--text-muted);"> — </span>
+          <span data-i18n="{{ result.personality.body_strength_desc_key }}"></span>
+        </div>
+      </div>
+      <div>
+        <div style="color: var(--text-muted); font-size: 12px; margin-bottom: 4px;" data-i18n="personality_label">性格特征</div>
+        <div style="font-size: 15px;" data-i18n="{{ result.personality.personality_key }}"></div>
+      </div>
+      <div>
+        <div style="color: var(--text-muted); font-size: 12px; margin-bottom: 4px;" data-i18n="strength_label">优势</div>
+        <div style="font-size: 15px;" data-i18n="{{ result.personality.strength_key }}"></div>
+      </div>
+      <div>
+        <div style="color: var(--text-muted); font-size: 12px; margin-bottom: 4px;" data-i18n="core_risk_label">核心风险</div>
+        <div style="font-size: 15px;" data-i18n="{{ result.personality.risk_key }}"></div>
+      </div>
+    </div>
+    <div class="divider"></div>
+    <div style="font-size: 14px; font-weight: 600; margin-bottom: 12px;" data-i18n="general_advice_title">综合建议</div>
+    <div style="display: flex; flex-direction: column; gap: 10px; font-size: 14px;">
+      <div>💼 <span data-i18n="career_advice_label">事业：</span><span data-i18n="{{ result.personality.career_advice_key }}"></span></div>
+      <div>💕 <span data-i18n="relationship_advice_label">感情：</span><span data-i18n="{{ result.personality.relationship_advice_key }}"></span></div>
+      <div>⚠️ <span data-i18n="risk_advice_label">风险：</span><span data-i18n="{{ result.personality.risk_advice_key }}"></span></div>
+    </div>
+  </div>
+
+  <!-- 每日运势 -->
+  <div class="card animate-slide">
+    <div class="card-header">
+      <div class="card-title">
+        <span class="card-title-icon">📅</span>
+        <span data-i18n="daily_fortune_title">每日运势</span>
+      </div>
+    </div>
+    <div id="dailyFortune">
+      <div class="skeleton skeleton-text" style="width: 80%;"></div>
+    </div>
+  </div>
+
+  <!-- 大运 + 流年详解 -->
+  <div class="card animate-slide">
+    <div class="card-header">
+      <div class="card-title">
+        <span class="card-title-icon">📈</span>
+        大运流年详解
+      </div>
+    </div>
+    
+    <div style="margin-bottom: 16px; font-size: 14px;">
+      起运：{{ result.qiyun.qiyun_time }}，方向：
+      <span data-i18n="{{ 'direction_forward' if result.qiyun.direction=='forward' else 'direction_backward' }}"></span>
+    </div>
+
+    {% for d in result.dayun %}
+    <div style="margin-bottom: 24px; padding: 16px; background: var(--bg-secondary); border-radius: var(--radius-md); border: 1px solid var(--border);">
+      <!-- 大运标题 -->
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+        <div>
+          <div style="font-size: 18px; font-weight: 700; color: var(--gold);">{{ d.gz }}大运</div>
+          <div style="font-size: 13px; color: var(--text-muted);">{{ d.start_year }}-{{ d.end_year }}年</div>
+        </div>
+        {% if result.dayun_comprehensive and loop.index0 < result.dayun_comprehensive|length %}
+        <div style="text-align: center; padding: 8px 12px; background: rgba(212,168,67,0.1); border-radius: 8px;">
+          <div style="font-size: 20px; font-weight: 700; color: var(--gold);">{{ result.dayun_comprehensive[loop.index0].overall_score }}</div>
+          <div style="font-size: 10px; color: var(--text-muted);">综合评分</div>
+        </div>
+        {% endif %}
+      </div>
+
+      <!-- 大运主题 -->
+      <div style="font-size: 14px; color: var(--text); margin-bottom: 8px;" data-i18n="{{ d.theme_key }}"></div>
+      <div style="font-size: 13px; color: var(--text-secondary); margin-bottom: 12px;" data-i18n="{{ d.advice_key }}"></div>
+
+      <!-- 大运6维度 -->
+      {% if result.dayun_comprehensive and loop.index0 < result.dayun_comprehensive|length %}
+      {% set comp = result.dayun_comprehensive[loop.index0] %}
+      <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 12px;">
+        <div style="padding: 8px; background: rgba(255,255,255,0.03); border-radius: 6px; font-size: 12px;">
+          <div style="color: var(--text-muted); margin-bottom: 2px;">💪 健康</div>
+          <div style="color: var(--text-secondary);">{{ comp.health.summary }}</div>
+        </div>
+        <div style="padding: 8px; background: rgba(255,255,255,0.03); border-radius: 6px; font-size: 12px;">
+          <div style="color: var(--text-muted); margin-bottom: 2px;">💕 感情</div>
+          <div style="color: var(--text-secondary);">{{ comp.love.summary }}</div>
+        </div>
+        <div style="padding: 8px; background: rgba(255,255,255,0.03); border-radius: 6px; font-size: 12px;">
+          <div style="color: var(--text-muted); margin-bottom: 2px;">💰 财运</div>
+          <div style="color: var(--text-secondary);">{{ comp.wealth.summary }}</div>
+        </div>
+        <div style="padding: 8px; background: rgba(255,255,255,0.03); border-radius: 6px; font-size: 12px;">
+          <div style="color: var(--text-muted); margin-bottom: 2px;">💼 事业</div>
+          <div style="color: var(--text-secondary);">{{ comp.career.summary }}</div>
+        </div>
+        <div style="padding: 8px; background: rgba(255,255,255,0.03); border-radius: 6px; font-size: 12px;">
+          <div style="color: var(--text-muted); margin-bottom: 2px;">📚 学业</div>
+          <div style="color: var(--text-secondary);">{{ comp.exam.summary }}</div>
+        </div>
+        <div style="padding: 8px; background: rgba(255,255,255,0.03); border-radius: 6px; font-size: 12px;">
+          <div style="color: var(--text-muted); margin-bottom: 2px;">👥 友情</div>
+          <div style="color: var(--text-secondary);">{{ comp.friendship.summary }}</div>
+        </div>
+      </div>
+      {% endif %}
+
+      <!-- 流年列表 -->
+      <div style="margin-top: 12px;">
+        <div style="font-size: 14px; font-weight: 600; margin-bottom: 8px;">流年运势</div>
+        {% for ln in d.liunian_list %}
+        <div style="padding: 12px; background: rgba(255,255,255,0.02); border-radius: 8px; margin-bottom: 8px; border-left: 3px solid var(--gold);">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+            <div style="font-size: 14px; font-weight: 600;">{{ ln.year }}年 {{ ln.gz }}</div>
+            <span style="font-size: 11px; color: var(--text-muted);" data-i18n="{{ ln.theme_key }}"></span>
+          </div>
+          
+          {% if result.liunian_comprehensive %}
+          {% set ln_comp = result.liunian_comprehensive[loop.index0] %}
+          <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 6px; font-size: 11px; margin-bottom: 6px;">
+            <div>💪 {{ ln_comp.health.summary }}</div>
+            <div>💕 {{ ln_comp.love.summary }}</div>
+            <div>💰 {{ ln_comp.wealth.summary }}</div>
+            <div>💼 {{ ln_comp.career.summary }}</div>
+            <div>📚 {{ ln_comp.exam.summary }}</div>
+            <div>👥 {{ ln_comp.friendship.summary }}</div>
+          </div>
+          <div style="font-size: 11px; color: var(--text-muted); display: flex; gap: 12px;">
+            <span>📌 {{ ln_comp.likely_events[0] if ln_comp.likely_events else '' }}</span>
+            <span>⚠️ {{ ln_comp.watch_out[0] if ln_comp.watch_out else '' }}</span>
+          </div>
+          {% else %}
+          <div style="font-size: 12px; color: var(--text-secondary);">
+            <span data-i18n="{{ ln.desc_key }}"></span>
+          </div>
+          {% endif %}
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+
+  <!-- 功能按钮 -->
+  <div class="actions-grid animate-slide">
+    <div class="action-card" onclick="exportPDF()">
+      <div class="action-icon">📄</div>
+      <span class="action-label" data-i18n="export_pdf">导出PDF</span>
+    </div>
+    <div class="action-card" onclick="generateShareCard()">
+      <div class="action-icon">📤</div>
+      <span class="action-label" data-i18n="share_card">分享卡</span>
+    </div>
+    <a href="/" class="action-card">
+      <div class="action-icon">🔄</div>
+      <span class="action-label" data-i18n="back">重新排盘</span>
+    </a>
+  </div>
+
 </div>
-</div>
+
 <script>
-  const zoomBtn = document.getElementById('zoomBtn');
-  const wrap = document.getElementById('baziWrap');
-  zoomBtn.addEventListener('click', ()=>{
-    wrap.classList.toggle('zoom-on');
-  });
+  const baziResult = {{ result_json | safe }};
+
+  // AI 分析
+  const aiContent = document.getElementById('aiContent');
+  async function loadAIAnalysis() {
+    try {
+      const response = await fetch('/api/ai-analysis', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ result: baziResult, lang: currentLang || 'zh', stream: true })
+      });
+      if (!response.ok) throw new Error('AI service unavailable');
+      const reader = response.body.getReader();
+      const decoder = new TextDecoder();
+      let fullText = '', buffer = '';
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        buffer += decoder.decode(value, { stream: true });
+        const lines = buffer.split('\n');
+        buffer = lines.pop();
+        for (const line of lines) {
+          if (line.startsWith('data: ')) {
+            const data = line.slice(6);
+            if (data === '[DONE]') { aiContent.innerHTML = formatText(fullText); return; }
+            try {
+              const parsed = JSON.parse(data);
+              if (parsed.content) { fullText += parsed.content; aiContent.innerHTML = formatText(fullText) + '<span class="ai-cursor"></span>'; }
+              if (parsed.error) { aiContent.innerHTML = '<p style="color: var(--text-muted);">' + parsed.error + '</p>'; return; }
+            } catch (e) {}
+          }
+        }
+      }
+      aiContent.innerHTML = formatText(fullText);
+    } catch (err) {
+      aiContent.innerHTML = '<p style="color: var(--text-muted); font-style: italic;">' + (I18N.ai_load_fail || 'AI 分析加载失败') + '</p>';
+    }
+  }
+  function formatText(text) { return text.split('\n').filter(p => p.trim()).map(p => '<p>' + p + '</p>').join(''); }
+
+  // 每日运势
+  async function loadDailyFortune() {
+    try {
+      const response = await fetch('/api/daily-fortune', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ result: baziResult })
+      });
+      const fortune = await response.json();
+      const container = document.getElementById('dailyFortune');
+      if (fortune.error) { container.innerHTML = '<p style="color: var(--text-muted);">' + (I18N.fortune_load_fail || '运势加载失败') + '</p>'; return; }
+      container.innerHTML = `
+        <div class="fortune-card">
+          <div class="fortune-score" style="background: ${fortune.color}20; color: ${fortune.color};">
+            <div class="fortune-score-num">${fortune.score}</div>
+            <div class="fortune-score-label">${fortune.level_text}</div>
+          </div>
+          <div class="fortune-info">
+            <div class="fortune-title">${fortune.day_ganzhi}日</div>
+            <div class="fortune-summary">${fortune.summary}</div>
+            <div class="fortune-tips">
+              <span>🎨 ${I18N.lucky_color || '幸运色'}: ${fortune.lucky_color}</span>
+              <span>🔢 ${I18N.lucky_number || '幸运数'}: ${fortune.lucky_number}</span>
+              <span>🧭 ${I18N.lucky_direction || '吉方'}: ${fortune.lucky_direction}</span>
+            </div>
+          </div>
+        </div>
+      `;
+    } catch (err) {
+      document.getElementById('dailyFortune').innerHTML = '<p style="color: var(--text-muted);">' + (I18N.fortune_load_fail || '运势加载失败') + '</p>';
+    }
+  }
+
+  function generateShareCard() {
+    fetch('/api/share-card', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ result: baziResult }) })
+    .then(r => { if (!r.ok) throw new Error(); return r.blob(); })
+    .then(blob => { const u = URL.createObjectURL(blob); const a = document.createElement('a'); a.href = u; a.download = 'bazi_card.png'; a.click(); URL.revokeObjectURL(u); })
+    .catch(() => alert(I18N.share_card_fail || '分享卡生成失败'));
+  }
+  function exportPDF() {
+    fetch('/api/export-pdf', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ result: baziResult }) })
+    .then(r => { if (!r.ok) throw new Error(); return r.blob(); })
+    .then(blob => { const u = URL.createObjectURL(blob); const a = document.createElement('a'); a.href = u; a.download = 'bazi_report.pdf'; a.click(); URL.revokeObjectURL(u); })
+    .catch(() => alert(I18N.pdf_export_fail || 'PDF导出失败'));
+  }
+
+  setTimeout(loadAIAnalysis, 500);
+  setTimeout(loadDailyFortune, 800);
 </script>
 {% endblock %}
