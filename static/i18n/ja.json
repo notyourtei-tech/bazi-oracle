@@ -733,5 +733,10 @@
   "hero_stat_free": "無料",
   "bazi_history_desc": "過去のチャート記録を確認",
   "bazi_learn_desc": "八字の知識を探索",
-  "bazi_compat_desc": "二人の相性を分析"
+  "bazi_compat_desc": "二人の相性を分析",
+  "err_invalid_country": "有効な出生国を選択してください",
+  "err_invalid_date": "有効な出生日を入力してください（YYYY-MM-DD）",
+  "err_invalid_time": "有効な出生時間を入力してください（HH:MM）",
+  "err_invalid_gender": "有効な性別を選択してください",
+  "err_invalid_name": "名前は中文字、英数字のみ使用できます"
 }

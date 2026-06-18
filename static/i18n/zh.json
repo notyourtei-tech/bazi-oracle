@@ -884,5 +884,10 @@
   "hero_stat_free": "免费使用",
   "bazi_history_desc": "查看过去的排盘记录",
   "bazi_learn_desc": "探索命理知识",
-  "bazi_compat_desc": "分析两人八字缘分"
+  "bazi_compat_desc": "分析两人八字缘分",
+  "err_invalid_country": "请选择有效的出生国家",
+  "err_invalid_date": "请输入有效的出生日期（格式：YYYY-MM-DD）",
+  "err_invalid_time": "请输入有效的出生时间（格式：HH:MM）",
+  "err_invalid_gender": "请选择有效的性别",
+  "err_invalid_name": "姓名只能包含中文、字母和数字"
 }

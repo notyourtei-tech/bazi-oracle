@@ -134,7 +134,7 @@ def validate_birth_date(date_str):
         return False
     try:
         y, m, d = map(int, date_str.split('-'))
-        if y < 1900 or y > 2100:
+        if y < 1 or y > 2200:
             return False
         if m < 1 or m > 12:
             return False

@@ -733,5 +733,10 @@
   "hero_stat_free": "Miễn phí",
   "bazi_history_desc": "Xem lịch sử biểu đồ",
   "bazi_learn_desc": "Khám phá tri thức Bát Tự",
-  "bazi_compat_desc": "Phân tích tương hợp hai người"
+  "bazi_compat_desc": "Phân tích tương hợp hai người",
+  "err_invalid_country": "Vui lòng chọn quốc gia hợp lệ",
+  "err_invalid_date": "Vui lòng nhập ngày sinh hợp lệ (YYYY-MM-DD)",
+  "err_invalid_time": "Vui lòng nhập giờ sinh hợp lệ (HH:MM)",
+  "err_invalid_gender": "Vui lòng chọn giới tính hợp lệ",
+  "err_invalid_name": "Tên chỉ được chứa chữ cái, số hoặc ký tự Trung Quốc"
 }

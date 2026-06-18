@@ -887,5 +887,10 @@
   "hero_stat_free": "Free",
   "bazi_history_desc": "View past chart records",
   "bazi_learn_desc": "Explore BaZi knowledge",
-  "bazi_compat_desc": "Analyze destiny between two people"
+  "bazi_compat_desc": "Analyze destiny between two people",
+  "err_invalid_country": "Please select a valid birth country",
+  "err_invalid_date": "Please enter a valid birth date (YYYY-MM-DD)",
+  "err_invalid_time": "Please enter a valid birth time (HH:MM)",
+  "err_invalid_gender": "Please select a valid gender",
+  "err_invalid_name": "Name can only contain letters, numbers, or Chinese characters"
 }

@@ -175,15 +175,15 @@ def index():
 
         # 输入验证
         if birth_country not in VALID_COUNTRIES:
-            return render_template("index.html", error="请选择有效的出生国家")
+            return render_template("index.html", error="err_invalid_country")
         if not validate_birth_date(birth_date):
-            return render_template("index.html", error="请输入有效的出生日期（格式：YYYY-MM-DD）")
+            return render_template("index.html", error="err_invalid_date")
         if birth_time and not validate_birth_time(birth_time):
-            return render_template("index.html", error="请输入有效的出生时间（格式：HH:MM）")
+            return render_template("index.html", error="err_invalid_time")
         if gender not in VALID_GENDERS:
-            return render_template("index.html", error="请选择有效的性别")
+            return render_template("index.html", error="err_invalid_gender")
         if name and not validate_name(name):
-            return render_template("index.html", error="姓名只能包含中文、字母和数字")
+            return render_template("index.html", error="err_invalid_name")
 
         # 核心分析
         try:
@@ -242,11 +242,29 @@ def index():
             chart = Chart.query.filter_by(id=int(load_id), user_id=session["user_id"]).first()
             if chart:
                 result = json.loads(chart.result_json)
-                # Ensure required fields exist
+                # Rebuild interpretation for fresh analysis
+                try:
+                    from core.interpretation_engine import build_comprehensive_interpretation
+                    result["interpretation"] = build_comprehensive_interpretation(result)
+                except Exception as e:
+                    logger.error(f"Rebuild interpretation error: {e}")
                 result.setdefault("dayun_comprehensive", [])
                 result.setdefault("liunian_comprehensive", [])
-                result.setdefault("interpretation", {"shensha_detail": {"has_shensha": False, "summary": "", "good_stars": [], "bad_stars": [], "neutral_stars": []}})
-                # Ensure each dayun has liunian_list
+                # Rebuild comprehensive analysis
+                try:
+                    birth_date = None
+                    for d in result.get("dayun", []):
+                        if d.get("start_year"):
+                            birth_date = str(d["start_year"])
+                            break
+                    day_master_gan = result.get("bazi_detail", {}).get("day", {}).get("gan", "甲")
+                    from core.comprehensive_analysis import STEM_ELEMENT
+                    dm_elem = STEM_ELEMENT.get(day_master_gan, "木")
+                    if not result["dayun_comprehensive"]:
+                        birth_year = int(birth_date) if birth_date else 1990
+                        result["dayun_comprehensive"] = analyze_dayun_comprehensive(result.get("dayun", []), birth_year, dm_elem)
+                except Exception as e:
+                    logger.error(f"Rebuild comprehensive error: {e}")
                 for d in result.get("dayun", []):
                     d.setdefault("liunian_list", [])
                 return render_template("result.html", result=result, result_json=json.dumps(result, ensure_ascii=False))

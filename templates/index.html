@@ -65,6 +65,14 @@
     </div>
   </div>
 
+  {% if error %}
+  <div class="error-toast" id="errorToast">
+    <span class="error-icon">⚠️</span>
+    <span data-i18n="{{ error }}">{{ error }}</span>
+    <button class="error-close" onclick="this.parentElement.remove()">×</button>
+  </div>
+  {% endif %}
+
   {% if session.get('user_id') and user_chart %}
   <!-- 登录用户：今日运势仪表盘 -->
   <div class="card animate-slide" style="background: linear-gradient(135deg, rgba(212,168,67,0.08), rgba(212,168,67,0.02));">

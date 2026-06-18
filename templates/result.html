@@ -115,7 +115,11 @@
         </div>
       </div>
       <div style="margin-bottom: 16px; padding: 14px; background: rgba(212,168,67,0.08); border-radius: var(--radius-md); border-left: 3px solid var(--gold);">
+        {% if result.interpretation.shensha_detail.summary_key %}
         <div style="font-size: 14px; color: var(--text); line-height: 1.6;" data-i18n="{{ result.interpretation.shensha_detail.summary_key }}"></div>
+        {% elif result.interpretation.shensha_detail.summary %}
+        <div style="font-size: 14px; color: var(--text); line-height: 1.6;">{{ result.interpretation.shensha_detail.summary }}</div>
+        {% endif %}
       </div>
       {% for star_type, stars, color, icon in [
         ('shensha_good_stars', result.interpretation.shensha_detail.good_stars, '#4ade80', '🌟'),
@@ -128,10 +132,18 @@
           {% for star in stars %}
           <div style="margin-bottom: 12px; padding: 14px; background: rgba({{ '74,222,128' if loop.cycle0 == 0 else '248,113,113' if loop.cycle0 == 1 else '96,165,250' }},0.06); border-radius: var(--radius-md); border-left: 3px solid {{ color }};">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
-              <div style="font-size: 15px; font-weight: 700;"><span data-i18n="{{ star.name_key }}"></span></div>
-              <span style="font-size: 11px; padding: 2px 8px; background: rgba(255,255,255,0.08); border-radius: 10px;"><span data-i18n="{{ star.pillar_key }}"></span> · <span data-i18n="{{ star.category_key }}"></span></span>
+              <div style="font-size: 15px; font-weight: 700;">
+                {% if star.name_key %}<span data-i18n="{{ star.name_key }}"></span>{% elif star.name %}{{ star.name }}{% endif %}
+              </div>
+              <span style="font-size: 11px; padding: 2px 8px; background: rgba(255,255,255,0.08); border-radius: 10px;">
+                {% if star.pillar_key %}<span data-i18n="{{ star.pillar_key }}"></span>{% elif star.pillar %}{{ star.pillar }}{% endif %}
+                 · 
+                {% if star.category_key %}<span data-i18n="{{ star.category_key }}"></span>{% elif star.category %}{{ star.category }}{% endif %}
+              </span>
             </div>
-            <div style="font-size: 13px; color: var(--text); line-height: 1.6;" data-i18n="{{ star.detail_key }}"></div>
+            <div style="font-size: 13px; color: var(--text); line-height: 1.6;">
+              {% if star.detail_key %}<span data-i18n="{{ star.detail_key }}"></span>{% elif star.detail %}{{ star.detail }}{% endif %}
+            </div>
           </div>
           {% endfor %}
         </div>
@@ -181,7 +193,7 @@
       <div style="margin-bottom: 12px; padding: 14px; background: var(--bg-secondary); border-radius: var(--radius-md); border: 1px solid var(--border);">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
           <div style="font-size: 15px; font-weight: 700;"><span data-i18n="pillar_{{ pillar.pillar_name }}"></span>（{{ pillar.gan }}）</div>
-          <span style="font-size: 13px; padding: 3px 10px; background: rgba(212,168,67,0.15); border-radius: 12px; color: var(--gold);"><span data-i18n="shishen_{{ pillar.shishen_key }}"></span></span>
+          <span style="font-size: 13px; padding: 3px 10px; background: rgba(212,168,67,0.15); border-radius: 12px; color: var(--gold);"><span data-i18n="{{ pillar.shishen_key }}"></span></span>
         </div>
         <div style="font-size: 13px; color: var(--text-muted); margin-bottom: 6px;" data-i18n="{{ pillar.meaning_key }}"></div>
         <div style="font-size: 13px; color: var(--text); line-height: 1.5;" data-i18n="{{ pillar.personality_key }}"></div>
@@ -200,7 +212,11 @@
         </div>
       </div>
       <div style="padding: 14px; background: rgba(212,168,67,0.08); border-radius: var(--radius-md); border-left: 3px solid var(--gold); margin-bottom: 16px;">
+        {% if result.interpretation.personality_detail.analysis_key %}
         <div style="font-size: 14px; color: var(--text); line-height: 1.6;" data-i18n="{{ result.interpretation.personality_detail.analysis_key }}"></div>
+        {% elif result.interpretation.personality_detail.analysis %}
+        <div style="font-size: 14px; color: var(--text); line-height: 1.6;">{{ result.interpretation.personality_detail.analysis }}</div>
+        {% endif %}
       </div>
       <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
         <div style="padding: 12px; background: var(--bg-secondary); border-radius: var(--radius-sm);">

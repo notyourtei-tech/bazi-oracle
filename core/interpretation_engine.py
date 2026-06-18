@@ -232,6 +232,12 @@ SHISHEN_I18N = {
     "正官": "Direct Officer", "七杀": "Seven Killings", "正印": "Direct Resource", "偏印": "Indirect Resource"
 }
 
+SHISHEN_CHINESE_TO_KEY = {
+    "比肩": "bijian", "劫财": "jiecai", "食神": "shishen",
+    "伤官": "shangguan", "正财": "zhengcai", "偏财": "piancai",
+    "正官": "zhengguan", "七杀": "qisha", "正印": "zhengyin", "偏印": "pianyin"
+}
+
 def _build_shensha_detail(shensha_list):
     """构建神煞详细解释"""
     if not shensha_list:
@@ -391,9 +397,9 @@ def _build_shishen_detail(bazi_detail):
             "pillar_name": pillar_key,
             "gan": gan,
             "shishen": shishen,
-            "shishen_key": f"shishen_{shishen}",
-            "meaning_key": f"shishen_{shishen}_meaning",
-            "personality_key": f"shishen_{shishen}_personality",
+            "shishen_key": f"shishen_{SHISHEN_CHINESE_TO_KEY.get(shishen, shishen)}",
+            "meaning_key": f"shishen_{SHISHEN_CHINESE_TO_KEY.get(shishen, shishen)}_meaning",
+            "personality_key": f"shishen_{SHISHEN_CHINESE_TO_KEY.get(shishen, shishen)}_personality",
             "hidden_stars": [{"name": s.get("name", ""), "key": s.get("key", "")} for s in hidden_stars]
         })
     
