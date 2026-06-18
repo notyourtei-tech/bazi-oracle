@@ -2,7 +2,7 @@
 {% block content %}
 <div class="container">
   <div class="page-header animate-fade">
-    <h1 class="page-title">注册</h1>
+    <h1 class="page-title" data-i18n="register">注册</h1>
   </div>
 
   <div class="card animate-slide" style="max-width: 400px; margin: 0 auto;">
@@ -13,21 +13,22 @@
     {% endif %}
 
     <form method="post">
+      <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
       <div class="form-group" style="margin-bottom: 16px;">
-        <label class="form-label">姓名</label>
-        <input type="text" name="username" class="form-input" placeholder="请输入姓名" required autocomplete="username">
+        <label class="form-label" data-i18n="name">姓名</label>
+        <input type="text" name="username" class="form-input" data-i18n-placeholder="name_placeholder" placeholder="请输入姓名" required autocomplete="username" maxlength="20">
       </div>
       
       <div class="form-group" style="margin-bottom: 24px;">
-        <label class="form-label">密码</label>
-        <input type="password" name="password" class="form-input" placeholder="请设置密码（至少6位）" required minlength="6" autocomplete="new-password">
+        <label class="form-label" data-i18n="password">密码</label>
+        <input type="password" name="password" class="form-input" data-i18n-placeholder="password_placeholder_long" placeholder="请设置密码（至少8位，含字母和数字）" required minlength="8" autocomplete="new-password">
       </div>
 
-      <button type="submit" class="btn btn-primary btn-block btn-lg">注册</button>
+      <button type="submit" class="btn btn-primary btn-block btn-lg" data-i18n="register">注册</button>
     </form>
 
     <div style="text-align: center; margin-top: 20px; font-size: 14px;">
-      <a href="/login" style="color: var(--gold); text-decoration: none;">已有账号，去登录</a>
+      <a href="/login" style="color: var(--gold); text-decoration: none;" data-i18n="go_login">去登录</a>
     </div>
   </div>
 </div>

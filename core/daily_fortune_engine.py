@@ -102,41 +102,40 @@ def calc_daily_fortune(bazi_result, target_date=None):
     # Determine fortune level
     if score >= 75:
         level = "excellent"
-        level_text = "大吉"
+        level_text_key = "fortune_level_excellent"
         color = "#8fd19e"
     elif score >= 60:
         level = "good"
-        level_text = "吉"
+        level_text_key = "fortune_level_good"
         color = "#7ec8e3"
     elif score >= 45:
         level = "neutral"
-        level_text = "平"
+        level_text_key = "fortune_level_neutral"
         color = "#e0c36b"
     elif score >= 30:
         level = "caution"
-        level_text = "注意"
+        level_text_key = "fortune_level_caution"
         color = "#ff826e"
     else:
         level = "challenging"
-        level_text = "挑战"
+        level_text_key = "fortune_level_challenging"
         color = "#b00020"
     
-    # Lucky elements
-    lucky_colors = {
-        "wood": "绿色", "fire": "红色", "earth": "黄色",
-        "metal": "白色", "water": "黑色/蓝色"
+    # Lucky elements - use i18n keys
+    lucky_color_keys = {
+        "wood": "lucky_color_wood", "fire": "lucky_color_fire", "earth": "lucky_color_earth",
+        "metal": "lucky_color_metal", "water": "lucky_color_water"
+    }
+    lucky_direction_keys = {
+        "wood": "lucky_dir_wood", "fire": "lucky_dir_fire", "earth": "lucky_dir_earth",
+        "metal": "lucky_dir_metal", "water": "lucky_dir_water"
     }
     lucky_numbers = {
         "wood": "3, 8", "fire": "2, 7", "earth": "5, 0",
         "metal": "4, 9", "water": "1, 6"
     }
-    lucky_directions = {
-        "wood": "东方", "fire": "南方", "earth": "中央/本地",
-        "metal": "西方", "water": "北方"
-    }
     
     # Determine what element to supplement today
-    # Look at what's weak in the chart
     wuxing = bazi_result.get("wuxing_strength", {})
     min_wx = min(wuxing.items(), key=lambda x: x[1])[0] if wuxing else "wood"
     
@@ -148,53 +147,42 @@ def calc_daily_fortune(bazi_result, target_date=None):
         "shishen": shishen,
         "score": score,
         "level": level,
-        "level_text": level_text,
+        "level_text_key": level_text_key,
         "color": color,
-        "lucky_color": lucky_colors.get(min_wx, "金色"),
+        "lucky_color_key": lucky_color_keys.get(min_wx, "lucky_color_wood"),
         "lucky_number": lucky_numbers.get(min_wx, "6, 8"),
-        "lucky_direction": lucky_directions.get(min_wx, "南方"),
-        "avoid_color": lucky_colors.get(dm_wx, "红色"),
-        "summary": _generate_summary(shishen, level, dm_wx, today_gan_wx),
+        "lucky_direction_key": lucky_direction_keys.get(min_wx, "lucky_dir_wood"),
+        "summary_key": _generate_summary_key(shishen, level),
     }
 
 
-def _generate_summary(shishen, level, dm_wx, today_wx):
-    """Generate a brief fortune summary."""
-    summaries = {
+def _generate_summary_key(shishen, level):
+    """Generate a fortune summary i18n key."""
+    summary_keys = {
         "excellent": {
-            "比肩": "今日适合与人合作，社交运旺盛。",
-            "劫财": "今日人际活跃，注意理财。",
-            "食神": "今日心情愉快，适合创作和学习。",
-            "伤官": "今日创意十足，适合突破创新。",
-            "正财": "今日财运稳定，适合正经生意。",
-            "偏财": "今日有意外收获，适合投资。",
-            "正官": "今日事业运好，利于升职。",
-            "七杀": "今日有挑战但能克服。",
-            "正印": "今日贵人运好，适合学习。",
-            "偏印": "今日灵感丰富，适合研究。",
+            "比肩": "fortune_sum_bijian_excellent", "劫财": "fortune_sum_jiecai_excellent",
+            "食神": "fortune_sum_shishen_excellent", "伤官": "fortune_sum_shangguan_excellent",
+            "正财": "fortune_sum_zhengcai_excellent", "偏财": "fortune_sum_piancai_excellent",
+            "正官": "fortune_sum_zhengguan_excellent", "七杀": "fortune_sum_qisha_excellent",
+            "正印": "fortune_sum_zhengyin_excellent", "偏印": "fortune_sum_pianyin_excellent",
+            "default": "fortune_sum_default_excellent",
         },
         "good": {
-            "比肩": "今日适合团队协作。",
-            "食神": "今日心情不错，适合享受生活。",
-            "正财": "今日收入稳定。",
-            "正官": "今日工作顺利。",
-            "正印": "今日有人帮助。",
+            "比肩": "fortune_sum_bijian_good", "食神": "fortune_sum_shishen_good",
+            "正财": "fortune_sum_zhengcai_good", "正官": "fortune_sum_zhengguan_good",
+            "正印": "fortune_sum_zhengyin_good",
+            "default": "fortune_sum_default_good",
         },
-        "neutral": {
-            "default": "今日平稳，按部就班即可。",
-        },
+        "neutral": {"default": "fortune_sum_default_neutral"},
         "caution": {
-            "劫财": "今日注意破财风险。",
-            "七杀": "今日压力较大，注意休息。",
-            "伤官": "今日注意口舌是非。",
+            "劫财": "fortune_sum_jiecai_caution", "七杀": "fortune_sum_qisha_caution",
+            "伤官": "fortune_sum_shangguan_caution",
+            "default": "fortune_sum_default_caution",
         },
-        "challenging": {
-            "default": "今日宜守不宜攻，谨慎行事。",
-        },
+        "challenging": {"default": "fortune_sum_default_challenging"},
     }
-    
-    level_summaries = summaries.get(level, {})
-    return level_summaries.get(shishen, level_summaries.get("default", "今日运势平稳。"))
+    level_map = summary_keys.get(level, summary_keys["neutral"])
+    return level_map.get(shishen, level_map.get("default", "fortune_sum_default_neutral"))
 
 
 def calc_weekly_fortune(bazi_result):

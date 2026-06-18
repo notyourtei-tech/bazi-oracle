@@ -2,31 +2,80 @@
 {% block content %}
 
 <div class="container">
-<h1 data-i18n="explain_title">系统说明与免责声明</h1>
+  <div class="page-header animate-fade">
+    <h1 class="page-title" data-i18n="explain_title">系统说明与免责声明</h1>
+  </div>
 
-<h2 data-i18n="verify_title">误差说明</h2>
-<p data-i18n="verify_p1"></p>
-<p data-i18n="verify_p2"></p>
-<p data-i18n="verify_p3"></p>
+  <div class="card animate-slide">
+    <div class="card-header">
+      <div class="card-title">
+        <span class="card-title-icon">⚖️</span>
+        <span data-i18n="verify_title">误差说明</span>
+      </div>
+    </div>
+    <div style="color: var(--text-secondary); font-size: 14px; line-height: 1.8;">
+      <p data-i18n="verify_p1" style="margin-bottom: 8px;"></p>
+      <p data-i18n="verify_p2" style="margin-bottom: 8px;"></p>
+      <p data-i18n="verify_p3"></p>
+    </div>
+  </div>
 
-<h2 data-i18n="disclaimer_title">免责声明</h2>
-<p data-i18n="disclaimer_p1"></p>
-<p data-i18n="disclaimer_p2"></p>
-<p data-i18n="disclaimer_p3"></p>
+  <div class="card animate-slide">
+    <div class="card-header">
+      <div class="card-title">
+        <span class="card-title-icon">📜</span>
+        <span data-i18n="disclaimer_title">免责声明</span>
+      </div>
+    </div>
+    <div style="color: var(--text-secondary); font-size: 14px; line-height: 1.8;">
+      <p data-i18n="disclaimer_p1" style="margin-bottom: 8px;"></p>
+      <p data-i18n="disclaimer_p2" style="margin-bottom: 8px;"></p>
+      <p data-i18n="disclaimer_p3"></p>
+    </div>
+  </div>
 
-<h2 data-i18n="wuxing_explain_title">五行说明</h2>
-<p data-i18n="wuxing_explain_p1"></p>
-<p data-i18n="wuxing_explain_p2"></p>
+  <div class="card animate-slide">
+    <div class="card-header">
+      <div class="card-title">
+        <span class="card-title-icon">🔥</span>
+        <span data-i18n="wuxing_explain_title">五行说明</span>
+      </div>
+    </div>
+    <div style="color: var(--text-secondary); font-size: 14px; line-height: 1.8;">
+      <p data-i18n="wuxing_explain_p1" style="margin-bottom: 8px;"></p>
+      <p data-i18n="wuxing_explain_p2"></p>
+    </div>
+  </div>
 
-<h2 data-i18n="yongshen_explain_title">用神说明</h2>
-<p data-i18n="yongshen_explain_p1"></p>
-<p data-i18n="yongshen_explain_p2"></p>
+  <div class="card animate-slide">
+    <div class="card-header">
+      <div class="card-title">
+        <span class="card-title-icon">🔑</span>
+        <span data-i18n="yongshen_explain_title">用神说明</span>
+      </div>
+    </div>
+    <div style="color: var(--text-secondary); font-size: 14px; line-height: 1.8;">
+      <p data-i18n="yongshen_explain_p1" style="margin-bottom: 8px;"></p>
+      <p data-i18n="yongshen_explain_p2"></p>
+    </div>
+  </div>
 
-<h2 data-i18n="dayun_explain_title">大运说明</h2>
-<p data-i18n="dayun_explain_p1"></p>
-<p data-i18n="dayun_explain_p2"></p>
-<p data-i18n="dayun_explain_p3"></p>
+  <div class="card animate-slide">
+    <div class="card-header">
+      <div class="card-title">
+        <span class="card-title-icon">⏳</span>
+        <span data-i18n="dayun_explain_title">大运说明</span>
+      </div>
+    </div>
+    <div style="color: var(--text-secondary); font-size: 14px; line-height: 1.8;">
+      <p data-i18n="dayun_explain_p1" style="margin-bottom: 8px;"></p>
+      <p data-i18n="dayun_explain_p2" style="margin-bottom: 8px;"></p>
+      <p data-i18n="dayun_explain_p3"></p>
+    </div>
+  </div>
 
-<a href="/" data-i18n="back">返回</a>
+  <a href="/" class="btn btn-secondary" style="display: inline-flex; margin-top: 16px;">
+    ← <span data-i18n="back">返回</span>
+  </a>
 </div>
 {% endblock %}

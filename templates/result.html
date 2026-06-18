@@ -6,238 +6,371 @@
     <h1 class="page-title" data-i18n="result_title">八字分析结果</h1>
   </div>
 
-  <!-- 四柱展示 -->
-  <div class="card animate-slide">
-    <div class="card-header">
-      <div class="card-title">
-        <span class="card-title-icon">☯</span>
-        <span data-i18n="bazi_overview">四柱八字</span>
+  <!-- 标签导航 -->
+  <div class="tab-nav">
+    <button class="tab-btn active" onclick="switchTab('chart')" data-i18n="tab_chart">命盘</button>
+    <button class="tab-btn" onclick="switchTab('analysis')" data-i18n="tab_analysis">分析</button>
+    <button class="tab-btn" onclick="switchTab('fortune')" data-i18n="tab_fortune">运势</button>
+    <button class="tab-btn" onclick="switchTab('advice')" data-i18n="tab_advice">建议</button>
+  </div>
+
+  <!-- Tab 1: 命盘 -->
+  <div class="tab-content active" id="tab-chart">
+    <!-- 四柱展示 -->
+    <div class="card animate-slide">
+      <div class="card-header">
+        <div class="card-title">
+          <span class="card-title-icon">☯</span>
+          <span data-i18n="bazi_overview">四柱八字</span>
+        </div>
+      </div>
+      <div id="baziWrap">
+        <div class="pillars-grid">
+          {% for pillar_key in ['year', 'month', 'day', 'hour'] %}
+            {% set pillar = result.bazi_detail[pillar_key] %}
+            <div class="pillar-card">
+              <div class="pillar-label" data-i18n="{{ pillar_key }}_pillar"></div>
+              {% if pillar.gan != '-' %}
+                <div class="pillar-nayin" data-i18n="{{ pillar.nayin_key }}"></div>
+                <div class="pillar-gan {{ 'wx-' + (pillar.gan_wx or '') }}">{{ pillar.gan }}</div>
+                <div class="pillar-zhi {{ 'wx-' + (pillar.zhi_wx or '') }}">{{ pillar.zhi }}</div>
+                <div class="shensha-tags">
+                  {% for s in pillar.shensha %}
+                    <span class="shensha-tag" data-i18n="{{ s.name_key }}" title-i18n="{{ s.desc_key }}"></span>
+                  {% endfor %}
+                </div>
+              {% else %}
+                <div class="pillar-gan">-</div>
+                <div class="pillar-zhi">-</div>
+              {% endif %}
+            </div>
+          {% endfor %}
+        </div>
       </div>
     </div>
-    <div id="baziWrap">
-      <div class="pillars-grid">
-        {% for pillar_key in ['year', 'month', 'day', 'hour'] %}
-          {% set pillar = result.bazi_detail[pillar_key] %}
-          <div class="pillar-card">
-            <div class="pillar-label" data-i18n="{{ pillar_key }}_pillar"></div>
-            {% if pillar.gan != '-' %}
-              <div class="pillar-nayin" data-i18n="{{ pillar.nayin_key }}"></div>
-              <div class="pillar-gan {{ 'wx-' + (pillar.gan_wx or '') }}">{{ pillar.gan }}</div>
-              <div class="pillar-zhi {{ 'wx-' + (pillar.zhi_wx or '') }}">{{ pillar.zhi }}</div>
-              <div class="shensha-tags">
-                {% for s in pillar.shensha %}
-                  <span class="shensha-tag" data-i18n="{{ s.name_key }}" title-i18n="{{ s.desc_key }}"></span>
-                {% endfor %}
-              </div>
-            {% else %}
-              <div class="pillar-gan">-</div>
-              <div class="pillar-zhi">-</div>
-            {% endif %}
+
+    <!-- 五行强弱 -->
+    <div class="card animate-slide">
+      <div class="card-header">
+        <div class="card-title">
+          <span class="card-title-icon">📊</span>
+          <span data-i18n="wuxing_strength_title">五行强弱</span>
+        </div>
+      </div>
+      <div class="wuxing-bars">
+        {% for wx, score in result.wuxing_strength.items() %}
+        <div class="wuxing-bar">
+          <span class="wuxing-label wx-{{ wx }}" data-i18n="wuxing_{{ wx }}"></span>
+          <div class="wuxing-track">
+            <div class="wuxing-fill wuxing-fill-{{ wx }}" style="width: {{ score }}%;"></div>
           </div>
+          <span class="wuxing-value">{{ score|int }}</span>
+        </div>
         {% endfor %}
       </div>
     </div>
   </div>
 
-  <!-- AI 智能分析 -->
-  <div class="ai-section animate-slide">
-    <div class="ai-header">
-      <div class="ai-title">✨ <span data-i18n="ai_analysis_title">AI 智能分析</span></div>
-      <span class="ai-tag">DeepSeek</span>
-    </div>
-    <div class="ai-content" id="aiContent">
-      <p style="color: var(--text-muted);" data-i18n="ai_loading">正在生成个性化分析...</p>
-    </div>
-  </div>
-
-  <!-- 五行强弱 -->
-  <div class="card animate-slide">
-    <div class="card-header">
-      <div class="card-title">
-        <span class="card-title-icon">📊</span>
-        <span data-i18n="wuxing_strength_title">五行强弱</span>
+  <!-- Tab 2: 分析 -->
+  <div class="tab-content" id="tab-analysis">
+    <!-- 性格与用神 -->
+    <div class="card animate-slide">
+      <div class="card-header">
+        <div class="card-title">
+          <span class="card-title-icon">👤</span>
+          <span data-i18n="personality_title">性格与用神</span>
+        </div>
+      </div>
+      <div style="display: flex; flex-direction: column; gap: 14px;">
+        <div>
+          <div style="color: var(--text-muted); font-size: 12px; margin-bottom: 4px;" data-i18n="body_strength_label">身强身弱</div>
+          <div style="font-size: 15px;">
+            <span data-i18n="{{ result.personality.body_strength_key }}"></span>
+            <span style="color: var(--text-muted);"> — </span>
+            <span data-i18n="{{ result.personality.body_strength_desc_key }}"></span>
+          </div>
+        </div>
+        <div>
+          <div style="color: var(--text-muted); font-size: 12px; margin-bottom: 4px;" data-i18n="personality_label">性格特征</div>
+          <div style="font-size: 15px;" data-i18n="{{ result.personality.personality_key }}"></div>
+        </div>
+        <div>
+          <div style="color: var(--text-muted); font-size: 12px; margin-bottom: 4px;" data-i18n="strength_label">优势</div>
+          <div style="font-size: 15px;" data-i18n="{{ result.personality.strength_key }}"></div>
+        </div>
+        <div>
+          <div style="color: var(--text-muted); font-size: 12px; margin-bottom: 4px;" data-i18n="core_risk_label">核心风险</div>
+          <div style="font-size: 15px;" data-i18n="{{ result.personality.risk_key }}"></div>
+        </div>
       </div>
     </div>
-    <div class="wuxing-bars">
-      {% for wx, score in result.wuxing_strength.items() %}
-      <div class="wuxing-bar">
-        <span class="wuxing-label wx-{{ wx }}" data-i18n="wuxing_{{ wx }}"></span>
-        <div class="wuxing-track">
-          <div class="wuxing-fill wuxing-fill-{{ wx }}" style="width: {{ score }}%;"></div>
+
+    <!-- 神煞详细解释 -->
+    {% if result.interpretation and result.interpretation.shensha_detail and result.interpretation.shensha_detail.has_shensha %}
+    <div class="card animate-slide">
+      <div class="card-header">
+        <div class="card-title">
+          <span class="card-title-icon">⭐</span>
+          <span data-i18n="shensha_detail_title">神煞详解</span>
         </div>
-        <span class="wuxing-value">{{ score|int }}</span>
+      </div>
+      <div style="margin-bottom: 16px; padding: 14px; background: rgba(212,168,67,0.08); border-radius: var(--radius-md); border-left: 3px solid var(--gold);">
+        <div style="font-size: 14px; color: var(--text); line-height: 1.6;" data-i18n="{{ result.interpretation.shensha_detail.summary_key }}"></div>
+      </div>
+      {% for star_type, stars, color, icon in [
+        ('shensha_good_stars', result.interpretation.shensha_detail.good_stars, '#4ade80', '🌟'),
+        ('shensha_bad_stars', result.interpretation.shensha_detail.bad_stars, '#f87171', '⚠️'),
+        ('shensha_neutral_stars', result.interpretation.shensha_detail.neutral_stars, '#60a5fa', '🔮')
+      ] %}
+        {% if stars %}
+        <div style="margin-bottom: 16px;">
+          <div style="font-size: 15px; font-weight: 600; color: {{ color }}; margin-bottom: 12px;">{{ icon }} <span data-i18n="{{ star_type }}"></span></div>
+          {% for star in stars %}
+          <div style="margin-bottom: 12px; padding: 14px; background: rgba({{ '74,222,128' if loop.cycle0 == 0 else '248,113,113' if loop.cycle0 == 1 else '96,165,250' }},0.06); border-radius: var(--radius-md); border-left: 3px solid {{ color }};">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+              <div style="font-size: 15px; font-weight: 700;"><span data-i18n="{{ star.name_key }}"></span></div>
+              <span style="font-size: 11px; padding: 2px 8px; background: rgba(255,255,255,0.08); border-radius: 10px;"><span data-i18n="{{ star.pillar_key }}"></span> · <span data-i18n="{{ star.category_key }}"></span></span>
+            </div>
+            <div style="font-size: 13px; color: var(--text); line-height: 1.6;" data-i18n="{{ star.detail_key }}"></div>
+          </div>
+          {% endfor %}
+        </div>
+        {% endif %}
+      {% endfor %}
+    </div>
+    {% endif %}
+
+    <!-- 五行分析详解 -->
+    {% if result.interpretation and result.interpretation.wuxing_detail %}
+    <div class="card animate-slide">
+      <div class="card-header">
+        <div class="card-title">
+          <span class="card-title-icon">🔮</span>
+          <span data-i18n="wuxing_detail_title">五行详解</span>
+        </div>
+      </div>
+      <div style="margin-bottom: 16px; padding: 14px; background: rgba(212,168,67,0.08); border-radius: var(--radius-md); border-left: 3px solid var(--gold);">
+        <div style="font-size: 14px; color: var(--text); line-height: 1.6;" data-i18n="{{ result.interpretation.wuxing_detail.analysis_key }}"></div>
+      </div>
+      {% for wx_key, wx_data in result.interpretation.wuxing_detail.elements_detail.items() %}
+      <div style="padding: 14px; background: var(--bg-secondary); border-radius: var(--radius-md); border: 1px solid var(--border); margin-bottom: 10px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+          <div style="font-size: 15px; font-weight: 700;" class="wx-{{ wx_key }}">{{ wx_data.name }}</div>
+          <span style="font-size: 12px; color: var(--text-muted);">{{ wx_data.score|int }}<span data-i18n="score_unit">分</span> · {{ wx_data.percentage }}%</span>
+        </div>
+        <div style="font-size: 13px; color: var(--text); line-height: 1.5;" data-i18n="{{ wx_data.personality_key }}"></div>
+        <div style="font-size: 12px; color: var(--text-muted); margin-top: 4px;">💼 <span data-i18n="{{ wx_data.career_key }}"></span></div>
+      </div>
+      {% endfor %}
+    </div>
+    {% endif %}
+
+    <!-- 十神分析详解 -->
+    {% if result.interpretation and result.interpretation.shishen_detail and result.interpretation.shishen_detail.pillars %}
+    <div class="card animate-slide">
+      <div class="card-header">
+        <div class="card-title">
+          <span class="card-title-icon">🎭</span>
+          <span data-i18n="shishen_detail_title">十神详解</span>
+        </div>
+      </div>
+      <div style="margin-bottom: 16px; padding: 14px; background: rgba(212,168,67,0.08); border-radius: var(--radius-md); border-left: 3px solid var(--gold);">
+        <div style="font-size: 14px; color: var(--text); line-height: 1.6;" data-i18n="{{ result.interpretation.shishen_detail.summary_key }}"></div>
+      </div>
+      {% for pillar in result.interpretation.shishen_detail.pillars %}
+      <div style="margin-bottom: 12px; padding: 14px; background: var(--bg-secondary); border-radius: var(--radius-md); border: 1px solid var(--border);">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+          <div style="font-size: 15px; font-weight: 700;"><span data-i18n="pillar_{{ pillar.pillar_name }}"></span>（{{ pillar.gan }}）</div>
+          <span style="font-size: 13px; padding: 3px 10px; background: rgba(212,168,67,0.15); border-radius: 12px; color: var(--gold);"><span data-i18n="shishen_{{ pillar.shishen_key }}"></span></span>
+        </div>
+        <div style="font-size: 13px; color: var(--text-muted); margin-bottom: 6px;" data-i18n="{{ pillar.meaning_key }}"></div>
+        <div style="font-size: 13px; color: var(--text); line-height: 1.5;" data-i18n="{{ pillar.personality_key }}"></div>
+      </div>
+      {% endfor %}
+    </div>
+    {% endif %}
+
+    <!-- 性格深度分析 -->
+    {% if result.interpretation and result.interpretation.personality_detail %}
+    <div class="card animate-slide">
+      <div class="card-header">
+        <div class="card-title">
+          <span class="card-title-icon">🧠</span>
+          <span data-i18n="personality_detail_title">性格深度分析</span>
+        </div>
+      </div>
+      <div style="padding: 14px; background: rgba(212,168,67,0.08); border-radius: var(--radius-md); border-left: 3px solid var(--gold); margin-bottom: 16px;">
+        <div style="font-size: 14px; color: var(--text); line-height: 1.6;" data-i18n="{{ result.interpretation.personality_detail.analysis_key }}"></div>
+      </div>
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+        <div style="padding: 12px; background: var(--bg-secondary); border-radius: var(--radius-sm);">
+          <div style="font-size: 12px; color: var(--text-muted); margin-bottom: 4px;" data-i18n="personality_analysis">性格特征</div>
+          <div style="font-size: 14px;" data-i18n="{{ result.personality.personality_key }}"></div>
+        </div>
+        <div style="padding: 12px; background: var(--bg-secondary); border-radius: var(--radius-sm);">
+          <div style="font-size: 12px; color: var(--text-muted); margin-bottom: 4px;" data-i18n="strength_analysis">优势</div>
+          <div style="font-size: 14px;" data-i18n="{{ result.personality.strength_key }}"></div>
+        </div>
+      </div>
+    </div>
+    {% endif %}
+  </div>
+
+  <!-- Tab 3: 运势 -->
+  <div class="tab-content" id="tab-fortune">
+    <!-- 每日运势 -->
+    <div class="card animate-slide">
+      <div class="card-header">
+        <div class="card-title">
+          <span class="card-title-icon">📅</span>
+          <span data-i18n="daily_fortune_title">每日运势</span>
+        </div>
+      </div>
+      <div id="dailyFortune">
+        <div class="skeleton skeleton-text" style="width: 80%;"></div>
+      </div>
+    </div>
+
+    <!-- 大运流年 -->
+    <div class="card animate-slide">
+      <div class="card-header">
+        <div class="card-title">
+          <span class="card-title-icon">📈</span>
+          <span data-i18n="dayun_detail_title">大运流年详解</span>
+        </div>
+      </div>
+      <div style="margin-bottom: 16px; font-size: 14px;">
+        <span data-i18n="qiyun_start">起运</span>：{{ result.qiyun.qiyun_time }}，<span data-i18n="direction">方向</span>：
+        <span data-i18n="{{ 'direction_forward' if result.qiyun.direction=='forward' else 'direction_backward' }}"></span>
+      </div>
+      {% for d in result.dayun %}
+      <div style="margin-bottom: 20px; padding: 16px; background: var(--bg-secondary); border-radius: var(--radius-md); border: 1px solid var(--border);">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+          <div>
+            <div style="font-size: 18px; font-weight: 700; color: var(--gold);">{{ d.gz }} <span data-i18n="dayun_title">大运</span></div>
+            <div style="font-size: 13px; color: var(--text-muted);">{{ d.start_year }}-{{ d.end_year }}<span data-i18n="year_suffix">年</span></div>
+          </div>
+          {% if result.dayun_comprehensive and loop.index0 < result.dayun_comprehensive|length %}
+          <div style="text-align: center; padding: 8px 12px; background: rgba(212,168,67,0.1); border-radius: 8px;">
+            <div style="font-size: 20px; font-weight: 700; color: var(--gold);">{{ result.dayun_comprehensive[loop.index0].overall_score }}</div>
+            <div style="font-size: 10px; color: var(--text-muted);" data-i18n="overall_score_label">综合评分</div>
+          </div>
+          {% endif %}
+        </div>
+        <div style="font-size: 14px; color: var(--text); margin-bottom: 6px;" data-i18n="{{ d.theme_key }}"></div>
+        <div style="font-size: 13px; color: var(--text-secondary);" data-i18n="{{ d.advice_key }}"></div>
+        {% if result.dayun_comprehensive and loop.index0 < result.dayun_comprehensive|length %}
+        {% set comp = result.dayun_comprehensive[loop.index0] %}
+        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin-top: 10px; font-size: 12px;">
+          <div style="padding: 6px; background: rgba(255,255,255,0.03); border-radius: 4px;">💪 <span data-i18n="{{ comp.health.summary_key }}"></span></div>
+          <div style="padding: 6px; background: rgba(255,255,255,0.03); border-radius: 4px;">💕 <span data-i18n="{{ comp.love.summary_key }}"></span></div>
+          <div style="padding: 6px; background: rgba(255,255,255,0.03); border-radius: 4px;">💰 <span data-i18n="{{ comp.wealth.summary_key }}"></span></div>
+          <div style="padding: 6px; background: rgba(255,255,255,0.03); border-radius: 4px;">💼 <span data-i18n="{{ comp.career.summary_key }}"></span></div>
+          <div style="padding: 6px; background: rgba(255,255,255,0.03); border-radius: 4px;">📚 <span data-i18n="{{ comp.exam.summary_key }}"></span></div>
+          <div style="padding: 6px; background: rgba(255,255,255,0.03); border-radius: 4px;">👥 <span data-i18n="{{ comp.friendship.summary_key }}"></span></div>
+        </div>
+        {% endif %}
+        <div style="margin-top: 10px;">
+          <div style="font-size: 13px; font-weight: 600; margin-bottom: 6px;" data-i18n="liunian_yearly">流年运势</div>
+          {% for ln in d.liunian_list %}
+          <div class="liunian-card" onclick="toggleLiunian(this)">
+            <div class="liunian-header">
+              <div style="display:flex;align-items:center;gap:8px;">
+                <span class="liunian-year">{{ ln.year }}</span>
+                <span class="liunian-gz">{{ ln.gz }}</span>
+                <span style="color:var(--text-muted);font-size:12px;" data-i18n="{{ ln.theme_key }}"></span>
+              </div>
+              <span class="liunian-arrow">▸</span>
+            </div>
+            <div class="liunian-detail">
+              <div class="liunian-section">
+                <div class="liunian-section-title">📖 <span data-i18n="{{ ln.theme_key }}"></span></div>
+                <div class="liunian-section-text" data-i18n="{{ ln.desc_key }}"></div>
+              </div>
+              <div class="liunian-section">
+                <div class="liunian-section-title">📅 <span data-i18n="event_hint_label">可能事件</span></div>
+                <div class="liunian-section-text" data-i18n="{{ ln.event_hint_key }}"></div>
+              </div>
+            </div>
+          </div>
+          {% endfor %}
+        </div>
       </div>
       {% endfor %}
     </div>
   </div>
 
-  <!-- 性格与用神 -->
-  <div class="card animate-slide">
-    <div class="card-header">
-      <div class="card-title">
-        <span class="card-title-icon">👤</span>
-        <span data-i18n="personality_title">性格与用神</span>
-      </div>
-    </div>
-    <div style="display: flex; flex-direction: column; gap: 14px;">
-      <div>
-        <div style="color: var(--text-muted); font-size: 12px; margin-bottom: 4px;" data-i18n="body_strength_label">身强身弱</div>
-        <div style="font-size: 15px;">
-          <span data-i18n="{{ result.personality.body_strength_key }}"></span>
-          <span style="color: var(--text-muted);"> — </span>
-          <span data-i18n="{{ result.personality.body_strength_desc_key }}"></span>
+  <!-- Tab 4: 建议 -->
+  <div class="tab-content" id="tab-advice">
+    <!-- 性格与用神 -->
+    <div class="card animate-slide">
+      <div class="card-header">
+        <div class="card-title">
+          <span class="card-title-icon">👤</span>
+          <span data-i18n="personality_title">性格与用神</span>
         </div>
       </div>
-      <div>
-        <div style="color: var(--text-muted); font-size: 12px; margin-bottom: 4px;" data-i18n="personality_label">性格特征</div>
-        <div style="font-size: 15px;" data-i18n="{{ result.personality.personality_key }}"></div>
+      <div style="display: flex; flex-direction: column; gap: 10px; font-size: 14px;">
+        <div>💼 <span data-i18n="career_advice_label">事业：</span><span data-i18n="{{ result.personality.career_advice_key }}"></span></div>
+        <div>💕 <span data-i18n="relationship_advice_label">感情：</span><span data-i18n="{{ result.personality.relationship_advice_key }}"></span></div>
+        <div>⚠️ <span data-i18n="risk_advice_label">风险：</span><span data-i18n="{{ result.personality.risk_advice_key }}"></span></div>
       </div>
-      <div>
-        <div style="color: var(--text-muted); font-size: 12px; margin-bottom: 4px;" data-i18n="strength_label">优势</div>
-        <div style="font-size: 15px;" data-i18n="{{ result.personality.strength_key }}"></div>
-      </div>
-      <div>
-        <div style="color: var(--text-muted); font-size: 12px; margin-bottom: 4px;" data-i18n="core_risk_label">核心风险</div>
-        <div style="font-size: 15px;" data-i18n="{{ result.personality.risk_key }}"></div>
-      </div>
-    </div>
-    <div class="divider"></div>
-    <div style="font-size: 14px; font-weight: 600; margin-bottom: 12px;" data-i18n="general_advice_title">综合建议</div>
-    <div style="display: flex; flex-direction: column; gap: 10px; font-size: 14px;">
-      <div>💼 <span data-i18n="career_advice_label">事业：</span><span data-i18n="{{ result.personality.career_advice_key }}"></span></div>
-      <div>💕 <span data-i18n="relationship_advice_label">感情：</span><span data-i18n="{{ result.personality.relationship_advice_key }}"></span></div>
-      <div>⚠️ <span data-i18n="risk_advice_label">风险：</span><span data-i18n="{{ result.personality.risk_advice_key }}"></span></div>
-    </div>
-  </div>
-
-  <!-- 每日运势 -->
-  <div class="card animate-slide">
-    <div class="card-header">
-      <div class="card-title">
-        <span class="card-title-icon">📅</span>
-        <span data-i18n="daily_fortune_title">每日运势</span>
-      </div>
-    </div>
-    <div id="dailyFortune">
-      <div class="skeleton skeleton-text" style="width: 80%;"></div>
-    </div>
-  </div>
-
-  <!-- 大运 + 流年详解 -->
-  <div class="card animate-slide">
-    <div class="card-header">
-      <div class="card-title">
-        <span class="card-title-icon">📈</span>
-        大运流年详解
-      </div>
-    </div>
-    
-    <div style="margin-bottom: 16px; font-size: 14px;">
-      起运：{{ result.qiyun.qiyun_time }}，方向：
-      <span data-i18n="{{ 'direction_forward' if result.qiyun.direction=='forward' else 'direction_backward' }}"></span>
     </div>
 
-    {% for d in result.dayun %}
-    <div style="margin-bottom: 24px; padding: 16px; background: var(--bg-secondary); border-radius: var(--radius-md); border: 1px solid var(--border);">
-      <!-- 大运标题 -->
-      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
-        <div>
-          <div style="font-size: 18px; font-weight: 700; color: var(--gold);">{{ d.gz }}大运</div>
-          <div style="font-size: 13px; color: var(--text-muted);">{{ d.start_year }}-{{ d.end_year }}年</div>
-        </div>
-        {% if result.dayun_comprehensive and loop.index0 < result.dayun_comprehensive|length %}
-        <div style="text-align: center; padding: 8px 12px; background: rgba(212,168,67,0.1); border-radius: 8px;">
-          <div style="font-size: 20px; font-weight: 700; color: var(--gold);">{{ result.dayun_comprehensive[loop.index0].overall_score }}</div>
-          <div style="font-size: 10px; color: var(--text-muted);">综合评分</div>
-        </div>
-        {% endif %}
-      </div>
-
-      <!-- 大运主题 -->
-      <div style="font-size: 14px; color: var(--text); margin-bottom: 8px;" data-i18n="{{ d.theme_key }}"></div>
-      <div style="font-size: 13px; color: var(--text-secondary); margin-bottom: 12px;" data-i18n="{{ d.advice_key }}"></div>
-
-      <!-- 大运6维度 -->
-      {% if result.dayun_comprehensive and loop.index0 < result.dayun_comprehensive|length %}
-      {% set comp = result.dayun_comprehensive[loop.index0] %}
-      <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 12px;">
-        <div style="padding: 8px; background: rgba(255,255,255,0.03); border-radius: 6px; font-size: 12px;">
-          <div style="color: var(--text-muted); margin-bottom: 2px;">💪 健康</div>
-          <div style="color: var(--text-secondary);">{{ comp.health.summary }}</div>
-        </div>
-        <div style="padding: 8px; background: rgba(255,255,255,0.03); border-radius: 6px; font-size: 12px;">
-          <div style="color: var(--text-muted); margin-bottom: 2px;">💕 感情</div>
-          <div style="color: var(--text-secondary);">{{ comp.love.summary }}</div>
-        </div>
-        <div style="padding: 8px; background: rgba(255,255,255,0.03); border-radius: 6px; font-size: 12px;">
-          <div style="color: var(--text-muted); margin-bottom: 2px;">💰 财运</div>
-          <div style="color: var(--text-secondary);">{{ comp.wealth.summary }}</div>
-        </div>
-        <div style="padding: 8px; background: rgba(255,255,255,0.03); border-radius: 6px; font-size: 12px;">
-          <div style="color: var(--text-muted); margin-bottom: 2px;">💼 事业</div>
-          <div style="color: var(--text-secondary);">{{ comp.career.summary }}</div>
-        </div>
-        <div style="padding: 8px; background: rgba(255,255,255,0.03); border-radius: 6px; font-size: 12px;">
-          <div style="color: var(--text-muted); margin-bottom: 2px;">📚 学业</div>
-          <div style="color: var(--text-secondary);">{{ comp.exam.summary }}</div>
-        </div>
-        <div style="padding: 8px; background: rgba(255,255,255,0.03); border-radius: 6px; font-size: 12px;">
-          <div style="color: var(--text-muted); margin-bottom: 2px;">👥 友情</div>
-          <div style="color: var(--text-secondary);">{{ comp.friendship.summary }}</div>
+    <!-- 人生综合建议 -->
+    {% if result.interpretation and result.interpretation.life_advice %}
+    <div class="card animate-slide">
+      <div class="card-header">
+        <div class="card-title">
+          <span class="card-title-icon">💡</span>
+          <span data-i18n="life_advice_title">人生综合建议</span>
         </div>
       </div>
-      {% endif %}
-
-      <!-- 流年列表 -->
-      <div style="margin-top: 12px;">
-        <div style="font-size: 14px; font-weight: 600; margin-bottom: 8px;">流年运势</div>
-        {% for ln in d.liunian_list %}
-        <div style="padding: 12px; background: rgba(255,255,255,0.02); border-radius: 8px; margin-bottom: 8px; border-left: 3px solid var(--gold);">
-          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
-            <div style="font-size: 14px; font-weight: 600;">{{ ln.year }}年 {{ ln.gz }}</div>
-            <span style="font-size: 11px; color: var(--text-muted);" data-i18n="{{ ln.theme_key }}"></span>
+      {% set advice = result.interpretation.life_advice %}
+      <div style="display: flex; flex-direction: column; gap: 12px;">
+        {% for key, icon, label_key in [
+          ('career', '💼', 'career_direction'),
+          ('wealth', '💰', 'wealth_advice'),
+          ('relationship', '💕', 'relationship_advice'),
+          ('health', '💪', 'health_advice'),
+          ('study', '📚', 'study_advice'),
+          ('social', '👥', 'social_advice')
+        ] %}
+        <div style="padding: 14px; background: var(--bg-secondary); border-radius: var(--radius-md); border: 1px solid var(--border);">
+          <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 6px;">
+            <span style="font-size: 16px;">{{ icon }}</span>
+            <span style="font-size: 14px; font-weight: 600;" data-i18n="{{ label_key }}"></span>
           </div>
-          
-          {% if result.liunian_comprehensive %}
-          {% set ln_comp = result.liunian_comprehensive[loop.index0] %}
-          <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 6px; font-size: 11px; margin-bottom: 6px;">
-            <div>💪 {{ ln_comp.health.summary }}</div>
-            <div>💕 {{ ln_comp.love.summary }}</div>
-            <div>💰 {{ ln_comp.wealth.summary }}</div>
-            <div>💼 {{ ln_comp.career.summary }}</div>
-            <div>📚 {{ ln_comp.exam.summary }}</div>
-            <div>👥 {{ ln_comp.friendship.summary }}</div>
-          </div>
-          <div style="font-size: 11px; color: var(--text-muted); display: flex; gap: 12px;">
-            <span>📌 {{ ln_comp.likely_events[0] if ln_comp.likely_events else '' }}</span>
-            <span>⚠️ {{ ln_comp.watch_out[0] if ln_comp.watch_out else '' }}</span>
-          </div>
-          {% else %}
-          <div style="font-size: 12px; color: var(--text-secondary);">
-            <span data-i18n="{{ ln.desc_key }}"></span>
-          </div>
-          {% endif %}
+          <div style="font-size: 13px; color: var(--text-secondary); line-height: 1.6;" data-i18n="{{ advice[key] }}"></div>
         </div>
         {% endfor %}
+
+        <div style="padding: 16px; background: rgba(212,168,67,0.08); border-radius: var(--radius-md); border-left: 3px solid var(--gold); margin-top: 4px;">
+          <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 6px;">
+            <span style="font-size: 16px;">🌟</span>
+            <span style="font-size: 14px; font-weight: 700; color: var(--gold);" data-i18n="overall_message">综合寄语</span>
+          </div>
+          <div style="font-size: 14px; color: var(--text); line-height: 1.8;" data-i18n="{{ advice.overall }}"></div>
+        </div>
       </div>
     </div>
-    {% endfor %}
-  </div>
+    {% endif %}
 
-  <!-- 功能按钮 -->
-  <div class="actions-grid animate-slide">
-    <div class="action-card" onclick="exportPDF()">
-      <div class="action-icon">📄</div>
-      <span class="action-label" data-i18n="export_pdf">导出PDF</span>
+    <!-- 功能按钮 -->
+    <div class="actions-grid animate-slide">
+      <div class="action-card" onclick="exportPDF()">
+        <div class="action-icon">📄</div>
+        <span class="action-label" data-i18n="export_pdf">导出PDF</span>
+      </div>
+      <div class="action-card" onclick="generateShareCard()">
+        <div class="action-icon">📤</div>
+        <span class="action-label" data-i18n="share_card">分享卡</span>
+      </div>
+      <a href="/" class="action-card">
+        <div class="action-icon">🔄</div>
+        <span class="action-label" data-i18n="back">重新排盘</span>
+      </a>
     </div>
-    <div class="action-card" onclick="generateShareCard()">
-      <div class="action-icon">📤</div>
-      <span class="action-label" data-i18n="share_card">分享卡</span>
-    </div>
-    <a href="/" class="action-card">
-      <div class="action-icon">🔄</div>
-      <span class="action-label" data-i18n="back">重新排盘</span>
-    </a>
   </div>
 
 </div>
@@ -245,45 +378,27 @@
 <script>
   const baziResult = {{ result_json | safe }};
 
-  // AI 分析
-  const aiContent = document.getElementById('aiContent');
-  async function loadAIAnalysis() {
-    try {
-      const response = await fetch('/api/ai-analysis', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ result: baziResult, lang: currentLang || 'zh', stream: true })
-      });
-      if (!response.ok) throw new Error('AI service unavailable');
-      const reader = response.body.getReader();
-      const decoder = new TextDecoder();
-      let fullText = '', buffer = '';
-      while (true) {
-        const { done, value } = await reader.read();
-        if (done) break;
-        buffer += decoder.decode(value, { stream: true });
-        const lines = buffer.split('\n');
-        buffer = lines.pop();
-        for (const line of lines) {
-          if (line.startsWith('data: ')) {
-            const data = line.slice(6);
-            if (data === '[DONE]') { aiContent.innerHTML = formatText(fullText); return; }
-            try {
-              const parsed = JSON.parse(data);
-              if (parsed.content) { fullText += parsed.content; aiContent.innerHTML = formatText(fullText) + '<span class="ai-cursor"></span>'; }
-              if (parsed.error) { aiContent.innerHTML = '<p style="color: var(--text-muted);">' + parsed.error + '</p>'; return; }
-            } catch (e) {}
-          }
-        }
+  // Tab switching
+  function switchTab(tabName) {
+    document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+    document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+    document.getElementById('tab-' + tabName).classList.add('active');
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+      if (btn.getAttribute('onclick') && btn.getAttribute('onclick').includes(tabName)) {
+        btn.classList.add('active');
       }
-      aiContent.innerHTML = formatText(fullText);
-    } catch (err) {
-      aiContent.innerHTML = '<p style="color: var(--text-muted); font-style: italic;">' + (I18N.ai_load_fail || 'AI 分析加载失败') + '</p>';
-    }
+    });
   }
+
+  // Liunian card toggle
+  function toggleLiunian(el) {
+    el.classList.toggle('open');
+  }
+
+  // AI Analysis with fallback
   function formatText(text) { return text.split('\n').filter(p => p.trim()).map(p => '<p>' + p + '</p>').join(''); }
 
-  // 每日运势
+  // Daily fortune
   async function loadDailyFortune() {
     try {
       const response = await fetch('/api/daily-fortune', {
@@ -297,15 +412,15 @@
         <div class="fortune-card">
           <div class="fortune-score" style="background: ${fortune.color}20; color: ${fortune.color};">
             <div class="fortune-score-num">${fortune.score}</div>
-            <div class="fortune-score-label">${fortune.level_text}</div>
+            <div class="fortune-score-label">${I18N[fortune.level_text_key] || fortune.level_text || ''}</div>
           </div>
           <div class="fortune-info">
-            <div class="fortune-title">${fortune.day_ganzhi}日</div>
-            <div class="fortune-summary">${fortune.summary}</div>
+            <div class="fortune-title">${fortune.day_ganzhi}${I18N.day_label || ''}</div>
+            <div class="fortune-summary">${I18N[fortune.summary_key] || fortune.summary || ''}</div>
             <div class="fortune-tips">
-              <span>🎨 ${I18N.lucky_color || '幸运色'}: ${fortune.lucky_color}</span>
-              <span>🔢 ${I18N.lucky_number || '幸运数'}: ${fortune.lucky_number}</span>
-              <span>🧭 ${I18N.lucky_direction || '吉方'}: ${fortune.lucky_direction}</span>
+              <span>🎨 ${I18N.lucky_color || ''}: ${I18N[fortune.lucky_color_key] || fortune.lucky_color || ''}</span>
+              <span>🔢 ${I18N.lucky_number || ''}: ${fortune.lucky_number || ''}</span>
+              <span>🧭 ${I18N.lucky_direction || ''}: ${I18N[fortune.lucky_direction_key] || fortune.lucky_direction || ''}</span>
             </div>
           </div>
         </div>
@@ -328,7 +443,6 @@
     .catch(() => alert(I18N.pdf_export_fail || 'PDF导出失败'));
   }
 
-  setTimeout(loadAIAnalysis, 500);
-  setTimeout(loadDailyFortune, 800);
+  setTimeout(loadDailyFortune, 500);
 </script>
 {% endblock %}

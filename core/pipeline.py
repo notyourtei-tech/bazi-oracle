@@ -9,6 +9,7 @@ from core.shensha_engine import compute_shensha
 from core.dayun_liunian_engine import analyze_dayun, analyze_liunian
 from core.bazi_utils import GAN_WUXING, ZHI_WUXING, get_nayin, get_hidden_stems, get_shishen, get_kongwang
 from core.wuxing_engine import calc_wuxing
+from core.interpretation_engine import build_comprehensive_interpretation
 
 def _parse_local_datetime(date_str: str, time_str: str | None) -> datetime:
     y, m, d = [int(x) for x in date_str.split("-")]
@@ -172,5 +173,11 @@ def run_full_analysis_from_birth(
         "qiyun": qiyun_info,
         "dayun": processed_dayun # 包含 liunian_list
     }
+    
+    # 生成综合解读
+    try:
+        result["interpretation"] = build_comprehensive_interpretation(result)
+    except Exception as e:
+        result["interpretation"] = {}
     
     return result
