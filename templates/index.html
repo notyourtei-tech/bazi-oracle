@@ -1,12 +1,6 @@
 {% extends "base.html" %}
 {% block content %}
 <div class="container">
-  
-  <!-- 标题区域 -->
-  <div class="page-header animate-fade">
-    <h1 class="page-title" data-i18n="app_title">八字自动排盘系统</h1>
-    <p class="page-subtitle" data-i18n="intro">基于真太阳时的专业排盘，AI 深度解读您的命盘</p>
-  </div>
 
   {% if session.get('user_id') and user_chart %}
   <!-- 登录用户：今日运势仪表盘 -->
@@ -22,23 +16,37 @@
     </div>
   </div>
 
-  <!-- 我的命盘 -->
+  <!-- 我的八字 -->
   <div class="card animate-slide">
     <div class="card-header">
       <div class="card-title">
         <span class="card-title-icon">☯</span>
-        <span data-i18n="my_charts">我的命盘</span>
+        <span data-i18n="my_own_bazi">我的八字</span>
       </div>
-      <a href="/history" style="color: var(--gold); font-size: 13px; text-decoration: none;" data-i18n="view_all">查看全部 →</a>
+      <a href="/history" style="color: var(--gold); font-size: 13px; text-decoration: none;" data-i18n="select_from_history">从历史选择 →</a>
     </div>
-    <div style="display: flex; gap: 12px; flex-wrap: wrap;">
-      {% for chart in user_chart %}
-      <div style="flex: 1; min-width: 200px; padding: 12px; background: var(--bg-secondary); border-radius: var(--radius-md); border: 1px solid var(--border);">
-        <div style="font-size: 14px; font-weight: 600; margin-bottom: 4px;">{{ chart.name or '未命名' }}</div>
-        <div style="font-size: 12px; color: var(--text-muted);">{{ chart.birth_date }}</div>
+    {% if own_chart %}
+      {% set res = own_chart.get_result() %}
+      <div style="display: flex; gap: 16px; flex-wrap: wrap; align-items: center;">
+        <div style="flex: 1; min-width: 180px;">
+          <div style="font-size: 15px; font-weight: 600; margin-bottom: 4px;">{{ own_chart.name or '未命名' }}</div>
+          <div style="font-size: 12px; color: var(--text-muted);">{{ own_chart.birth_date }} {% if own_chart.gender == 'male' %}♂{% else %}♀{% endif %} {% if own_chart.birth_time %}{{ own_chart.birth_time }}{% endif %}</div>
+        </div>
+        <div style="display: flex; gap: 12px; flex-wrap: wrap;">
+          {% set bazi = res.get('bazi', {}) %}
+          {% for key in ['year', 'month', 'day', 'hour'] %}
+            {% if bazi.get(key) %}
+            <div style="text-align: center; padding: 8px 12px; background: var(--bg-secondary); border-radius: var(--radius-sm); border: 1px solid var(--border);">
+              <div style="font-size: 10px; color: var(--text-muted); margin-bottom: 2px;" data-i18n="{{ key }}_pillar"></div>
+              <div style="font-size: 14px; font-weight: 700;">{{ bazi[key] }}</div>
+            </div>
+            {% endif %}
+          {% endfor %}
+        </div>
       </div>
-      {% endfor %}
-    </div>
+    {% else %}
+      <div style="text-align: center; padding: 16px; color: var(--text-muted); font-size: 13px;" data-i18n="no_own_bazi_hint">暂未设置自己的八字，可从历史记录中选择</div>
+    {% endif %}
   </div>
   {% endif %}
 
@@ -70,40 +78,6 @@
     <span class="error-icon">⚠️</span>
     <span data-i18n="{{ error }}">{{ error }}</span>
     <button class="error-close" onclick="this.parentElement.remove()">×</button>
-  </div>
-  {% endif %}
-
-  {% if session.get('user_id') and user_chart %}
-  <!-- 登录用户：今日运势仪表盘 -->
-  <div class="card animate-slide" style="background: linear-gradient(135deg, rgba(212,168,67,0.08), rgba(212,168,67,0.02));">
-    <div class="card-header">
-      <div class="card-title">
-        <span class="card-title-icon">🌟</span>
-        <span data-i18n="my_fortune">我的今日运势</span>
-      </div>
-    </div>
-    <div id="myFortuneDashboard">
-      <div class="skeleton skeleton-text" style="width: 60%;"></div>
-    </div>
-  </div>
-
-  <!-- 我的命盘 -->
-  <div class="card animate-slide">
-    <div class="card-header">
-      <div class="card-title">
-        <span class="card-title-icon">☯</span>
-        <span data-i18n="my_charts">我的命盘</span>
-      </div>
-      <a href="/history" style="color: var(--gold); font-size: 13px; text-decoration: none;" data-i18n="view_all">查看全部 →</a>
-    </div>
-    <div style="display: flex; gap: 12px; flex-wrap: wrap;">
-      {% for chart in user_chart %}
-      <div style="flex: 1; min-width: 200px; padding: 12px; background: var(--bg-secondary); border-radius: var(--radius-md); border: 1px solid var(--border);">
-        <div style="font-size: 14px; font-weight: 600; margin-bottom: 4px;">{{ chart.name or '未命名' }}</div>
-        <div style="font-size: 12px; color: var(--text-muted);">{{ chart.birth_date }}</div>
-      </div>
-      {% endfor %}
-    </div>
   </div>
   {% endif %}
 

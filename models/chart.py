@@ -19,5 +19,8 @@ class Chart(db.Model):
     # 结果（JSON 存储）
     result_json = db.Column(db.Text)
 
+    # 是否为用户自己的八字
+    is_own = db.Column(db.Boolean, default=False)
+
     def get_result(self):
         return json.loads(self.result_json)

@@ -41,8 +41,8 @@ def csrf_protect(f):
 # ========================
 
 _login_attempts = {}  # {ip: [timestamp, ...]}
-LOGIN_RATE_LIMIT = 5  # 每分钟最多5次登录尝试
-LOGIN_LOCKOUT_SECONDS = 300  # 锁定5分钟
+LOGIN_RATE_LIMIT = 20  # 每分钟最多20次请求
+LOGIN_LOCKOUT_SECONDS = 60  # 锁定60秒
 
 def check_login_rate_limit():
     """检查登录限流"""
@@ -79,7 +79,7 @@ def reset_login_attempts():
 # ========================
 
 _request_counts = {}
-RATE_LIMIT = 30
+RATE_LIMIT = 120
 RATE_WINDOW = 60
 _last_cleanup = time.time()
 CLEANUP_INTERVAL = 300  # 每5分钟清理一次
@@ -158,13 +158,13 @@ def validate_birth_time(time_str):
         return False
 
 def validate_name(name):
-    """验证姓名"""
+    """验证姓名 - 支持中文、日文、韩文、越南文、英文字母和数字"""
     if not name:
         return True  # 可选
     if len(name) > 50:
         return False
-    # 只允许中文、字母、数字、空格
-    return bool(re.match(r'^[\u4e00-\u9fa5a-zA-Z0-9\s]+$', name))
+    # 允许：中文、日文平假名、日文片假名、韩文、越南文、英文字母、数字、空格
+    return bool(re.match(r'^[\u4e00-\u9fa5\u3040-\u309f\u30a0-\u30ff\uac00-\ud7af\u00c0-\u024fa-zA-Z0-9\s]+$', name))
 
 
 # ========================

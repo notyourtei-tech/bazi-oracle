@@ -45,6 +45,7 @@ app.secret_key = os.environ.get('SECRET_KEY') or secrets.token_hex(32)
 # 数据库
 app.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get('DATABASE_URL', 'sqlite:///db.sqlite3')
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
+app.config["TEMPLATES_AUTO_RELOAD"] = True
 
 # Session 安全
 app.config["SESSION_COOKIE_HTTPONLY"] = True
@@ -272,6 +273,7 @@ def index():
             logger.error(f"Load chart error: {type(e).__name__}: {e}")
 
     user_chart = None
+    own_chart = None
     daily_fortune = None
     if "user_id" in session:
         try:
@@ -279,13 +281,17 @@ def index():
                 user_id=session["user_id"]
             ).order_by(Chart.created_at.desc()).limit(3).all()
             user_chart = charts
+            # 单独查询 is_own 的八字，确保一定存在
+            own_chart = Chart.query.filter_by(
+                user_id=session["user_id"], is_own=True
+            ).first()
             if charts:
                 latest_result = json.loads(charts[0].result_json)
                 daily_fortune = calc_daily_fortune(latest_result)
         except Exception as e:
             logger.error(f"Load history error: {type(e).__name__}")
 
-    return render_template("index.html", user_chart=user_chart, daily_fortune=daily_fortune)
+    return render_template("index.html", user_chart=user_chart, own_chart=own_chart, daily_fortune=daily_fortune)
 
 
 # ======================
@@ -385,6 +391,44 @@ def history():
     except Exception as e:
         logger.error(f"History query error: {type(e).__name__}")
         return render_template("history.html", history=[])
+
+
+# ======================
+# 设置/取消我的八字
+# ======================
+@app.route("/api/set-own/<int:chart_id>", methods=["POST"])
+@login_required
+def set_own_chart(chart_id):
+    try:
+        chart = Chart.query.filter_by(id=chart_id, user_id=session["user_id"]).first()
+        if not chart:
+            return jsonify({"error": "not found"}), 404
+        # 取消其他所有 is_own
+        Chart.query.filter_by(user_id=session["user_id"], is_own=True).update({"is_own": False})
+        # 设置当前为 is_own
+        chart.is_own = True
+        db.session.commit()
+        return jsonify({"ok": True})
+    except Exception as e:
+        logger.error(f"Set own chart error: {type(e).__name__}")
+        db.session.rollback()
+        return jsonify({"error": "failed"}), 500
+
+
+@app.route("/api/unset-own/<int:chart_id>", methods=["POST"])
+@login_required
+def unset_own_chart(chart_id):
+    try:
+        chart = Chart.query.filter_by(id=chart_id, user_id=session["user_id"]).first()
+        if not chart:
+            return jsonify({"error": "not found"}), 404
+        chart.is_own = False
+        db.session.commit()
+        return jsonify({"ok": True})
+    except Exception as e:
+        logger.error(f"Unset own chart error: {type(e).__name__}")
+        db.session.rollback()
+        return jsonify({"error": "failed"}), 500
 
 
 # ======================
@@ -563,6 +607,14 @@ def export_pdf():
 @app.route("/explain")
 def explain():
     return render_template("explain.html")
+
+
+# ======================
+# 付费咨询页
+# ======================
+@app.route("/consult")
+def consult():
+    return render_template("consult.html")
 
 
 # ======================

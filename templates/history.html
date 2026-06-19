@@ -9,14 +9,17 @@
   {% if history %}
     {% for h in history %}
       {% set res = h.get_result() %}
-      <div class="card animate-slide" style="cursor: pointer;" onclick="location.href='/?load={{ h.id }}'">
+      <div class="card animate-slide">
         <div style="display: flex; justify-content: space-between; align-items: flex-start;">
-          <div>
+          <div style="cursor: pointer; flex: 1;" onclick="location.href='/?load={{ h.id }}'">
             <div style="font-size: 16px; font-weight: 600; margin-bottom: 4px;">
               {% if h.name %}
                 {{ h.name }}
               {% else %}
                 <span data-i18n="unnamed">未命名</span>
+              {% endif %}
+              {% if h.is_own %}
+                <span style="font-size: 11px; color: var(--gold); background: rgba(212,168,67,0.15); padding: 2px 8px; border-radius: 10px; margin-left: 8px; font-weight: 600;" data-i18n="my_bazi_tag">我的八字</span>
               {% endif %}
             </div>
             <div style="font-size: 12px; color: var(--text-muted); margin-bottom: 2px;">
@@ -26,11 +29,16 @@
             </div>
             <div style="font-size: 11px; color: var(--text-muted);">{{ h.created_at.strftime('%Y-%m-%d %H:%M') }}</div>
           </div>
-          <div style="text-align: right;">
-            <span style="color: var(--text-muted); font-size: 14px;">→</span>
+          <div style="display: flex; gap: 8px; align-items: center; flex-shrink: 0;">
+            {% if h.is_own %}
+              <button class="own-btn own-btn-active" onclick="event.stopPropagation(); toggleOwn({{ h.id }}, false)" data-i18n="cancel_my_bazi">取消</button>
+            {% else %}
+              <button class="own-btn" onclick="event.stopPropagation(); toggleOwn({{ h.id }}, true)" data-i18n="set_as_my_bazi">设为我的八字</button>
+            {% endif %}
+            <span style="color: var(--text-muted); font-size: 14px; cursor: pointer;" onclick="location.href='/?load={{ h.id }}'">→</span>
           </div>
         </div>
-        <div style="display: flex; gap: 12px; margin-top: 12px; flex-wrap: wrap;">
+        <div style="display: flex; gap: 12px; margin-top: 12px; flex-wrap: wrap; cursor: pointer;" onclick="location.href='/?load={{ h.id }}'">
           <div style="font-size: 13px; color: var(--text-secondary);">
             <span data-i18n="year_pillar">年柱</span>: <strong>{{ res.bazi.year }}</strong>
           </div>
@@ -57,5 +65,41 @@
     ← <span data-i18n="back">返回</span>
   </a>
 </div>
+
+<style>
+.own-btn {
+  padding: 6px 14px;
+  border-radius: var(--radius-sm);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--text-muted);
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+.own-btn:hover {
+  border-color: var(--gold);
+  color: var(--gold);
+}
+.own-btn-active {
+  border-color: var(--gold);
+  background: rgba(212,168,67,0.12);
+  color: var(--gold);
+}
+</style>
+
+<script>
+async function toggleOwn(chartId, setOwn) {
+  const url = setOwn ? '/api/set-own/' + chartId : '/api/unset-own/' + chartId;
+  try {
+    const res = await fetch(url, { method: 'POST' });
+    if (res.ok) location.reload();
+  } catch(e) {
+    console.error('toggleOwn error:', e);
+  }
+}
+</script>
 
 {% endblock %}

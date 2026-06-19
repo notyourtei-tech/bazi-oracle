@@ -2,13 +2,13 @@
 <html lang="zh">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
   <meta name="theme-color" content="#0a0a0f">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <title data-i18n="app_title">BaZi</title>
 
-  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}?v=3.0">
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}?v=6.0">
 
   <script>
     let I18N = {};
@@ -87,6 +87,63 @@
 
 <body>
 
+<!-- 语言选择弹窗 -->
+<div class="lang-modal-overlay" id="langModal">
+  <div class="lang-modal">
+    <span class="lang-modal-icon">☯</span>
+    <div class="lang-modal-title" data-i18n="lang_select_title">选择语言</div>
+    <div class="lang-modal-desc" data-i18n="lang_select_desc">请选择您偏好的语言</div>
+    <div class="lang-options">
+      <button class="lang-option" data-lang-val="zh" onclick="selectLangModal(this)">
+        <span class="lang-option-flag">🇨🇳</span>
+        中文
+      </button>
+      <button class="lang-option" data-lang-val="ja" onclick="selectLangModal(this)">
+        <span class="lang-option-flag">🇯🇵</span>
+        日本語
+      </button>
+      <button class="lang-option" data-lang-val="en" onclick="selectLangModal(this)">
+        <span class="lang-option-flag">🇬🇧</span>
+        English
+      </button>
+      <button class="lang-option" data-lang-val="ko" onclick="selectLangModal(this)">
+        <span class="lang-option-flag">🇰🇷</span>
+        한국어
+      </button>
+      <button class="lang-option" data-lang-val="vi" onclick="selectLangModal(this)">
+        <span class="lang-option-flag">🇻🇳</span>
+        Tiếng Việt
+      </button>
+    </div>
+    <button class="lang-modal-confirm" onclick="confirmLangModal()" data-i18n="lang_select_confirm">确认</button>
+  </div>
+</div>
+
+<!-- 引导教程弹窗 -->
+<div class="onboard-overlay hidden" id="onboardModal">
+  <div class="onboard-modal">
+    <button class="onboard-close" onclick="closeOnboard()">×</button>
+    <span class="onboard-icon">☯</span>
+    <div class="onboard-title" data-i18n="onboard_title">欢迎使用八字排盘</div>
+    <div id="onboardContent">
+      <div class="onboard-step-title" data-i18n="onboard_step1_title">什么是八字？</div>
+      <div class="onboard-step-desc" data-i18n="onboard_step1_desc">八字（四柱）是基于出生年月日时的天干地支，结合节气与真太阳时进行推演的传统命理系统。</div>
+    </div>
+    <div class="onboard-dots">
+      <div class="onboard-dot active" data-step="0"></div>
+      <div class="onboard-dot" data-step="1"></div>
+      <div class="onboard-dot" data-step="2"></div>
+      <div class="onboard-dot" data-step="3"></div>
+      <div class="onboard-dot" data-step="4"></div>
+      <div class="onboard-dot" data-step="5"></div>
+    </div>
+    <div class="onboard-actions">
+      <button class="onboard-btn onboard-btn-skip" onclick="closeOnboard()" data-i18n="onboard_skip">跳过教程</button>
+      <button class="onboard-btn onboard-btn-next" onclick="nextOnboardStep()" data-i18n="onboard_next">下一步</button>
+    </div>
+  </div>
+</div>
+
 <!-- 加载动画 -->
 <div class="loading-overlay" id="loadingOverlay">
   <div class="loading-spinner"></div>
@@ -139,12 +196,110 @@
   </div>
 </nav>
 
+<!-- 页脚 -->
+<footer class="site-footer">
+  <div class="footer-divider"></div>
+  <div class="footer-bottom">
+    <div class="footer-powered" data-i18n="footer_powered_by">Powered by BaZi Auto Chart System</div>
+  </div>
+</footer>
+
 <script>
 function showLoading() {
   document.getElementById('loadingOverlay').classList.add('active');
 }
 function hideLoading() {
   document.getElementById('loadingOverlay').classList.remove('active');
+}
+
+// ========================
+// 语言选择弹窗逻辑
+// ========================
+var selectedLangVal = localStorage.getItem('lang') || 'zh';
+
+function selectLangModal(el) {
+  document.querySelectorAll('.lang-option').forEach(function(o) { o.classList.remove('selected'); });
+  el.classList.add('selected');
+  selectedLangVal = el.getAttribute('data-lang-val');
+}
+
+function confirmLangModal() {
+  localStorage.setItem('lang', selectedLangVal);
+  localStorage.setItem('lang_selected', '1');
+  loadLang(selectedLangVal);
+  document.getElementById('langModal').classList.add('hidden');
+  // 如果是首次访问，显示引导教程
+  if (!localStorage.getItem('onboard_done')) {
+    setTimeout(function() {
+      document.getElementById('onboardModal').classList.remove('hidden');
+    }, 400);
+  }
+}
+
+// 初始化语言选择弹窗的选中状态
+(function() {
+  var savedLang = localStorage.getItem('lang') || 'zh';
+  var options = document.querySelectorAll('.lang-option');
+  options.forEach(function(o) {
+    if (o.getAttribute('data-lang-val') === savedLang) {
+      o.classList.add('selected');
+      selectedLangVal = savedLang;
+    }
+  });
+  // 如果已选择过语言，隐藏弹窗
+  if (localStorage.getItem('lang_selected')) {
+    document.getElementById('langModal').classList.add('hidden');
+  }
+})();
+
+// ========================
+// 引导教程逻辑
+// ========================
+var onboardSteps = [
+  { titleKey: 'onboard_step1_title', descKey: 'onboard_step1_desc', icon: '📖' },
+  { titleKey: 'onboard_step2_title', descKey: 'onboard_step2_desc', icon: '📝' },
+  { titleKey: 'onboard_step3_title', descKey: 'onboard_step3_desc', icon: '📋' },
+  { titleKey: 'onboard_step4_title', descKey: 'onboard_step4_desc', icon: '🔒' },
+  { titleKey: 'onboard_step5_title', descKey: 'onboard_step5_desc', icon: '🔮' },
+  { titleKey: 'onboard_step6_title', descKey: 'onboard_step6_desc', icon: '💬' }
+];
+var currentOnboardStep = 0;
+
+function renderOnboardStep() {
+  var step = onboardSteps[currentOnboardStep];
+  var content = document.getElementById('onboardContent');
+  var icon = document.querySelector('.onboard-icon');
+  icon.textContent = step.icon;
+  content.innerHTML = '<div class="onboard-step-title" data-i18n="' + step.titleKey + '">' + (I18N[step.titleKey] || '') + '</div>' +
+    '<div class="onboard-step-desc" data-i18n="' + step.descKey + '">' + (I18N[step.descKey] || '') + '</div>';
+  // 更新指示点
+  document.querySelectorAll('.onboard-dot').forEach(function(d, i) {
+    d.classList.toggle('active', i === currentOnboardStep);
+  });
+  // 更新按钮
+  var nextBtn = document.querySelector('.onboard-btn-next');
+  if (currentOnboardStep === onboardSteps.length - 1) {
+    nextBtn.setAttribute('data-i18n', 'onboard_start');
+    nextBtn.textContent = I18N.onboard_start || '开始使用';
+  } else {
+    nextBtn.setAttribute('data-i18n', 'onboard_next');
+    nextBtn.textContent = I18N.onboard_next || '下一步';
+  }
+}
+
+function nextOnboardStep() {
+  if (currentOnboardStep < onboardSteps.length - 1) {
+    currentOnboardStep++;
+    renderOnboardStep();
+  } else {
+    closeOnboard();
+  }
+}
+
+function closeOnboard() {
+  document.getElementById('onboardModal').classList.add('hidden');
+  localStorage.setItem('onboard_done', '1');
+  localStorage.setItem('lang_selected', '1');
 }
 </script>
 
