@@ -935,5 +935,6 @@
   "no_own_bazi_hint": "暂未设置自己的八字，可从历史记录中选择",
   "set_as_my_bazi": "设为我的八字",
   "cancel_my_bazi": "取消",
-  "my_bazi_tag": "我的八字"
+  "my_bazi_tag": "我的八字",
+  "wechat_tip_text": "微信内置浏览器部分功能受限，建议点击右上角 ··· 选择「在浏览器中打开」以获得最佳体验"
 }

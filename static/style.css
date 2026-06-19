@@ -2167,6 +2167,61 @@ select option {
 }
 
 /* =========================
+   微信浏览器提示条
+   ========================= */
+
+.wechat-tip {
+    position: fixed;
+    top: 56px;
+    left: 0;
+    right: 0;
+    z-index: 200;
+    background: linear-gradient(135deg, #07c160, #06ad56);
+    padding: 0;
+    animation: slideDown 0.3s ease;
+}
+
+@keyframes slideDown {
+    from { transform: translateY(-100%); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+}
+
+.wechat-tip-inner {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 10px 16px;
+}
+
+.wechat-tip-icon {
+    font-size: 16px;
+    flex-shrink: 0;
+}
+
+.wechat-tip-text {
+    font-size: 13px;
+    color: #fff;
+    flex: 1;
+    line-height: 1.4;
+}
+
+.wechat-tip-close {
+    background: none;
+    border: none;
+    color: rgba(255,255,255,0.8);
+    font-size: 18px;
+    cursor: pointer;
+    padding: 0 4px;
+    flex-shrink: 0;
+}
+
+.wechat-tip-close:hover {
+    color: #fff;
+}
+
+/* =========================
    语言选择弹窗
    ========================= */
 

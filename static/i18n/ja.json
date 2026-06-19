@@ -938,5 +938,6 @@
   "no_own_bazi_hint": "八字が設定されていません。履歴から選択してください。",
   "set_as_my_bazi": "私の八字に設定",
   "cancel_my_bazi": "解除",
-  "my_bazi_tag": "私の八字"
+  "my_bazi_tag": "私の八字",
+  "wechat_tip_text": "WeChat内蔵ブラウザでは一部機能が制限されています。右上の ··· をタップし「ブラウザで開く」を選択してください。"
 }

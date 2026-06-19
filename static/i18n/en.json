@@ -938,5 +938,6 @@
   "no_own_bazi_hint": "No BaZi set yet. Select one from your history.",
   "set_as_my_bazi": "Set as my BaZi",
   "cancel_my_bazi": "Cancel",
-  "my_bazi_tag": "My BaZi"
+  "my_bazi_tag": "My BaZi",
+  "wechat_tip_text": "WeChat browser has limited features. Tap ··· at top right and select 'Open in Browser' for the best experience."
 }

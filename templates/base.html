@@ -81,11 +81,31 @@
       document.querySelectorAll('.lang-btn').forEach(btn => {
         btn.classList.toggle('active', btn.dataset.lang === currentLang);
       });
+      // 微信浏览器检测
+      if (/MicroMessenger/i.test(navigator.userAgent)) {
+        var tip = document.getElementById('wechatTip');
+        if (tip && !localStorage.getItem('wechat_tip_closed')) {
+          tip.style.display = 'block';
+          // 调整容器顶部间距
+          document.querySelectorAll('.container').forEach(function(c) {
+            c.style.paddingTop = '100px';
+          });
+        }
+      }
     });
   </script>
 </head>
 
 <body>
+
+<!-- 微信浏览器提示条 -->
+<div class="wechat-tip" id="wechatTip" style="display:none;">
+  <div class="wechat-tip-inner">
+    <span class="wechat-tip-icon">📱</span>
+    <span class="wechat-tip-text" data-i18n="wechat_tip_text">微信内置浏览器部分功能受限，建议点击右上角 ··· 选择"在浏览器中打开"以获得最佳体验</span>
+    <button class="wechat-tip-close" onclick="document.getElementById('wechatTip').style.display='none';localStorage.setItem('wechat_tip_closed','1')">×</button>
+  </div>
+</div>
 
 <!-- 语言选择弹窗 -->
 <div class="lang-modal-overlay" id="langModal">
