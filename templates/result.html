@@ -388,6 +388,13 @@
       </a>
     </div>
 
+    <!-- 社交分享 -->
+    <div class="share-buttons" style="display:flex;gap:10px;justify-content:center;margin:16px 0;flex-wrap:wrap;">
+      <button class="share-btn" onclick="shareToWechat()" style="padding:8px 16px;border-radius:20px;border:1px solid var(--border);background:var(--bg-secondary);color:var(--text);font-size:13px;cursor:pointer;" data-i18n="share_wechat">微信</button>
+      <button class="share-btn" onclick="shareToLine()" style="padding:8px 16px;border-radius:20px;border:1px solid var(--border);background:var(--bg-secondary);color:var(--text);font-size:13px;cursor:pointer;">LINE</button>
+      <button class="share-btn" onclick="shareToWhatsApp()" style="padding:8px 16px;border-radius:20px;border:1px solid var(--border);background:var(--bg-secondary);color:var(--text);font-size:13px;cursor:pointer;">WhatsApp</button>
+    </div>
+
     <!-- 咨询卡片 -->
     <div class="consult-card animate-slide">
       <div class="consult-card-inner">
@@ -486,5 +493,21 @@
   }
 
   setTimeout(loadDailyFortune, 500);
+
+  function shareToWechat() {
+    if (navigator.share) {
+      navigator.share({ title: 'BaZi', text: I18N.app_title_short || 'BaZi', url: window.location.href });
+    } else {
+      alert(I18N.share_copy_link || 'Link copied!');
+    }
+  }
+  function shareToLine() {
+    var url = 'https://social-plugins.line.me/lineit/share?url=' + encodeURIComponent(window.location.href);
+    window.open(url, '_blank');
+  }
+  function shareToWhatsApp() {
+    var url = 'https://wa.me/?text=' + encodeURIComponent((I18N.app_title_short || 'BaZi') + ' ' + window.location.href);
+    window.open(url, '_blank');
+  }
 </script>
 {% endblock %}

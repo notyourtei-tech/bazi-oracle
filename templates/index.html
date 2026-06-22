@@ -110,7 +110,7 @@
       </div>
     </div>
 
-    <form method="post" onsubmit="showLoading()">
+    <form method="post" onsubmit="return validateForm()">
       <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
       <div class="form-section">
         <div class="form-row">
@@ -118,7 +118,7 @@
             <label class="form-label" data-i18n="name">姓名</label>
             <input type="text" name="name" class="form-input" data-i18n-placeholder="name_placeholder" placeholder="请输入您的姓名">
           </div>
-          <div class="form-group">
+          <div class="form-group" id="genderGroupWrap">
             <label class="form-label" data-i18n="gender">性别</label>
             <div class="form-radio-group" id="genderGroup">
               <label class="form-radio" onclick="selectRadio(this, 'gender', 'male')">
@@ -133,11 +133,12 @@
               </label>
             </div>
             <div id="genderFeedback" class="gender-feedback"></div>
+            <div class="field-error" id="genderError"></div>
           </div>
         </div>
 
         <div class="form-row">
-          <div class="form-group">
+          <div class="form-group" id="countryGroupWrap">
             <label class="form-label" data-i18n="birth_country">出生国家</label>
             <input type="hidden" name="birth_country" id="birthCountryHidden" value="CN">
             <div class="custom-select" id="countrySelect">
@@ -278,26 +279,32 @@
                 </div>
               </div>
             </div>
+            <div class="field-error" id="countryError"></div>
           </div>
-          <div class="form-group">
+          <div class="form-group" id="cityGroupWrap">
             <label class="form-label" data-i18n="birth_city">出生城市</label>
             <input type="text" name="birth_city" class="form-input" data-i18n-placeholder="birth_city_placeholder" placeholder="选填，提高精度">
           </div>
         </div>
 
         <div class="form-row">
-          <div class="form-group">
+          <div class="form-group" id="dateGroupWrap">
             <label class="form-label" data-i18n="birth_date">出生日期</label>
             <input type="hidden" name="birth_date" id="birthDateHidden" required>
             <div style="display:flex;gap:8px;">
-              <select id="birthYear" class="form-input" style="flex:1;" onchange="syncBirthDate()"></select>
+              <input type="number" id="birthYear" class="form-input" style="flex:1;" min="1" max="9999" data-i18n-placeholder="year_placeholder" placeholder="年" oninput="syncBirthDate()">
               <select id="birthMonth" class="form-input" style="flex:1;" onchange="syncBirthDate();updateBirthDayOptions()"></select>
               <select id="birthDay" class="form-input" style="flex:1;" onchange="syncBirthDate()"></select>
             </div>
+            <div class="field-error" id="dateError"></div>
           </div>
           <div class="form-group">
             <label class="form-label" data-i18n="birth_time">出生时间</label>
-            <input type="time" name="birth_time" class="form-input">
+            <input type="hidden" name="birth_time" id="birthTimeHidden">
+            <div class="time-picker-display" onclick="openTimePicker()">
+              <span class="time-display-placeholder" id="timePickerDisplay" data-i18n="time_picker_placeholder">点击选择时间</span>
+              <span class="time-display-icon">🕐</span>
+            </div>
           </div>
         </div>
 
@@ -316,10 +323,97 @@
 
 </div>
 
+<!-- Time Picker Modal -->
+<div class="time-picker-overlay" id="timePickerOverlay">
+  <div class="time-picker-modal">
+    <div class="time-picker-header">
+      <div class="time-picker-title" data-i18n="time_picker_title">选择时间</div>
+      <div class="time-picker-selected">
+        <span class="time-picker-selected-digit active" id="tpHour" onclick="switchTimeMode('hour')">00</span>
+        <span class="time-picker-separator">:</span>
+        <span class="time-picker-selected-digit" id="tpMinute" onclick="switchTimeMode('minute')">00</span>
+      </div>
+      <div class="time-picker-ampm">
+        <button class="time-picker-ampm-btn active" id="tpAM" onclick="selectAMPM('AM')">AM</button>
+        <button class="time-picker-ampm-btn" id="tpPM" onclick="selectAMPM('PM')">PM</button>
+      </div>
+    </div>
+    <div class="time-picker-clock" id="tpClock">
+      <div class="time-picker-clock-center"></div>
+      <div class="time-picker-clock-hand hour-hand" id="tpHourHand"></div>
+      <div class="time-picker-clock-hand minute-hand" id="tpMinuteHand" style="display:none;"></div>
+    </div>
+    <div class="time-picker-actions">
+      <button class="time-picker-btn time-picker-btn-cancel" onclick="closeTimePicker()" data-i18n="time_picker_cancel">取消</button>
+      <button class="time-picker-btn time-picker-btn-confirm" onclick="confirmTimePicker()" data-i18n="time_picker_confirm">确认</button>
+    </div>
+  </div>
+</div>
+
 <script>
 function escapeHtml(text) {
   if (!text) return '';
   return text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#039;');
+}
+
+// ========================
+// Form Validation with Shake
+// ========================
+function validateForm() {
+  var valid = true;
+  clearErrors();
+
+  // Validate gender
+  var genderChecked = document.querySelector('input[name="gender"]:checked');
+  if (!genderChecked) {
+    shakeField('genderGroupWrap');
+    showError('genderError', I18N.validate_gender || 'Please select gender');
+    valid = false;
+  }
+
+  // Validate country
+  var country = document.getElementById('birthCountryHidden').value;
+  if (!country) {
+    shakeField('countryGroupWrap');
+    showError('countryError', I18N.validate_country || 'Please select birth country');
+    valid = false;
+  }
+
+  // Validate date
+  var year = document.getElementById('birthYear').value;
+  var month = document.getElementById('birthMonth').value;
+  var day = document.getElementById('birthDay').value;
+  if (!year || !month || !day) {
+    shakeField('dateGroupWrap');
+    showError('dateError', I18N.validate_date || 'Please select birth date');
+    valid = false;
+  }
+
+  if (valid) {
+    showLoading();
+  }
+  return valid;
+}
+
+function shakeField(groupId) {
+  var group = document.getElementById(groupId);
+  if (!group) return;
+  group.classList.add('shake');
+  setTimeout(function() { group.classList.remove('shake'); }, 500);
+}
+
+function showError(errorId, msg) {
+  var el = document.getElementById(errorId);
+  if (!el) return;
+  el.textContent = msg;
+  el.classList.add('show');
+}
+
+function clearErrors() {
+  document.querySelectorAll('.field-error').forEach(function(el) {
+    el.classList.remove('show');
+    el.textContent = '';
+  });
 }
 
 // Date selects
@@ -327,11 +421,7 @@ function initDateSelects() {
   var yearSel = document.getElementById('birthYear');
   var monthSel = document.getElementById('birthMonth');
   var daySel = document.getElementById('birthDay');
-  if (!yearSel) return;
-  var now = new Date();
-  var yearOpts = '<option value="">----</option>';
-  for (var y = now.getFullYear(); y >= 1920; y--) yearOpts += '<option value="' + y + '">' + y + '</option>';
-  yearSel.innerHTML = yearOpts;
+  if (!monthSel) return;
   var monthNames = (I18N.month_names || '1,2,3,4,5,6,7,8,9,10,11,12').split(',');
   var mOpts = '<option value="">--</option>';
   for (var m = 1; m <= 12; m++) mOpts += '<option value="' + (m < 10 ? '0' + m : m) + '">' + (I18N['month_' + m] || monthNames[m - 1] || m) + '</option>';
@@ -357,8 +447,12 @@ function syncBirthDate() {
   var m = document.getElementById('birthMonth').value;
   var d = document.getElementById('birthDay').value;
   var hidden = document.getElementById('birthDateHidden');
-  if (y && m && d) hidden.value = y + '-' + m + '-' + d;
-  else hidden.value = '';
+  if (y && m && d) {
+    var yPad = y.length < 4 ? ('000' + y).slice(-4) : y;
+    hidden.value = yPad + '-' + m + '-' + d;
+  } else {
+    hidden.value = '';
+  }
 }
 function refreshDateSelects() {
   var monthSel = document.getElementById('birthMonth');
@@ -459,7 +553,7 @@ function renderHomeFortune() {
 }
 
 function refreshDateInputs() {
-  document.querySelectorAll('input[type="date"], input[type="time"]').forEach(function(el) {
+  document.querySelectorAll('input[type="date"]').forEach(function(el) {
     var val = el.value;
     var clone = el.cloneNode(true);
     el.parentNode.replaceChild(clone, el);
@@ -467,5 +561,12 @@ function refreshDateInputs() {
   });
 }
 {% endif %}
+
+</script>
+<script src="{{ url_for('static', filename='timepicker.js') }}"></script>
+<script>
+document.getElementById('timePickerOverlay').addEventListener('click', function(e) {
+  if (e.target === this) closeTimePicker();
+});
 </script>
 {% endblock %}

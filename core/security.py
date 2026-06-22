@@ -157,7 +157,7 @@ def validate_birth_date(date_str):
     try:
         from datetime import date
         y, m, d = map(int, date_str.split('-'))
-        if y < 1 or y > 2200:
+        if y < 1 or y > 9999:
             return False
         date(y, m, d)  # 会自动校验每月天数和闰年
         return True

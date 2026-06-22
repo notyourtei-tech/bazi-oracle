@@ -7,6 +7,7 @@ import os
 import re
 import secrets
 import logging
+import gzip
 from datetime import timedelta
 
 from config import Config, _get_secret_key
@@ -67,18 +68,6 @@ db.init_app(app)
 # 模板中可用 csrf_token
 app.jinja_env.globals['csrf_token'] = generate_csrf_token
 
-# 旧模板 i18n 支持：T 字典 + t() 函数
-from static.lang.lang import TEXT
-app.jinja_env.globals['T'] = TEXT
-
-def _get_template_lang():
-    return session.get('lang', 'zh')
-
-@app.template_global()
-def t(key):
-    lang = _get_template_lang()
-    return TEXT.get(lang, TEXT.get('zh', {})).get(key, TEXT.get('zh', {}).get(key, key))
-
 
 # ========================
 # 安全中间件
@@ -126,8 +115,10 @@ def security_headers(response):
     response.headers['Permissions-Policy'] = 'geolocation=(), camera=(), microphone=()'
     response.headers['X-Permitted-Cross-Domain-Policies'] = 'none'
 
-    # 开发环境：禁止浏览器缓存HTML，确保始终获取最新内容
-    if request.path.endswith('.html') or request.path == '/' or request.path == '':
+    # 静态资源长期缓存
+    if request.path.startswith('/static/'):
+        response.headers['Cache-Control'] = 'public, max-age=31536000, immutable'
+    elif request.path.endswith('.html') or request.path == '/' or request.path == '':
         response.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate'
         response.headers['Pragma'] = 'no-cache'
         response.headers['Expires'] = '0'
@@ -150,6 +141,28 @@ def security_headers(response):
     ]
     response.headers['Content-Security-Policy'] = "; ".join(csp_parts)
 
+    return response
+
+
+@app.after_request
+def compress_response(response):
+    """Gzip压缩响应体"""
+    accept = request.headers.get('Accept-Encoding', '')
+    if 'gzip' not in accept:
+        return response
+    ct = response.content_type or ''
+    if not any(t in ct for t in ['text/', 'json', 'javascript', 'css', 'xml']):
+        return response
+    try:
+        data = response.get_data()
+        if len(data) < 500:
+            return response
+        compressed = gzip.compress(data, compresslevel=6)
+        response.set_data(compressed)
+        response.headers['Content-Encoding'] = 'gzip'
+        response.headers['Content-Length'] = len(compressed)
+    except Exception:
+        pass
     return response
 
 
@@ -217,7 +230,7 @@ def index():
                 bazi_cache.set(result, **cache_params)
             except Exception as e:
                 logger.error(f"Bazi analysis error: {type(e).__name__}")
-                return render_template("index.html", error="排盘计算出错，请检查输入信息后重试")
+                return render_template("index.html", error="err_bazi_calc")
 
         # 添加综合分析
         try:
@@ -325,20 +338,20 @@ def register():
         password = request.form.get("password", "")
 
         if not username or not password:
-            return render_template("register.html", error="请填写完整信息")
+            return render_template("register.html", error="err_register_empty")
 
         if len(username) < 2 or len(username) > 20:
-            return render_template("register.html", error="姓名长度为2-20个字符")
+            return render_template("register.html", error="err_register_name_length")
 
         if len(password) < 8:
-            return render_template("register.html", error="密码至少8位")
+            return render_template("register.html", error="err_register_password_length")
 
         # 密码强度检查
         if not re.search(r'[A-Za-z]', password) or not re.search(r'\d', password):
-            return render_template("register.html", error="密码必须包含字母和数字")
+            return render_template("register.html", error="err_register_password_strength")
 
         if User.query.filter_by(username=username).first():
-            return render_template("register.html", error="该姓名已被注册")
+            return render_template("register.html", error="err_register_name_exists")
 
         try:
             user = User(username=username)
@@ -349,7 +362,7 @@ def register():
         except Exception as e:
             logger.error(f"Register error: {type(e).__name__}")
             db.session.rollback()
-            return render_template("register.html", error="注册失败，请重试")
+            return render_template("register.html", error="err_register_fail")
 
     return render_template("register.html")
 
@@ -365,25 +378,26 @@ def login():
         # 检查登录限流
         allowed, remaining = check_login_rate_limit()
         if not allowed:
-            return render_template("login.html", error=f"登录尝试过多，请{remaining}秒后重试")
+            session['rate_limit_remaining'] = remaining
+            return render_template("login.html", error="err_login_rate_limit")
 
         username = sanitize_input(request.form.get("username"))
         password = request.form.get("password", "")
 
         if not username or not password:
-            return render_template("login.html", error="请填写完整信息")
+            return render_template("login.html", error="err_login_empty")
 
         user = User.query.filter_by(username=username).first()
         if user and user.check_password(password):
             reset_login_attempts()
-            session.clear()  # 清除旧 session 防止会话固定攻击
+            session.clear()
             session.permanent = True
             session["user_id"] = user.id
             session["username"] = user.username
             return redirect("/")
 
         record_login_attempt()
-        return render_template("login.html", error="姓名或密码错误")
+        return render_template("login.html", error="err_login_wrong")
 
     return render_template("login.html")
 
@@ -656,23 +670,6 @@ def dashboard():
         from models.chart import Chart
         charts = Chart.query.filter_by(user_id=user_id).order_by(Chart.created_at.desc()).all()
     return render_template("dashboard.html", charts=charts)
-
-
-@app.route("/intro")
-def intro():
-    return render_template("intro.html")
-
-
-@app.route("/form")
-def form():
-    return render_template("form.html")
-
-
-@app.route("/choose")
-def choose():
-    LANGS = ['zh', 'ja', 'en', 'ko', 'vi', 'my']
-    LANG_LABELS = {'zh': '中文', 'ja': '日本語', 'en': 'English', 'ko': '한국어', 'vi': 'Tiếng Việt', 'my': 'မြန်မာ'}
-    return render_template("choose.html", LANGS=LANGS, LANG_LABELS=LANG_LABELS)
 
 
 @app.route("/set_lang/<lang>")

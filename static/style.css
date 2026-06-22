@@ -1,6 +1,6 @@
 /* =========================
    全局基础 - 大厂级设计
-========================= */
+   ========================= */
 
 * {
     box-sizing: border-box;
@@ -44,6 +44,21 @@
     --shadow-md: 0 4px 16px rgba(0,0,0,0.3);
     --shadow-lg: 0 8px 32px rgba(0,0,0,0.4);
     --shadow-gold: 0 4px 20px rgba(212,168,67,0.15);
+}
+
+[data-theme="light"] {
+    --bg: #f5f3ee;
+    --bg-secondary: #eae7e0;
+    --card: #ffffff;
+    --card-hover: #f8f6f1;
+    --border: rgba(0,0,0,0.08);
+    --border-focus: rgba(201,162,63,0.5);
+    --text: #1a1a1a;
+    --text-secondary: #555555;
+    --text-muted: #888888;
+    --shadow-sm: 0 2px 8px rgba(0,0,0,0.08);
+    --shadow-md: 0 4px 16px rgba(0,0,0,0.12);
+    --shadow-lg: 0 8px 32px rgba(0,0,0,0.16);
 }
 
 html {
@@ -98,9 +113,28 @@ body {
 .nav-brand {
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 8px;
     text-decoration: none;
+}
+
+.theme-toggle {
+    background: none;
+    border: 1px solid var(--border);
+    border-radius: 50%;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 14px;
+    transition: all 0.2s;
     color: var(--text);
+}
+
+.theme-toggle:hover {
+    border-color: var(--gold);
+    background: rgba(212,168,67,0.1);
 }
 
 .nav-brand-icon {
@@ -2826,5 +2860,320 @@ select option {
     .footer-qr-img-wrap {
         width: 110px;
         height: 110px;
+    }
+}
+
+/* =========================
+   Form Validation Shake
+   ========================= */
+
+@keyframes fieldShake {
+  0%, 100% { transform: translateX(0); }
+  10%, 30%, 50%, 70%, 90% { transform: translateX(-4px); }
+  20%, 40%, 60%, 80% { transform: translateX(4px); }
+}
+
+.form-group.shake {
+  animation: fieldShake 0.4s ease;
+}
+
+.form-group.shake .form-input,
+.form-group.shake .time-picker-display,
+.form-group.shake .custom-select {
+  border-color: var(--danger) !important;
+  box-shadow: 0 0 0 2px rgba(248,113,113,0.2) !important;
+}
+
+.form-group.shake .form-radio-group {
+  border-color: var(--danger) !important;
+  box-shadow: 0 0 0 2px rgba(248,113,113,0.2) !important;
+  border-radius: var(--radius-md);
+}
+
+.field-error {
+  color: var(--danger);
+  font-size: 12px;
+  margin-top: 4px;
+  display: none;
+}
+
+.field-error.show {
+  display: block;
+}
+
+/* =========================
+   Custom Time Picker (Clock UI)
+   ========================= */
+
+.time-picker-display {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 16px;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    min-height: 48px;
+}
+
+.time-picker-display:hover {
+    border-color: var(--border-focus);
+}
+
+.time-picker-display .time-display-value {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--text);
+    flex: 1;
+}
+
+.time-picker-display .time-display-placeholder {
+    font-size: 14px;
+    color: var(--text-muted);
+    flex: 1;
+}
+
+.time-picker-display .time-display-icon {
+    font-size: 18px;
+    opacity: 0.6;
+}
+
+.time-picker-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0,0,0,0.7);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    z-index: 10000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+}
+
+.time-picker-overlay.active {
+    opacity: 1;
+    pointer-events: all;
+}
+
+.time-picker-modal {
+    background: var(--card);
+    border-radius: var(--radius-xl);
+    padding: 24px;
+    width: 320px;
+    max-width: 90vw;
+    box-shadow: var(--shadow-lg);
+    transform: scale(0.9);
+    transition: transform 0.3s ease;
+}
+
+.time-picker-overlay.active .time-picker-modal {
+    transform: scale(1);
+}
+
+.time-picker-header {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.time-picker-title {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--text);
+    margin-bottom: 4px;
+}
+
+.time-picker-selected {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    margin-top: 8px;
+}
+
+.time-picker-selected-digit {
+    font-size: 36px;
+    font-weight: 700;
+    color: var(--gold);
+    min-width: 48px;
+    text-align: center;
+    line-height: 1;
+    padding: 4px 8px;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.time-picker-selected-digit:hover {
+    background: rgba(212,168,67,0.1);
+}
+
+.time-picker-selected-digit.active {
+    background: rgba(212,168,67,0.2);
+}
+
+.time-picker-separator {
+    font-size: 32px;
+    font-weight: 700;
+    color: var(--text-muted);
+}
+
+.time-picker-ampm {
+    display: flex;
+    gap: 8px;
+    justify-content: center;
+    margin-top: 10px;
+}
+
+.time-picker-ampm-btn {
+    padding: 6px 16px;
+    border-radius: 20px;
+    border: 1px solid var(--border);
+    background: transparent;
+    color: var(--text-muted);
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.time-picker-ampm-btn.active {
+    background: var(--gold);
+    color: #000;
+    border-color: var(--gold);
+}
+
+.time-picker-ampm-btn:hover:not(.active) {
+    border-color: var(--gold);
+    color: var(--gold);
+}
+
+.time-picker-clock {
+    position: relative;
+    width: 240px;
+    height: 240px;
+    margin: 0 auto 20px;
+    border-radius: 50%;
+    background: var(--bg-secondary);
+    border: 2px solid var(--border);
+}
+
+.time-picker-clock-center {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--gold);
+    transform: translate(-50%, -50%);
+    z-index: 3;
+}
+
+.time-picker-clock-hand {
+    position: absolute;
+    bottom: 50%;
+    left: calc(50% - 1px);
+    width: 2px;
+    background: var(--gold);
+    transform-origin: bottom center;
+    z-index: 2;
+    border-radius: 1px;
+    transition: transform 0.2s ease;
+}
+
+.time-picker-clock-hand.hour-hand {
+    height: 80px;
+}
+
+.time-picker-clock-hand.minute-hand {
+    height: 90px;
+}
+
+.time-picker-number {
+    position: absolute;
+    width: 34px;
+    height: 34px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-secondary);
+    border-radius: 50%;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    z-index: 4;
+    user-select: none;
+    -webkit-user-select: none;
+}
+
+.time-picker-number:hover {
+    background: rgba(212,168,67,0.15);
+    color: var(--gold);
+}
+
+.time-picker-number.selected {
+    background: var(--gold);
+    color: #000;
+    font-weight: 700;
+    box-shadow: 0 2px 8px rgba(212,168,67,0.4);
+}
+
+.time-picker-actions {
+    display: flex;
+    gap: 12px;
+    margin-top: 8px;
+}
+
+.time-picker-btn {
+    flex: 1;
+    padding: 12px;
+    border-radius: var(--radius-md);
+    border: none;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.time-picker-btn-cancel {
+    background: var(--bg-secondary);
+    color: var(--text-secondary);
+    border: 1px solid var(--border);
+}
+
+.time-picker-btn-cancel:hover {
+    background: var(--border);
+}
+
+.time-picker-btn-confirm {
+    background: var(--gold);
+    color: #000;
+}
+
+.time-picker-btn-confirm:hover {
+    background: var(--gold-light);
+}
+
+@media (max-width: 480px) {
+    .time-picker-modal {
+        width: 300px;
+        padding: 20px;
+    }
+    .time-picker-number {
+        width: 30px;
+        height: 30px;
+        font-size: 13px;
+    }
+    .time-picker-selected-digit {
+        font-size: 32px;
     }
 }

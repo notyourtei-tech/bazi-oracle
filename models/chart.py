@@ -3,6 +3,13 @@ from datetime import datetime
 import json
 
 class Chart(db.Model):
+    __tablename__ = 'chart'
+    __table_args__ = (
+        db.Index('idx_chart_user_id', 'user_id'),
+        db.Index('idx_chart_created_at', 'created_at'),
+        db.Index('idx_chart_user_own', 'user_id', 'is_own'),
+    )
+
     id = db.Column(db.Integer, primary_key=True)
 
     user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)

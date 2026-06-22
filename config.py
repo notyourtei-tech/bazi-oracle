@@ -25,6 +25,11 @@ class Config:
     SECRET_KEY = _get_secret_key()
     SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL', 'sqlite:///db.sqlite3')
     SQLALCHEMY_TRACK_MODIFICATIONS = False
+    SQLALCHEMY_ENGINE_OPTIONS = {
+        'pool_pre_ping': True,
+        'pool_recycle': 300,
+        'pool_timeout': 20,
+    }
     OPENROUTER_API_KEY = os.environ.get('OPENROUTER_API_KEY', '')
     SESSION_COOKIE_HTTPONLY = True
     SESSION_COOKIE_SECURE = True
