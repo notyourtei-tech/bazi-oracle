@@ -404,7 +404,7 @@
 </div>
 
 <script>
-  const baziResult = {{ result_json | safe }};
+  const baziResult = {{ result | tojson }};
 
   // Tab switching
   function switchTab(tabName) {
@@ -423,38 +423,52 @@
     el.classList.toggle('open');
   }
 
+  function escapeHtml(text) {
+    if (!text) return '';
+    return text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#039;');
+  }
+
   // AI Analysis with fallback
-  function formatText(text) { return text.split('\n').filter(p => p.trim()).map(p => '<p>' + p + '</p>').join(''); }
+  function formatText(text) {
+    if (!text) return '';
+    return text.split('\n').filter(p => p.trim()).map(p => '<p>' + escapeHtml(p) + '</p>').join('');
+  }
 
   // Daily fortune
+  var _resultFortune = null;
+  function renderResultFortune() {
+    var container = document.getElementById('dailyFortune');
+    if (!container || !_resultFortune) return;
+    var f = _resultFortune;
+    if (f.error) { container.innerHTML = '<p style="color: var(--text-muted);">' + (I18N.fortune_load_fail || '') + '</p>'; return; }
+    container.innerHTML = `
+      <div class="fortune-card">
+        <div class="fortune-score" style="background: ${escapeHtml(String(f.color || ''))}20; color: ${escapeHtml(String(f.color || ''))};">
+          <div class="fortune-score-num">${escapeHtml(String(f.score || ''))}</div>
+          <div class="fortune-score-label">${escapeHtml(I18N[f.level_text_key] || f.level_text || '')}</div>
+        </div>
+        <div class="fortune-info">
+          <div class="fortune-title">${escapeHtml(f.day_ganzhi || '')}${escapeHtml(I18N.day_label || '')}</div>
+          <div class="fortune-summary">${escapeHtml(I18N[f.summary_key] || f.summary || '')}</div>
+          <div class="fortune-tips">
+            <span>🎨 ${escapeHtml(I18N.lucky_color || '')}: ${escapeHtml(I18N[f.lucky_color_key] || f.lucky_color || '')}</span>
+            <span>🔢 ${escapeHtml(I18N.lucky_number || '')}: ${escapeHtml(String(f.lucky_number || ''))}</span>
+            <span>🧭 ${escapeHtml(I18N.lucky_direction || '')}: ${escapeHtml(I18N[f.lucky_direction_key] || f.lucky_direction || '')}</span>
+          </div>
+        </div>
+      </div>
+    `;
+  }
   async function loadDailyFortune() {
     try {
-      const response = await fetch('/api/daily-fortune', {
+      var response = await fetch('/api/daily-fortune', {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ result: baziResult })
       });
-      const fortune = await response.json();
-      const container = document.getElementById('dailyFortune');
-      if (fortune.error) { container.innerHTML = '<p style="color: var(--text-muted);">' + (I18N.fortune_load_fail || '运势加载失败') + '</p>'; return; }
-      container.innerHTML = `
-        <div class="fortune-card">
-          <div class="fortune-score" style="background: ${fortune.color}20; color: ${fortune.color};">
-            <div class="fortune-score-num">${fortune.score}</div>
-            <div class="fortune-score-label">${I18N[fortune.level_text_key] || fortune.level_text || ''}</div>
-          </div>
-          <div class="fortune-info">
-            <div class="fortune-title">${fortune.day_ganzhi}${I18N.day_label || ''}</div>
-            <div class="fortune-summary">${I18N[fortune.summary_key] || fortune.summary || ''}</div>
-            <div class="fortune-tips">
-              <span>🎨 ${I18N.lucky_color || ''}: ${I18N[fortune.lucky_color_key] || fortune.lucky_color || ''}</span>
-              <span>🔢 ${I18N.lucky_number || ''}: ${fortune.lucky_number || ''}</span>
-              <span>🧭 ${I18N.lucky_direction || ''}: ${I18N[fortune.lucky_direction_key] || fortune.lucky_direction || ''}</span>
-            </div>
-          </div>
-        </div>
-      `;
+      _resultFortune = await response.json();
+      renderResultFortune();
     } catch (err) {
-      document.getElementById('dailyFortune').innerHTML = '<p style="color: var(--text-muted);">' + (I18N.fortune_load_fail || '运势加载失败') + '</p>';
+      document.getElementById('dailyFortune').innerHTML = '<p style="color: var(--text-muted);">' + (I18N.fortune_load_fail || '') + '</p>';
     }
   }
 

@@ -535,4 +535,6 @@ if __name__ == "__main__":
     print("初始化数据库 sixyao2.db ...")
     init_db()
     print("启动: http://127.0.0.1:8888")
-    app.run(debug=True, host="127.0.0.1", port=8888)
+    import os
+    debug_mode = os.environ.get('FLASK_DEBUG', 'false').lower() == 'true'
+    app.run(debug=debug_mode, host="127.0.0.1", port=8888)

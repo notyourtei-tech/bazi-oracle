@@ -5,10 +5,11 @@ def get_stars(bazi):
     """
     bazi: dict，由 bazi_calc 生成的完整八字信息
     return: dict，神煞名称 -> 解释
-    """
 
-    # 这里先用占位，但结构已经对
-    # 后续你可以慢慢补逻辑，不会再炸
+    TODO: This function returns hardcoded placeholder data.
+    Real star/shensha calculation based on the bazi input is not yet implemented.
+    """
+    # WARNING: Returning hardcoded data. This does not reflect actual bazi analysis.
     return {
         "天乙贵人": {
             "level": "吉",

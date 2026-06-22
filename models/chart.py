@@ -23,4 +23,9 @@ class Chart(db.Model):
     is_own = db.Column(db.Boolean, default=False)
 
     def get_result(self):
-        return json.loads(self.result_json)
+        if not self.result_json:
+            return {}
+        try:
+            return json.loads(self.result_json)
+        except (json.JSONDecodeError, TypeError):
+            return {}

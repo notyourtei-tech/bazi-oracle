@@ -72,6 +72,8 @@ def map_liunian_event(
 
     liu_gan = liunian.get("gan")
     liu_wx = GAN_WUXING.get(liu_gan)
+    if liu_wx is None:
+        liu_wx = 'earth'
 
     ten_god = _ten_god(day_wx, liu_wx)
     strength = strength_info.get("strength")

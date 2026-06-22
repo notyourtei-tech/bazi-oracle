@@ -1,49 +1,39 @@
-<!DOCTYPE html>
-<html lang="{{ session.get('lang','zh') }}">
-<head>
-    <meta charset="utf-8">
-    <title>{{ t("liunian") }}</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-</head>
-<body>
+{% extends "base.html" %}
+{% block content %}
+<div class="container" style="max-width:720px;margin:0 auto;padding:24px 16px;">
 
-<div class="container">
+    <h1 class="page-title" data-i18n="liunian">流年运势</h1>
+    <p data-i18n="liunian_intro" style="color:var(--text-secondary);margin-bottom:20px;"></p>
 
-    <div class="lang-switch">
-        <a href="?lang=zh">{{ t("lang_zh") }}</a> |
-        <a href="?lang=ja">{{ t("lang_ja") }}</a> |
-        <a href="?lang=en">{{ t("lang_en") }}</a> |
-        <a href="?lang=vi">{{ t("lang_vi") }}</a>
-    </div>
-
-    <h1>{{ t("liunian") }}</h1>
-    <p>{{ t("liunian_intro") }}</p>
-
+    {% if overview %}
     {% for y in overview %}
-    <div class="year-card {{ y.risk.level }}">
-        <h2>{{ y.year }}</h2>
+    <div class="card {{ y.risk.level }}" style="margin-bottom:16px;padding:16px;">
+        <h2 style="color:var(--gold);">{{ y.year }}</h2>
 
-        <p><strong>{{ t("career") }}：</strong>{{ t(y.event.career_key) }}</p>
-        <p><strong>{{ t("wealth") }}：</strong>{{ t(y.event.wealth_key) }}</p>
-        <p><strong>{{ t("relationship") }}：</strong>{{ t(y.event.relationship_key) }}</p>
-        <p><strong>{{ t("health") }}：</strong>{{ t(y.event.health_key) }}</p>
+        <p><strong data-i18n="career">事业：</strong><span data-i18n="{{ y.event.career_key }}"></span></p>
+        <p><strong data-i18n="wealth">财运：</strong><span data-i18n="{{ y.event.wealth_key }}"></span></p>
+        <p><strong data-i18n="relationship">感情：</strong><span data-i18n="{{ y.event.relationship_key }}"></span></p>
+        <p><strong data-i18n="health">健康：</strong><span data-i18n="{{ y.event.health_key }}"></span></p>
 
         <p class="risk {{ y.risk.level }}">
-            {{ t("risk_" ~ y.risk.level) }}
+            <span data-i18n="risk_{{ y.risk.level }}"></span>
         </p>
 
         {% if y.risk.level == "high" %}
         <ul>
-            <li>{{ t("risk_advice_1") }}</li>
-            <li>{{ t("risk_advice_2") }}</li>
-            <li>{{ t("risk_advice_3") }}</li>
+            <li data-i18n="risk_advice_1"></li>
+            <li data-i18n="risk_advice_2"></li>
+            <li data-i18n="risk_advice_3"></li>
         </ul>
         {% endif %}
     </div>
     {% endfor %}
+    {% else %}
+    <div class="card" style="padding:24px;text-align:center;">
+        <p data-i18n="liunian_empty">暂无流年数据</p>
+    </div>
+    {% endif %}
 
-    <a href="{{ url_for('index') }}">{{ t("back") }}</a>
-
+    <a href="{{ url_for('index') }}" class="btn" data-i18n="back">返回</a>
 </div>
-</body>
-</html>
+{% endblock %}

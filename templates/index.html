@@ -29,7 +29,7 @@
       {% set res = own_chart.get_result() %}
       <div style="display: flex; gap: 16px; flex-wrap: wrap; align-items: center;">
         <div style="flex: 1; min-width: 180px;">
-          <div style="font-size: 15px; font-weight: 600; margin-bottom: 4px;">{{ own_chart.name or '未命名' }}</div>
+          <div style="font-size: 15px; font-weight: 600; margin-bottom: 4px;">{{ own_chart.name or t('unnamed') }}</div>
           <div style="font-size: 12px; color: var(--text-muted);">{{ own_chart.birth_date }} {% if own_chart.gender == 'male' %}♂{% else %}♀{% endif %} {% if own_chart.birth_time %}{{ own_chart.birth_time }}{% endif %}</div>
         </div>
         <div style="display: flex; gap: 12px; flex-wrap: wrap;">
@@ -288,7 +288,12 @@
         <div class="form-row">
           <div class="form-group">
             <label class="form-label" data-i18n="birth_date">出生日期</label>
-            <input type="date" name="birth_date" class="form-input" required>
+            <input type="hidden" name="birth_date" id="birthDateHidden" required>
+            <div style="display:flex;gap:8px;">
+              <select id="birthYear" class="form-input" style="flex:1;" onchange="syncBirthDate()"></select>
+              <select id="birthMonth" class="form-input" style="flex:1;" onchange="syncBirthDate();updateBirthDayOptions()"></select>
+              <select id="birthDay" class="form-input" style="flex:1;" onchange="syncBirthDate()"></select>
+            </div>
           </div>
           <div class="form-group">
             <label class="form-label" data-i18n="birth_time">出生时间</label>
@@ -312,6 +317,61 @@
 </div>
 
 <script>
+function escapeHtml(text) {
+  if (!text) return '';
+  return text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#039;');
+}
+
+// Date selects
+function initDateSelects() {
+  var yearSel = document.getElementById('birthYear');
+  var monthSel = document.getElementById('birthMonth');
+  var daySel = document.getElementById('birthDay');
+  if (!yearSel) return;
+  var now = new Date();
+  var yearOpts = '<option value="">----</option>';
+  for (var y = now.getFullYear(); y >= 1920; y--) yearOpts += '<option value="' + y + '">' + y + '</option>';
+  yearSel.innerHTML = yearOpts;
+  var monthNames = (I18N.month_names || '1,2,3,4,5,6,7,8,9,10,11,12').split(',');
+  var mOpts = '<option value="">--</option>';
+  for (var m = 1; m <= 12; m++) mOpts += '<option value="' + (m < 10 ? '0' + m : m) + '">' + (I18N['month_' + m] || monthNames[m - 1] || m) + '</option>';
+  monthSel.innerHTML = mOpts;
+  updateBirthDayOptions();
+}
+function updateBirthDayOptions() {
+  var daySel = document.getElementById('birthDay');
+  var monthSel = document.getElementById('birthMonth');
+  var yearSel = document.getElementById('birthYear');
+  if (!daySel) return;
+  var m = parseInt(monthSel.value) || 0;
+  var y = parseInt(yearSel.value) || 2000;
+  var daysInMonth = m ? new Date(y, m, 0).getDate() : 31;
+  var prev = daySel.value;
+  var opts = '<option value="">--</option>';
+  for (var d = 1; d <= daysInMonth; d++) opts += '<option value="' + (d < 10 ? '0' + d : d) + '">' + d + '</option>';
+  daySel.innerHTML = opts;
+  if (prev && parseInt(prev) <= daysInMonth) daySel.value = prev;
+}
+function syncBirthDate() {
+  var y = document.getElementById('birthYear').value;
+  var m = document.getElementById('birthMonth').value;
+  var d = document.getElementById('birthDay').value;
+  var hidden = document.getElementById('birthDateHidden');
+  if (y && m && d) hidden.value = y + '-' + m + '-' + d;
+  else hidden.value = '';
+}
+function refreshDateSelects() {
+  var monthSel = document.getElementById('birthMonth');
+  if (!monthSel) return;
+  var cur = monthSel.value;
+  var monthNames = (I18N.month_names || '1,2,3,4,5,6,7,8,9,10,11,12').split(',');
+  var mOpts = '<option value="">--</option>';
+  for (var m = 1; m <= 12; m++) mOpts += '<option value="' + (m < 10 ? '0' + m : m) + '">' + (I18N['month_' + m] || monthNames[m - 1] || m) + '</option>';
+  monthSel.innerHTML = mOpts;
+  if (cur) monthSel.value = cur;
+}
+setTimeout(initDateSelects, 100);
+
 // Custom country dropdown
 function toggleCountryDropdown() {
   document.getElementById('countrySelect').classList.toggle('open');
@@ -371,33 +431,41 @@ function selectRadio(el, name, value) {
 
 // Load user daily fortune
 {% if session.get('user_id') and daily_fortune %}
-document.addEventListener('DOMContentLoaded', function() {
-  const fortune = {{ daily_fortune | tojson }};
-  const container = document.getElementById('myFortuneDashboard');
-  if (container && fortune) {
-    container.innerHTML = `
-      <div class="fortune-card" style="background:transparent;border:none;">
-        <div class="fortune-score" style="background:${fortune.color}20;color:${fortune.color};width:72px;height:72px;">
-          <div class="fortune-score-num" style="font-size:28px;">${fortune.score}</div>
-          <div class="fortune-score-label" style="font-size:11px;">${I18N[fortune.level_text_key] || fortune.level_text || ''}</div>
+var _homeFortune = {{ daily_fortune | tojson }};
+function renderHomeFortune() {
+  var container = document.getElementById('myFortuneDashboard');
+  if (!container || !_homeFortune) return;
+  container.innerHTML = `
+    <div class="fortune-card" style="background:transparent;border:none;">
+      <div class="fortune-score" style="background:${escapeHtml(String(_homeFortune.color || ''))}20;color:${escapeHtml(String(_homeFortune.color || ''))};width:72px;height:72px;">
+        <div class="fortune-score-num" style="font-size:28px;">${escapeHtml(String(_homeFortune.score || ''))}</div>
+        <div class="fortune-score-label" style="font-size:11px;">${escapeHtml(I18N[_homeFortune.level_text_key] || _homeFortune.level_text || '')}</div>
+      </div>
+      <div class="fortune-info">
+        <div style="display:flex;justify-content:space-between;align-items:center;">
+          <div class="fortune-title" style="font-size:16px;">${escapeHtml(_homeFortune.day_ganzhi || '')}${escapeHtml(I18N.day_label || '')}</div>
+          <span style="font-size:12px;color:var(--text-muted);" data-i18n="today_fortune"></span>
         </div>
-        <div class="fortune-info">
-          <div style="display:flex;justify-content:space-between;align-items:center;">
-            <div class="fortune-title" style="font-size:16px;">${fortune.day_ganzhi}${I18N.day_label || ''}</div>
-            <span style="font-size:12px;color:var(--text-muted);" data-i18n="today_fortune">今日运势</span>
-          </div>
-          <div class="fortune-summary" style="margin:6px 0;">${I18N[fortune.summary_key] || fortune.summary || ''}</div>
-          <div class="fortune-tips" style="flex-wrap:wrap;gap:10px;">
-            <span>🎨 ${I18N.lucky_color || ''}: ${I18N[fortune.lucky_color_key] || fortune.lucky_color || ''}</span>
-            <span>🔢 ${I18N.lucky_number || ''}: ${fortune.lucky_number || ''}</span>
-            <span>🧭 ${I18N.lucky_direction || ''}: ${I18N[fortune.lucky_direction_key] || fortune.lucky_direction || ''}</span>
-          </div>
+        <div class="fortune-summary" style="margin:6px 0;">${escapeHtml(I18N[_homeFortune.summary_key] || _homeFortune.summary || '')}</div>
+        <div class="fortune-tips" style="flex-wrap:wrap;gap:10px;">
+          <span>🎨 ${escapeHtml(I18N.lucky_color || '')}: ${escapeHtml(I18N[_homeFortune.lucky_color_key] || _homeFortune.lucky_color || '')}</span>
+          <span>🔢 ${escapeHtml(I18N.lucky_number || '')}: ${escapeHtml(String(_homeFortune.lucky_number || ''))}</span>
+          <span>🧭 ${escapeHtml(I18N.lucky_direction || '')}: ${escapeHtml(I18N[_homeFortune.lucky_direction_key] || _homeFortune.lucky_direction || '')}</span>
         </div>
       </div>
-    `;
-    if (typeof applyI18N === 'function') applyI18N();
-  }
-});
+    </div>
+  `;
+  if (typeof applyI18N === 'function') applyI18N();
+}
+
+function refreshDateInputs() {
+  document.querySelectorAll('input[type="date"], input[type="time"]').forEach(function(el) {
+    var val = el.value;
+    var clone = el.cloneNode(true);
+    el.parentNode.replaceChild(clone, el);
+    if (val) clone.value = val;
+  });
+}
 {% endif %}
 </script>
 {% endblock %}

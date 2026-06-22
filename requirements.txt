@@ -11,3 +11,9 @@ pytz==2025.2
 requests==2.32.5 
 gunicorn==21.2.0 
 python-dotenv==1.2.2
+
+# 可选依赖（安装后启用对应功能）
+# pip install Pillow    -> 启用分享卡生成
+# pip install ReportLab -> 启用PDF导出
+Pillow>=10.0.0
+reportlab>=4.0.0

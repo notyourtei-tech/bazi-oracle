@@ -19,6 +19,8 @@ try:
 except ImportError:
     HAS_REPORTLAB = False
 
+from xml.sax.saxutils import escape as xml_escape
+
 
 def _register_chinese_font():
     """Register Chinese font for PDF generation."""
@@ -190,8 +192,8 @@ def generate_pdf_report(result, output_path=None):
     shensha = result.get("shensha", [])
     if shensha:
         for s in shensha:
-            name = s.get("name_key", "").replace("shensha_", "").replace("_name", "")
-            desc = s.get("desc_key", "")
+            name = xml_escape(s.get("name_key", "").replace("shensha_", "").replace("_name", ""))
+            desc = xml_escape(s.get("desc_key", ""))
             story.append(Paragraph(f"• {name}：{desc}", body_style))
     else:
         story.append(Paragraph("无明显神煞", body_style))
@@ -203,18 +205,18 @@ def generate_pdf_report(result, output_path=None):
     
     personality = result.get("personality", {})
     if personality:
-        strength = personality.get("body_strength_key", "").replace("body_", "")
+        strength = xml_escape(personality.get("body_strength_key", "").replace("body_", ""))
         story.append(Paragraph(f"身强身弱：{strength}", body_style))
         
-        trait = personality.get("personality_key", "")
+        trait = xml_escape(personality.get("personality_key", ""))
         if trait:
             story.append(Paragraph(f"性格特征：{trait}", body_style))
         
-        career = personality.get("career_advice_key", "")
+        career = xml_escape(personality.get("career_advice_key", ""))
         if career:
             story.append(Paragraph(f"事业建议：{career}", body_style))
         
-        relationship = personality.get("relationship_advice_key", "")
+        relationship = xml_escape(personality.get("relationship_advice_key", ""))
         if relationship:
             story.append(Paragraph(f"感情建议：{relationship}", body_style))
     

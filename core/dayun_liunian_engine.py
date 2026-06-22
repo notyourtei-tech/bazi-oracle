@@ -69,4 +69,4 @@ def build_yearly_focus(year, dayun, liunian, overlap):
     """
     年度重点
     """
-    return f"重点关注：{liunian['event_hints']}"
+    return f"重点关注：{liunian['event_hint_key']}"

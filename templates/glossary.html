@@ -1,40 +1,77 @@
-<!DOCTYPE html>
-<html lang="{{ session.get('lang','zh') }}">
-<head>
-    <meta charset="utf-8">
-    <title>{{ t("glossary") }}</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-</head>
-<body>
+{% extends "base.html" %}
+{% block content %}
+<div class="container" style="max-width:720px;margin:0 auto;padding:24px 16px;">
 
-<div class="container">
+    <h1 class="page-title" data-i18n="glossary">术语表</h1>
 
-    <div class="lang-switch">
-        <a href="?lang=zh">{{ t("lang_zh") }}</a> |
-        <a href="?lang=ja">{{ t("lang_ja") }}</a> |
-        <a href="?lang=en">{{ t("lang_en") }}</a> |
-        <a href="?lang=vi">{{ t("lang_vi") }}</a>
+    <div class="card" style="margin-bottom:16px;">
+        <h3 style="color:var(--gold);" data-i18n="glossary_bazi_title">八字基础术语</h3>
+        <table style="width:100%;border-collapse:collapse;margin-top:12px;">
+            <tr style="border-bottom:1px solid var(--border);">
+                <th style="text-align:left;padding:8px;color:var(--gold);" data-i18n="glossary_term">术语</th>
+                <th style="text-align:left;padding:8px;color:var(--gold);" data-i18n="glossary_explain">说明</th>
+            </tr>
+            <tr style="border-bottom:1px solid var(--border);">
+                <td style="padding:8px;" data-i18n="glossary_sizhu">四柱</td>
+                <td style="padding:8px;" data-i18n="glossary_sizhu_desc">年柱、月柱、日柱、时柱，由天干地支组成</td>
+            </tr>
+            <tr style="border-bottom:1px solid var(--border);">
+                <td style="padding:8px;" data-i18n="glossary_tiangan">天干</td>
+                <td style="padding:8px;" data-i18n="glossary_tiangan_desc">甲乙丙丁戊己庚辛壬癸，共十个</td>
+            </tr>
+            <tr style="border-bottom:1px solid var(--border);">
+                <td style="padding:8px;" data-i18n="glossary_dizhi">地支</td>
+                <td style="padding:8px;" data-i18n="glossary_dizhi_desc">子丑寅卯辰巳午未申酉戌亥，共十二个</td>
+            </tr>
+            <tr style="border-bottom:1px solid var(--border);">
+                <td style="padding:8px;" data-i18n="glossary_wuxing">五行</td>
+                <td style="padding:8px;" data-i18n="glossary_wuxing_desc">金、木、水、火、土，相生相克</td>
+            </tr>
+            <tr style="border-bottom:1px solid var(--border);">
+                <td style="padding:8px;" data-i18n="glossary_shishen">十神</td>
+                <td style="padding:8px;" data-i18n="glossary_shishen_desc">比肩、劫财、食神、伤官、偏财、正财、七杀、正官、偏印、正印</td>
+            </tr>
+            <tr style="border-bottom:1px solid var(--border);">
+                <td style="padding:8px;" data-i18n="glossary_yongshen">用神</td>
+                <td style="padding:8px;" data-i18n="glossary_yongshen_desc">对命局最有帮助的五行元素</td>
+            </tr>
+            <tr style="border-bottom:1px solid var(--border);">
+                <td style="padding:8px;" data-i18n="glossary_shensha">神煞</td>
+                <td style="padding:8px;" data-i18n="glossary_shensha_desc">天乙贵人、文昌、桃花等象征性星曜</td>
+            </tr>
+        </table>
     </div>
 
-    <h1>{{ t("glossary") }}</h1>
+    <div class="card" style="margin-bottom:16px;">
+        <h3 style="color:var(--gold);" data-i18n="glossary_fortune_title">运势术语</h3>
+        <table style="width:100%;border-collapse:collapse;margin-top:12px;">
+            <tr style="border-bottom:1px solid var(--border);">
+                <th style="text-align:left;padding:8px;color:var(--gold);" data-i18n="glossary_term">术语</th>
+                <th style="text-align:left;padding:8px;color:var(--gold);" data-i18n="glossary_explain">说明</th>
+            </tr>
+            <tr style="border-bottom:1px solid var(--border);">
+                <td style="padding:8px;" data-i18n="glossary_dayun">大运</td>
+                <td style="padding:8px;" data-i18n="glossary_dayun_desc">每十年一个周期的运势变化</td>
+            </tr>
+            <tr style="border-bottom:1px solid var(--border);">
+                <td style="padding:8px;" data-i18n="glossary_liunian">流年</td>
+                <td style="padding:8px;" data-i18n="glossary_liunian_desc">每一年的运势，与大运叠加产生吉凶</td>
+            </tr>
+            <tr style="border-bottom:1px solid var(--border);">
+                <td style="padding:8px;" data-i18n="glossary_qiyun">起运</td>
+                <td style="padding:8px;" data-i18n="glossary_qiyun_desc">从出生到第一步大运开始的年龄</td>
+            </tr>
+            <tr style="border-bottom:1px solid var(--border);">
+                <td style="padding:8px;" data-i18n="glossary_rizhu">日主</td>
+                <td style="padding:8px;" data-i18n="glossary_rizhu_desc">日柱天干，代表命主自身</td>
+            </tr>
+            <tr style="border-bottom:1px solid var(--border);">
+                <td style="padding:8px;" data-i18n="glossary_shenti">身强身弱</td>
+                <td style="padding:8px;" data-i18n="glossary_shenti_desc">日主得到的生扶力量的强弱判断</td>
+            </tr>
+        </table>
+    </div>
 
-    <table>
-        <tr>
-            <th>{{ t("term_cn") }}</th>
-            <th>{{ t("term_en") }}</th>
-        </tr>
-        <tr>
-            <td>{{ t("term_yongshen") }}</td>
-            <td>{{ t("term_yongshen_en") }}</td>
-        </tr>
-        <tr>
-            <td>{{ t("term_dayun") }}</td>
-            <td>{{ t("term_dayun_en") }}</td>
-        </tr>
-    </table>
-
-    <a href="{{ url_for('index') }}">{{ t("back") }}</a>
-
+    <a href="{{ url_for('index') }}" class="btn" data-i18n="back">返回</a>
 </div>
-</body>
-</html>
+{% endblock %}

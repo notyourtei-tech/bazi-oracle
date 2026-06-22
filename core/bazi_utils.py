@@ -149,18 +149,21 @@ def get_shishen(day_master_gan, other_gan):
          (dm_wx == "water" and other_wx == "fire"):
         relation = "controlled"
         
-    return SHISHEN_MAP[relation][is_same_yy]
+    return SHISHEN_MAP.get(relation, {}).get(is_same_yy, "比肩")
 
 def get_nayin(ganzhi):
     return NAYIN_MAP.get(ganzhi, "")
 
 def get_kongwang(gan, zhi):
-    g_idx = TIANGAN.index(gan)
-    z_idx = ZHI.index(zhi)
-    dist = 9 - g_idx
+    try:
+        g_idx = TIANGAN.index(gan)
+        z_idx = ZHI.index(zhi)
+    except (ValueError, AttributeError):
+        return None, None
+    dist = 10 - g_idx
     z_gui = (z_idx + dist) % 12
-    kw1 = ZHI[(z_gui + 1) % 12]
-    kw2 = ZHI[(z_gui + 2) % 12]
+    kw1 = ZHI[(z_gui) % 12]
+    kw2 = ZHI[(z_gui + 1) % 12]
     return [kw1, kw2]
 
 def get_hidden_stems(zhi):

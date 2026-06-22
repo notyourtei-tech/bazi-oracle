@@ -30,7 +30,7 @@ ZHI = list("子丑寅卯辰巳午未申酉戌亥")
 # 60甲子日计算基准
 # =========================
 
-BASE_DAY = datetime(1984, 2, 2)  # 甲子日（公认基准）
+BASE_DAY = datetime(1984, 1, 31)  # 甲子日（公认基准）
 
 
 def ganzhi_day(solar_dt: datetime):

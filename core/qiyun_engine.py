@@ -128,7 +128,10 @@ def _gan_zhi_next(gz: str, step: int):
     for i in range(60):
         seq.append(GAN[i % 10] + ZHI[i % 12])
 
-    idx = seq.index(gz)
+    try:
+        idx = seq.index(gz)
+    except ValueError:
+        idx = 0
     return seq[(idx + step) % 60]
 
 

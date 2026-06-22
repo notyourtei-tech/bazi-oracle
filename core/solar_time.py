@@ -1,3 +1,7 @@
+"""WARNING: This module only converts to timezone-based solar time.
+True solar time requires longitude-based Equation of Time correction.
+Use geo_time_engine.py for proper true solar time calculation.
+"""
 # core/solar_time.py
 # ==========================================
 # 真太阳时计算模块

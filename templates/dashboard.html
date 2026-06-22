@@ -1,15 +1,28 @@
-<!DOCTYPE html>
-<html>
-<head><title>用户中心</title></head>
-<body>
-<h2>我的命盘</h2>
+{% extends "base.html" %}
+{% block content %}
+<div class="container" style="max-width:720px;margin:0 auto;padding:24px 16px;">
 
-<ul>
-{% for c in charts %}
-  <li>{{ c.name }}（可继续加：查看 / 历史验证）</li>
-{% endfor %}
-</ul>
+    <h1 class="page-title" data-i18n="dashboard_title">用户中心</h1>
 
-<a href="/">新建命盘</a>
-</body>
-</html>
+    <h2 style="color:var(--gold);margin:16px 0 12px;" data-i18n="my_charts">我的命盘</h2>
+
+    {% if charts %}
+    <div class="card" style="margin-bottom:16px;">
+        <ul style="list-style:none;padding:0;">
+        {% for c in charts %}
+            <li style="padding:12px 0;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;">
+                <span>{{ c.name }}</span>
+                <span style="color:var(--text-muted);font-size:13px;" data-i18n="dashboard_chart_hint">可继续加：查看 / 历史验证</span>
+            </li>
+        {% endfor %}
+        </ul>
+    </div>
+    {% else %}
+    <div class="card" style="padding:24px;text-align:center;">
+        <p style="color:var(--text-muted);" data-i18n="history_empty">暂无记录</p>
+    </div>
+    {% endif %}
+
+    <a href="{{ url_for('index') }}" class="btn" data-i18n="new_chart">新建命盘</a>
+</div>
+{% endblock %}

@@ -314,12 +314,12 @@ def _build_wuxing_detail(wuxing_strength, bazi_detail):
     # 最旺的五行
     strong_wx = strongest[0]
     strong_explain = WUXING_EXPLANATIONS.get(strong_wx, {})
-    analysis_parts.append(f"命盘中{wx_map[strong_wx]}行最旺（{strongest[1]:.1f}分），{strong_explain.get('personality', '')}")
+    analysis_parts.append(f"命盘中{wx_map[strong_wx]}行最旺（{strongest[1]:.1f}分），{strong_explain.get('personality_key', '')}")
     
     # 最弱的五行
     weak_wx = weakest[0]
     weak_explain = WUXING_EXPLANATIONS.get(weak_wx, {})
-    analysis_parts.append(f"{wx_map[weak_wx]}行最弱（{weakest[1]:.1f}分），{weak_explain.get('personality', '')}")
+    analysis_parts.append(f"{wx_map[weak_wx]}行最弱（{weakest[1]:.1f}分），{weak_explain.get('personality_key', '')}")
     
     # 五行平衡分析
     avg = total / 5

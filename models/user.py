@@ -9,6 +9,8 @@ class User(db.Model):
     password_hash = db.Column(db.String(200), nullable=False)
 
     def set_password(self, password):
+        if len(password) < 6:
+            raise ValueError("Password must be at least 6 characters")
         self.password_hash = generate_password_hash(password)
 
     def check_password(self, password):

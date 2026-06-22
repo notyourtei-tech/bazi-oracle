@@ -126,7 +126,7 @@ def generate_ai_analysis(result, lang="zh"):
             headers={
                 "Authorization": f"Bearer {OPENROUTER_API_KEY}",
                 "Content-Type": "application/json",
-                "HTTP-Referer": "http://127.0.0.1:5000",
+                "HTTP-Referer": os.environ.get("APP_REFERER", "http://127.0.0.1:5000"),
                 "X-Title": "BaZi Chart System",
             },
             json={
@@ -144,8 +144,8 @@ def generate_ai_analysis(result, lang="zh"):
         return {"success": True, "analysis": analysis}
     except requests.exceptions.Timeout:
         return {"success": False, "error": "timeout"}
-    except requests.exceptions.RequestException as e:
-        return {"success": False, "error": str(e)}
+    except requests.exceptions.RequestException:
+        return {"success": False, "error": "service_unavailable"}
     except (KeyError, IndexError):
         return {"success": False, "error": "invalid_response"}
 
@@ -165,7 +165,7 @@ def generate_ai_analysis_stream(result, lang="zh"):
             headers={
                 "Authorization": f"Bearer {OPENROUTER_API_KEY}",
                 "Content-Type": "application/json",
-                "HTTP-Referer": "http://127.0.0.1:5000",
+                "HTTP-Referer": os.environ.get("APP_REFERER", "http://127.0.0.1:5000"),
                 "X-Title": "BaZi Chart System",
             },
             json={
@@ -180,7 +180,13 @@ def generate_ai_analysis_stream(result, lang="zh"):
         )
         response.raise_for_status()
 
+        import time
+        start_time = time.time()
+        STREAM_TIMEOUT = 60
+
         for line in response.iter_lines():
+            if time.time() - start_time > STREAM_TIMEOUT:
+                break
             if line:
                 line = line.decode("utf-8")
                 if line.startswith("data: "):
@@ -196,5 +202,5 @@ def generate_ai_analysis_stream(result, lang="zh"):
                             yield f"data: {json.dumps({'content': content})}\n\n"
                     except json.JSONDecodeError:
                         continue
-    except Exception as e:
-        yield f"data: {json.dumps({'error': str(e)})}\n\n"
+    except Exception:
+        yield f"data: {json.dumps({'error': 'service_unavailable'})}\n\n"

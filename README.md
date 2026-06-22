@@ -14,7 +14,7 @@
 - **Comprehensive Life Advice** - Career, wealth, relationship, health, study, and social guidance
 
 ### AI-Powered Insights
-- **DeepSeek AI Integration** - Personalized, in-depth analysis of your destiny
+- **OpenRouter AI Integration** - Personalized, in-depth analysis of your destiny
 - **Streaming Response** - Real-time typewriter effect for analysis display
 
 ### User Experience
@@ -86,8 +86,8 @@ Open http://127.0.0.1:5000 in your browser.
 ### Environment Variables (Optional)
 
 ```bash
-# For AI-powered analysis
-set DEEPSEEK_API_KEY=your_api_key_here
+# For AI-powered analysis (OpenRouter)
+set OPENROUTER_API_KEY=your_api_key_here
 ```
 
 ## 📁 Project Structure
@@ -112,7 +112,7 @@ bazi_app/
 │   ├── daily_fortune_engine.py  # Daily fortune calculation
 │   ├── compatibility_engine.py  # Two-person compatibility
 │   ├── comprehensive_analysis.py # Multi-dimension analysis
-│   ├── ai_engine.py       # DeepSeek AI integration
+│   ├── ai_engine.py       # OpenRouter AI integration
 │   ├── share_card.py      # Share card generation (Pillow)
 │   ├── pdf_engine.py      # PDF report generation (ReportLab)
 │   └── security.py        # Rate limiting, CSRF, validation
@@ -155,7 +155,7 @@ bazi_app/
 - **Backend:** Python Flask
 - **Database:** SQLite (SQLAlchemy ORM)
 - **Frontend:** HTML5, CSS3, Vanilla JavaScript
-- **AI:** DeepSeek API (optional)
+- **AI:** OpenRouter API (optional)
 - **Charts:** Custom BaZi engine with astronomical calculations
 - **i18n:** Client-side JSON translation system (5 languages)
 - **Export:** Pillow (share cards), ReportLab (PDF reports)
@@ -186,7 +186,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 - Traditional Chinese BaZi (Four Pillars) methodology
 - Astronomical solar terms calculation algorithms
-- DeepSeek AI for personalized analysis
+- OpenRouter AI for personalized analysis
 
 ---
 

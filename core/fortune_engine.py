@@ -53,8 +53,8 @@ def full_analysis_from_birth(
             liunian_info = analyze_liunian(
                 year=year,
                 gz=liunian_gz,
-                day_master_wx=day_master_wx,
-                yongshen=yongshen
+                day_master_gan=bazi["day"][0],
+                dayun_shishen=yongshen
             )
 
             overlap = analyze_dayun_liunian_overlap(

@@ -3,7 +3,7 @@ Daily Fortune Engine
 Calculates daily fortune based on bazi and current day's ganzhi
 """
 from datetime import datetime, date
-from core.bazi_utils import GAN_WUXING, ZHI_WUXING, SHISHEN_MAP
+from core.bazi_utils import GAN_WUXING, ZHI_WUXING, SHISHEN_MAP, get_shishen
 
 
 def get_ganzhi_index(gan_idx, zhi_idx):
@@ -66,7 +66,10 @@ def calc_daily_fortune(bazi_result, target_date=None):
     today_zhi_wx = ZHI_WUXING.get(today_gz["zhi"], "earth")
     
     # Calculate shishen relationship between day master and today's gan
-    shishen = SHISHEN_MAP.get((dm_idx, gans.index(today_gz["gan"])), "比肩")
+    try:
+        shishen = get_shishen(day_master_gan, today_gz["gan"])
+    except (KeyError, TypeError):
+        shishen = "比肩"
     
     # Calculate favorability based on wuxing relationships
     wx_order = ["wood", "fire", "earth", "metal", "water"]

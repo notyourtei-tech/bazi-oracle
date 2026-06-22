@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="zh">
+<html lang="{{ session.get('lang', 'zh') }}">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
@@ -7,10 +7,16 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <title data-i18n="app_title">BaZi</title>
+  <meta name="csrf-token" content="{{ csrf_token() }}">
 
   <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}?v=6.0">
 
   <script>
+    function escapeHtml(text) {
+      if (!text) return '';
+      return text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#039;');
+    }
+
     let I18N = {};
     let currentLang = localStorage.getItem("lang") || "zh";
 
@@ -21,7 +27,11 @@
         I18N = await res.json();
         currentLang = lang;
         localStorage.setItem("lang", lang);
+        document.documentElement.lang = lang;
         applyI18N();
+        if (typeof renderHomeFortune === 'function') renderHomeFortune();
+        if (typeof renderResultFortune === 'function') renderResultFortune();
+        if (typeof refreshDateSelects === 'function') refreshDateSelects();
         document.querySelectorAll('.lang-btn').forEach(btn => {
           btn.classList.toggle('active', btn.dataset.lang === lang);
         });
@@ -75,6 +85,26 @@
         if (I18N[key]) el.label = I18N[key];
       });
     }
+
+    // CSRF helper for API calls
+    function getCsrfToken() {
+      var meta = document.querySelector('meta[name="csrf-token"]');
+      return meta ? meta.getAttribute('content') : '';
+    }
+
+    // Patched fetch that auto-injects CSRF token for POST/PUT/DELETE/PATCH
+    var _origFetch = window.fetch;
+    window.fetch = function(url, opts) {
+      opts = opts || {};
+      var method = (opts.method || 'GET').toUpperCase();
+      if (['POST','PUT','DELETE','PATCH'].indexOf(method) !== -1) {
+        opts.headers = opts.headers || {};
+        if (!opts.headers['X-CSRF-Token'] && !opts.headers['x-csrf-token']) {
+          opts.headers['X-CSRF-Token'] = getCsrfToken();
+        }
+      }
+      return _origFetch.call(this, url, opts);
+    };
 
     window.addEventListener("DOMContentLoaded", function() {
       loadLang(currentLang);
@@ -130,10 +160,14 @@
         <span class="lang-option-flag">🇰🇷</span>
         한국어
       </button>
-      <button class="lang-option" data-lang-val="vi" onclick="selectLangModal(this)">
-        <span class="lang-option-flag">🇻🇳</span>
-        Tiếng Việt
-      </button>
+        <button class="lang-option" data-lang-val="vi" onclick="selectLangModal(this)">
+          <span class="lang-option-flag">🇻🇳</span>
+          Tiếng Việt
+        </button>
+        <button class="lang-option" data-lang-val="my" onclick="selectLangModal(this)">
+          <span class="lang-option-flag">🇲🇲</span>
+          မြန်မာ
+        </button>
     </div>
     <button class="lang-modal-confirm" onclick="confirmLangModal()" data-i18n="lang_select_confirm">确认</button>
   </div>
@@ -188,6 +222,7 @@
       <button class="lang-btn" data-lang="en" onclick="loadLang('en')">EN</button>
       <button class="lang-btn" data-lang="ko" onclick="loadLang('ko')">한</button>
       <button class="lang-btn" data-lang="vi" onclick="loadLang('vi')">VI</button>
+      <button class="lang-btn" data-lang="my" onclick="loadLang('my')">မြန်မာ</button>
     </div>
   </div>
 </nav>
@@ -290,8 +325,8 @@ function renderOnboardStep() {
   var content = document.getElementById('onboardContent');
   var icon = document.querySelector('.onboard-icon');
   icon.textContent = step.icon;
-  content.innerHTML = '<div class="onboard-step-title" data-i18n="' + step.titleKey + '">' + (I18N[step.titleKey] || '') + '</div>' +
-    '<div class="onboard-step-desc" data-i18n="' + step.descKey + '">' + (I18N[step.descKey] || '') + '</div>';
+  content.innerHTML = '<div class="onboard-step-title" data-i18n="' + escapeHtml(step.titleKey) + '">' + escapeHtml(I18N[step.titleKey] || '') + '</div>' +
+    '<div class="onboard-step-desc" data-i18n="' + escapeHtml(step.descKey) + '">' + escapeHtml(I18N[step.descKey] || '') + '</div>';
   // 更新指示点
   document.querySelectorAll('.onboard-dot').forEach(function(d, i) {
     d.classList.toggle('active', i === currentOnboardStep);

@@ -92,6 +92,7 @@
 
 <script>
 async function toggleOwn(chartId, setOwn) {
+  if (!/^\d+$/.test(String(chartId))) return;
   const url = setOwn ? '/api/set-own/' + chartId : '/api/unset-own/' + chartId;
   try {
     const res = await fetch(url, { method: 'POST' });

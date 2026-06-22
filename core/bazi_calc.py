@@ -50,6 +50,8 @@ def build_bazi(
     year_pillar = ganzhi_from_index(year_index)
 
     # ---- 月柱（简化占位）----
+    # TODO: Month pillar must be determined by solar terms (节气), not calendar month.
+    # For now, approximate using the solar datetime's month. This needs calendar_engine integration.
     month_index = year_index * 12 + solar_datetime.month
     month_pillar = ganzhi_from_index(month_index)
 
@@ -61,7 +63,9 @@ def build_bazi(
     # ---- 时柱 ----
     if with_hour:
         hour_index = ((solar_datetime.hour + 1) // 2) % 12
-        hour_pillar = GAN[day_pillar[0] and GAN.index(day_pillar[0]) % 10], ZHI[hour_index]
+        day_gan_idx = GAN.index(day_pillar[0]) if day_pillar[0] in GAN else 0
+        hour_gan_idx = (day_gan_idx * 2 + hour_index) % 10
+        hour_pillar = (GAN[hour_gan_idx], ZHI[hour_index])
     else:
         hour_pillar = None
 

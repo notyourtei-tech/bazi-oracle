@@ -231,6 +231,9 @@ def analyze_dayun(ec, birth_year: int):
     dm_elem = stem_to_element(dm_gan)
 
     res = []
+    # NOTE: qiyun_age=6 is an approximation. The actual qiyun age should be
+    # calculated from the birth date's gender, day stem, and month stem using
+    # the proper 起运 formula. Pass calculated qiyun_age when available.
     qiyun_age = 6  # 近似起运年龄
 
     for i in range(0, 9):
@@ -256,6 +259,7 @@ def analyze_liunian(ec, birth_year: int):
     dm_elem = stem_to_element(dm_gan)
 
     res = []
+    # NOTE: qiyun_age=6 is an approximation. See analyze_dayun() for details.
     qiyun_age = 6
     start_year = birth_year + qiyun_age
     end_year = birth_year + 86

@@ -9,10 +9,13 @@ import secrets
 import logging
 from datetime import timedelta
 
+from config import Config, _get_secret_key
+
 from models.user import db, User
 from models.chart import Chart
 
 from core.pipeline import run_full_analysis_from_birth
+from core.cache import bazi_cache
 from core.ai_engine import generate_ai_analysis, generate_ai_analysis_stream
 from core.share_card import generate_share_card, HAS_PILLOW
 from core.daily_fortune_engine import calc_daily_fortune, calc_weekly_fortune, calc_monthly_fortune
@@ -22,7 +25,7 @@ from core.comprehensive_analysis import analyze_dayun_comprehensive, analyze_liu
 from core.security import (
     generate_csrf_token, csrf_protect, check_rate_limit,
     check_login_rate_limit, record_login_attempt, reset_login_attempts,
-    validate_birth_date, validate_birth_time, validate_name,
+    validate_birth_date, validate_birth_time, validate_name, validate_city,
     validate_csrf_token, safe_error_response, VALID_COUNTRIES, VALID_GENDERS,
     register_temp_file
 )
@@ -39,30 +42,42 @@ logger = logging.getLogger(__name__)
 load_dotenv()
 app = Flask(__name__)
 
-# 密钥：优先从环境变量读取，否则每次启动随机生成（开发环境）
-app.secret_key = os.environ.get('SECRET_KEY') or secrets.token_hex(32)
+# 密钥：优先环境变量，否则持久化到文件（重启不会丢失）
+app.secret_key = _get_secret_key()
 
 # 数据库
-app.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get('DATABASE_URL', 'sqlite:///db.sqlite3')
-app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
+app.config["SQLALCHEMY_DATABASE_URI"] = Config.SQLALCHEMY_DATABASE_URI
+app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = Config.SQLALCHEMY_TRACK_MODIFICATIONS
 app.config["TEMPLATES_AUTO_RELOAD"] = True
 
 # Session 安全
-app.config["SESSION_COOKIE_HTTPONLY"] = True
-app.config["SESSION_COOKIE_SAMESITE"] = "Lax"
-app.config["PERMANENT_SESSION_LIFETIME"] = timedelta(days=30)
+app.config["SESSION_COOKIE_HTTPONLY"] = Config.SESSION_COOKIE_HTTPONLY
+app.config["SESSION_COOKIE_SAMESITE"] = Config.SESSION_COOKIE_SAMESITE
+app.config["PERMANENT_SESSION_LIFETIME"] = timedelta(days=7)
 
 # 仅在生产环境启用 Secure flag（需要 HTTPS）
 if os.environ.get('FLASK_ENV') == 'production' or os.environ.get('FORCE_HTTPS'):
     app.config["SESSION_COOKIE_SECURE"] = True
 
 # 上传限制
-app.config["MAX_CONTENT_LENGTH"] = 1 * 1024 * 1024  # 1MB
+app.config["MAX_CONTENT_LENGTH"] = Config.MAX_CONTENT_LENGTH
 
 db.init_app(app)
 
 # 模板中可用 csrf_token
 app.jinja_env.globals['csrf_token'] = generate_csrf_token
+
+# 旧模板 i18n 支持：T 字典 + t() 函数
+from static.lang.lang import TEXT
+app.jinja_env.globals['T'] = TEXT
+
+def _get_template_lang():
+    return session.get('lang', 'zh')
+
+@app.template_global()
+def t(key):
+    lang = _get_template_lang()
+    return TEXT.get(lang, TEXT.get('zh', {})).get(key, TEXT.get('zh', {}).get(key, key))
 
 
 # ========================
@@ -75,6 +90,10 @@ def security_checks():
     # 限流
     if not check_rate_limit():
         return safe_error_response("请求过于频繁，请稍后再试", 429)
+
+    # API 端点 CSRF 验证
+    if request.path.startswith('/api/') and request.method in ('POST', 'PUT', 'DELETE', 'PATCH'):
+        validate_csrf_token()
 
     # 阻止常见攻击路径
     blocked_paths = [
@@ -185,19 +204,20 @@ def index():
             return render_template("index.html", error="err_invalid_gender")
         if name and not validate_name(name):
             return render_template("index.html", error="err_invalid_name")
+        if birth_city and not validate_city(birth_city):
+            return render_template("index.html", error="err_invalid_city")
 
-        # 核心分析
-        try:
-            result = run_full_analysis_from_birth(
-                birth_country=birth_country,
-                birth_date=birth_date,
-                birth_time=birth_time,
-                gender=gender,
-                city=birth_city
-            )
-        except Exception as e:
-            logger.error(f"Bazi analysis error: {type(e).__name__}")
-            return render_template("index.html", error="排盘计算出错，请检查输入信息后重试")
+        # 核心分析（带缓存）
+        cache_params = dict(birth_country=birth_country, birth_date=birth_date,
+                           birth_time=birth_time, gender=gender, city=birth_city)
+        result = bazi_cache.get(**cache_params)
+        if result is None:
+            try:
+                result = run_full_analysis_from_birth(**cache_params)
+                bazi_cache.set(result, **cache_params)
+            except Exception as e:
+                logger.error(f"Bazi analysis error: {type(e).__name__}")
+                return render_template("index.html", error="排盘计算出错，请检查输入信息后重试")
 
         # 添加综合分析
         try:
@@ -211,7 +231,7 @@ def index():
                 all_liunian.extend(d.get("liunian_list", []))
             result["liunian_comprehensive"] = analyze_liunian_comprehensive(all_liunian, birth_year, dm_elem)
         except Exception as e:
-            logger.error(f"Comprehensive analysis error: {type(e).__name__}")
+            logger.error(f"Comprehensive analysis error: {type(e).__name__}: {e}")
             result["dayun_comprehensive"] = []
             result["liunian_comprehensive"] = []
 
@@ -259,7 +279,6 @@ def index():
                             birth_date = str(d["start_year"])
                             break
                     day_master_gan = result.get("bazi_detail", {}).get("day", {}).get("gan", "甲")
-                    from core.comprehensive_analysis import STEM_ELEMENT
                     dm_elem = STEM_ELEMENT.get(day_master_gan, "木")
                     if not result["dayun_comprehensive"]:
                         birth_year = int(birth_date) if birth_date else 1990
@@ -357,6 +376,7 @@ def login():
         user = User.query.filter_by(username=username).first()
         if user and user.check_password(password):
             reset_login_attempts()
+            session.clear()  # 清除旧 session 防止会话固定攻击
             session.permanent = True
             session["user_id"] = user.id
             session["username"] = user.username
@@ -435,6 +455,7 @@ def unset_own_chart(chart_id):
 # AI 分析接口
 # ======================
 @app.route("/api/ai-analysis", methods=["POST"])
+@login_required
 def ai_analysis():
     data = request.get_json(silent=True)
     if not data:
@@ -617,6 +638,59 @@ def consult():
     return render_template("consult.html")
 
 
+@app.route("/glossary")
+def glossary():
+    return render_template("glossary.html")
+
+
+@app.route("/liunian")
+def liunian():
+    return render_template("liunian.html", overview=[])
+
+
+@app.route("/dashboard")
+def dashboard():
+    user_id = session.get('user_id')
+    charts = []
+    if user_id:
+        from models.chart import Chart
+        charts = Chart.query.filter_by(user_id=user_id).order_by(Chart.created_at.desc()).all()
+    return render_template("dashboard.html", charts=charts)
+
+
+@app.route("/intro")
+def intro():
+    return render_template("intro.html")
+
+
+@app.route("/form")
+def form():
+    return render_template("form.html")
+
+
+@app.route("/choose")
+def choose():
+    LANGS = ['zh', 'ja', 'en', 'ko', 'vi', 'my']
+    LANG_LABELS = {'zh': '中文', 'ja': '日本語', 'en': 'English', 'ko': '한국어', 'vi': 'Tiếng Việt', 'my': 'မြန်မာ'}
+    return render_template("choose.html", LANGS=LANGS, LANG_LABELS=LANG_LABELS)
+
+
+@app.route("/set_lang/<lang>")
+def set_lang(lang):
+    if lang in ('zh', 'ja', 'en', 'ko', 'vi', 'my'):
+        session['lang'] = lang
+    next_url = request.args.get('next', '/')
+    return redirect(next_url)
+
+
+# ======================
+# 缓存统计
+# ======================
+@app.route("/api/cache-stats")
+def cache_stats():
+    return jsonify(bazi_cache.stats())
+
+
 # ======================
 # 404 处理
 # ======================
@@ -655,6 +729,11 @@ def init_db():
     db.create_all()
     print("Database initialized.")
 
+
+if os.environ.get('FLASK_ENV') == 'production' and os.environ.get('FLASK_DEBUG') == 'true':
+    logger.warning('FLASK_DEBUG=true in production is a security risk. Forcing debug off.')
+    app.debug = False
+    os.environ['FLASK_DEBUG'] = 'false'
 
 if __name__ == "__main__":
     # 绝对不要在生产环境使用 debug=True

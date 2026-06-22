@@ -214,8 +214,15 @@ def generate_share_card(result, output_path="share_card.png"):
     draw.text((width // 2, y), "仅供文化研究参考", font=small_font, fill=(80, 80, 80), anchor="mt")
     
     # Save
-    img.save(output_path, "PNG", quality=95)
-    return output_path
+    if output_path is None:
+        import io
+        buf = io.BytesIO()
+        img.save(buf, 'PNG')
+        buf.seek(0)
+        return buf
+    else:
+        img.save(output_path, "PNG", quality=95)
+        return output_path
 
 
 def generate_share_card_base64(result):
@@ -227,6 +234,9 @@ def generate_share_card_base64(result):
         return None
     
     output = generate_share_card(result, output_path=None)
+    
+    if isinstance(output, io.BytesIO):
+        return base64.b64encode(output.getvalue()).decode("utf-8")
     
     buffer = io.BytesIO()
     img = Image.open(output) if isinstance(output, str) else output
