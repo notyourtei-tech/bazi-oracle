@@ -7,6 +7,7 @@ import secrets
 import time
 import re
 import hmac
+import threading
 from functools import wraps
 from flask import session, request, abort, jsonify
 
@@ -42,13 +43,15 @@ def csrf_protect(f):
 # ========================
 
 _login_attempts = {}  # {ip: [timestamp, ...]}
+_login_lock = threading.Lock()
 LOGIN_RATE_LIMIT = 10  # 每分钟最多10次请求
 LOGIN_LOCKOUT_SECONDS = 60  # 锁定60秒
 
 def _get_real_ip():
-    """Get real client IP behind reverse proxy."""
-    if request.headers.get('X-Forwarded-For'):
-        return request.headers['X-Forwarded-For'].split(',')[0].strip()
+    """Get real client IP. Only trusts X-Forwarded-For if behind a known proxy."""
+    xff = request.headers.get('X-Forwarded-For')
+    if xff and os.environ.get('TRUST_PROXY'):
+        return xff.split(',')[0].strip()
     return request.remote_addr or '0.0.0.0'
 
 _login_cleanup_counter = 0
@@ -68,32 +71,35 @@ def check_login_rate_limit():
     _cleanup_login_attempts()
     ip = _get_real_ip()
     now = time.time()
-    if ip not in _login_attempts:
-        _login_attempts[ip] = []
-    # 清理过期记录
-    _login_attempts[ip] = [t for t in _login_attempts[ip] if now - t < 60]
-    # 检查是否被锁定
-    if len(_login_attempts[ip]) >= LOGIN_RATE_LIMIT:
-        # 检查最近一次尝试是否在锁定期内
-        if now - _login_attempts[ip][-1] < LOGIN_LOCKOUT_SECONDS:
-            remaining = int(LOGIN_LOCKOUT_SECONDS - (now - _login_attempts[ip][-1]))
-            return False, remaining
-        # Lockout expired — reset the list to prevent stale accumulation
-        _login_attempts[ip] = [now]
-    return True, 0
+    with _login_lock:
+        if ip not in _login_attempts:
+            _login_attempts[ip] = []
+        # 清理过期记录
+        _login_attempts[ip] = [t for t in _login_attempts[ip] if now - t < 60]
+        # 检查是否被锁定
+        if len(_login_attempts[ip]) >= LOGIN_RATE_LIMIT:
+            # 检查最近一次尝试是否在锁定期内
+            if now - _login_attempts[ip][-1] < LOGIN_LOCKOUT_SECONDS:
+                remaining = int(LOGIN_LOCKOUT_SECONDS - (now - _login_attempts[ip][-1]))
+                return False, remaining
+            # Lockout expired — reset the list to prevent stale accumulation
+            _login_attempts[ip] = [now]
+        return True, 0
 
 def record_login_attempt():
     """记录登录尝试"""
     ip = _get_real_ip()
     now = time.time()
-    if ip not in _login_attempts:
-        _login_attempts[ip] = []
-    _login_attempts[ip].append(now)
+    with _login_lock:
+        if ip not in _login_attempts:
+            _login_attempts[ip] = []
+        _login_attempts[ip].append(now)
 
 def reset_login_attempts():
     """登录成功后重置尝试次数"""
     ip = _get_real_ip()
-    _login_attempts.pop(ip, None)
+    with _login_lock:
+        _login_attempts.pop(ip, None)
 
 
 # ========================
@@ -101,6 +107,7 @@ def reset_login_attempts():
 # ========================
 
 _request_counts = {}
+_request_lock = threading.Lock()
 RATE_LIMIT = 120
 RATE_WINDOW = 60
 _last_cleanup = time.time()
@@ -111,21 +118,44 @@ def check_rate_limit():
     global _last_cleanup
     ip = _get_real_ip()
     now = time.time()
-    
-    # 定期清理过期IP记录，防止内存泄漏
-    if now - _last_cleanup > CLEANUP_INTERVAL:
-        expired_ips = [k for k, v in _request_counts.items() if not v or now - v[-1] > RATE_WINDOW]
-        for ip_key in expired_ips:
-            del _request_counts[ip_key]
-        _last_cleanup = now
-    
-    if ip not in _request_counts:
-        _request_counts[ip] = []
-    _request_counts[ip] = [t for t in _request_counts[ip] if now - t < RATE_WINDOW]
-    if len(_request_counts[ip]) >= RATE_LIMIT:
-        return False
-    _request_counts[ip].append(now)
-    return True
+
+    with _request_lock:
+        # 定期清理过期IP记录，防止内存泄漏
+        if now - _last_cleanup > CLEANUP_INTERVAL:
+            expired_ips = [k for k, v in _request_counts.items() if not v or now - v[-1] > RATE_WINDOW]
+            for ip_key in expired_ips:
+                del _request_counts[ip_key]
+            _last_cleanup = now
+
+        if ip not in _request_counts:
+            _request_counts[ip] = []
+        _request_counts[ip] = [t for t in _request_counts[ip] if now - t < RATE_WINDOW]
+        if len(_request_counts[ip]) >= RATE_LIMIT:
+            return False
+        _request_counts[ip].append(now)
+        return True
+
+
+# ========================
+# 用户级 API 限流（AI 接口等高成本端点）
+# ========================
+
+_user_api_counts = {}  # {user_id: [timestamp, ...]}
+_user_api_lock = threading.Lock()
+USER_API_RATE_LIMIT = 10  # 每分钟最多 10 次
+USER_API_WINDOW = 60
+
+def check_user_api_rate_limit(user_id):
+    """检查用户级 API 限流"""
+    now = time.time()
+    with _user_api_lock:
+        if user_id not in _user_api_counts:
+            _user_api_counts[user_id] = []
+        _user_api_counts[user_id] = [t for t in _user_api_counts[user_id] if now - t < USER_API_WINDOW]
+        if len(_user_api_counts[user_id]) >= USER_API_RATE_LIMIT:
+            return False
+        _user_api_counts[user_id].append(now)
+        return True
 
 
 # ========================
@@ -203,6 +233,40 @@ def validate_city(city):
 def safe_error_response(message, status_code=400):
     """返回安全的错误响应，不泄露内部信息"""
     return jsonify({"error": message}), status_code
+
+
+# ========================
+# 结果数据校验（防 Prompt 注入）
+# ========================
+
+_REQUIRED_BAZI_KEYS = {"bazi_detail", "gender", "birth_country"}
+_BAZI_DETAIL_KEYS = {"year", "month", "day"}
+
+def validate_result_dict(result):
+    """
+    校验客户端传来的 result dict 结构是否合法。
+    只检查必须存在的 key 和基本类型，不做深度校验。
+    返回 True 表示合法，False 表示非法。
+    """
+    if not isinstance(result, dict):
+        return False
+    # 必须包含核心字段
+    if not _REQUIRED_BAZI_KEYS.issubset(result.keys()):
+        return False
+    bazi_detail = result.get("bazi_detail")
+    if not isinstance(bazi_detail, dict):
+        return False
+    if not _BAZI_DETAIL_KEYS.issubset(bazi_detail.keys()):
+        return False
+    # 每个 pillar 必须是 dict 且包含 gan/zhi
+    for pillar in ("year", "month", "day"):
+        p = bazi_detail[pillar]
+        if not isinstance(p, dict) or "gan" not in p or "zhi" not in p:
+            return False
+    # gender 合法性
+    if result.get("gender") not in ("male", "female"):
+        return False
+    return True
 
 
 # ========================

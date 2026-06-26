@@ -1,4 +1,5 @@
 # core/fortune_engine.py
+from __future__ import annotations
 
 from core.dayun_liunian_engine import (
     analyze_liunian,

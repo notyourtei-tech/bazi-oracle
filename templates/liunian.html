@@ -10,10 +10,10 @@
     <div class="card {{ y.risk.level }}" style="margin-bottom:16px;padding:16px;">
         <h2 style="color:var(--gold);">{{ y.year }}</h2>
 
-        <p><strong data-i18n="career">事业：</strong><span data-i18n="{{ y.event.career_key }}"></span></p>
-        <p><strong data-i18n="wealth">财运：</strong><span data-i18n="{{ y.event.wealth_key }}"></span></p>
-        <p><strong data-i18n="relationship">感情：</strong><span data-i18n="{{ y.event.relationship_key }}"></span></p>
-        <p><strong data-i18n="health">健康：</strong><span data-i18n="{{ y.event.health_key }}"></span></p>
+        <p><strong data-i18n="career_label">事业</strong>: <span data-i18n="{{ y.event.career_key }}"></span></p>
+        <p><strong data-i18n="wealth_label">财运</strong>: <span data-i18n="{{ y.event.wealth_key }}"></span></p>
+        <p><strong data-i18n="relationship_label">感情</strong>: <span data-i18n="{{ y.event.relationship_key }}"></span></p>
+        <p><strong data-i18n="health_label">健康</strong>: <span data-i18n="{{ y.event.health_key }}"></span></p>
 
         <p class="risk {{ y.risk.level }}">
             <span data-i18n="risk_{{ y.risk.level }}"></span>
@@ -34,6 +34,6 @@
     </div>
     {% endif %}
 
-    <a href="{{ url_for('index') }}" class="btn" data-i18n="back">返回</a>
+    <a href="{{ url_for('index') }}" class="btn" data-i18n="back">重新排盘</a>
 </div>
 {% endblock %}

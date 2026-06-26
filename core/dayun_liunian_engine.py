@@ -24,7 +24,7 @@ def analyze_dayun(index, gz, start_year, end_year, day_master_wx, yongshen=None,
     zhi = gz[1]
     
     # 优先使用天干计算十神来定大运基调
-    dayun_shishen = "未知"
+    dayun_shishen = "unknown"
     key_suffix = "unknown"
     if day_master_gan:
         dayun_shishen = get_shishen(day_master_gan, gan)
@@ -63,10 +63,10 @@ def analyze_dayun_liunian_overlap(dayun, liunian):
     """
     大运流年叠加简单分析
     """
-    return f"大运{dayun['shishen']}遇流年{liunian['shishen']}"
+    return "dayun_liunian_overlap_key"
 
 def build_yearly_focus(year, dayun, liunian, overlap):
     """
     年度重点
     """
-    return f"重点关注：{liunian['event_hint_key']}"
+    return "dayun_yearly_focus_key"

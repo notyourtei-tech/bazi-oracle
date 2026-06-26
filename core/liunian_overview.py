@@ -14,36 +14,31 @@ GAN_WUXING = {
 
 def assess_risk(event_result: dict, yongshen_info: dict) -> dict:
     """
-    根据事件结果，评估风险等级
+    根据事件结果的 risk_tags，评估风险等级
     """
-
     risk = 0
     reasons = []
+    tags = event_result.get("risk_tags", {})
 
-    # 事业压力
-    if "压力" in event_result["career"] or "冲突" in event_result["career"]:
+    if tags.get("career"):
         risk += 1
-        reasons.append("事业压力明显")
+        reasons.append("risk_reason_career_stress")
 
-    # 财务风险
-    if "风险" in event_result["wealth"] or "破财" in event_result["wealth"]:
+    if tags.get("wealth"):
         risk += 1
-        reasons.append("财务波动风险")
+        reasons.append("risk_reason_wealth_risk")
 
-    # 感情冲突
-    if "争执" in event_result["relationship"]:
+    if tags.get("relationship"):
         risk += 1
-        reasons.append("人际关系紧张")
+        reasons.append("risk_reason_relationship_tension")
 
-    # 健康问题
-    if "注意" in event_result["health"] or "失衡" in event_result["health"]:
+    if tags.get("health"):
         risk += 1
-        reasons.append("健康需留意")
+        reasons.append("risk_reason_health_attention")
 
-    # 用神是否受损（简化版）
-    if not any(wx in yongshen_info.get("yongshen", []) for wx in ["water", "metal", "wood", "fire", "earth"]):
+    if tags.get("yongshen"):
         risk += 1
-        reasons.append("用神未得到有效助力")
+        reasons.append("risk_reason_yongshen_weak")
 
     # 风险等级
     if risk >= 3:

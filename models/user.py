@@ -8,7 +8,7 @@ class User(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(80), unique=True, nullable=False, index=True)
-    password_hash = db.Column(db.String(200), nullable=False)
+    password_hash = db.Column(db.String(512), nullable=False)
 
     def set_password(self, password):
         if len(password) < 6:

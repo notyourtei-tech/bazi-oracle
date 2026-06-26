@@ -202,5 +202,7 @@ def generate_ai_analysis_stream(result, lang="zh"):
                             yield f"data: {json.dumps({'content': content})}\n\n"
                     except json.JSONDecodeError:
                         continue
-    except Exception:
+    except Exception as e:
+        import logging
+        logging.getLogger(__name__).error(f"AI stream error: {e}", exc_info=True)
         yield f"data: {json.dumps({'error': 'service_unavailable'})}\n\n"

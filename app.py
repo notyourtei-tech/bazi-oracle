@@ -1,4 +1,5 @@
 from flask import Flask, render_template, request, redirect, session, Response, jsonify, send_file, abort
+from flask_migrate import Migrate
 from functools import wraps
 from dotenv import load_dotenv
 import json
@@ -28,7 +29,7 @@ from core.security import (
     check_login_rate_limit, record_login_attempt, reset_login_attempts,
     validate_birth_date, validate_birth_time, validate_name, validate_city,
     validate_csrf_token, safe_error_response, VALID_COUNTRIES, VALID_GENDERS,
-    register_temp_file
+    register_temp_file, validate_result_dict, check_user_api_rate_limit
 )
 
 # ========================
@@ -49,21 +50,20 @@ app.secret_key = _get_secret_key()
 # 数据库
 app.config["SQLALCHEMY_DATABASE_URI"] = Config.SQLALCHEMY_DATABASE_URI
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = Config.SQLALCHEMY_TRACK_MODIFICATIONS
+app.config["SQLALCHEMY_ENGINE_OPTIONS"] = Config.SQLALCHEMY_ENGINE_OPTIONS
 app.config["TEMPLATES_AUTO_RELOAD"] = True
 
 # Session 安全
 app.config["SESSION_COOKIE_HTTPONLY"] = Config.SESSION_COOKIE_HTTPONLY
 app.config["SESSION_COOKIE_SAMESITE"] = Config.SESSION_COOKIE_SAMESITE
+app.config["SESSION_COOKIE_SECURE"] = Config.SESSION_COOKIE_SECURE
 app.config["PERMANENT_SESSION_LIFETIME"] = timedelta(days=7)
-
-# 仅在生产环境启用 Secure flag（需要 HTTPS）
-if os.environ.get('FLASK_ENV') == 'production' or os.environ.get('FORCE_HTTPS'):
-    app.config["SESSION_COOKIE_SECURE"] = True
 
 # 上传限制
 app.config["MAX_CONTENT_LENGTH"] = Config.MAX_CONTENT_LENGTH
 
 db.init_app(app)
+migrate = Migrate(app, db)
 
 # 模板中可用 csrf_token
 app.jinja_env.globals['csrf_token'] = generate_csrf_token
@@ -78,11 +78,16 @@ def security_checks():
     """请求前安全检查"""
     # 限流
     if not check_rate_limit():
-        return safe_error_response("请求过于频繁，请稍后再试", 429)
+        return safe_error_response("error_rate_limit", 429)
 
-    # API 端点 CSRF 验证
+    # API 端点 CSRF 验证（公开只读 API 无需 CSRF）
+    _csrf_exempt_paths = {
+        '/api/share-card', '/api/daily-fortune', '/api/weekly-fortune',
+        '/api/monthly-fortune', '/api/compatibility', '/api/export-pdf',
+    }
     if request.path.startswith('/api/') and request.method in ('POST', 'PUT', 'DELETE', 'PATCH'):
-        validate_csrf_token()
+        if request.path not in _csrf_exempt_paths:
+            validate_csrf_token()
 
     # 阻止常见攻击路径
     blocked_paths = [
@@ -147,6 +152,9 @@ def security_headers(response):
 @app.after_request
 def compress_response(response):
     """Gzip压缩响应体"""
+    # Skip SSE streaming responses — they must stream incrementally
+    if response.content_type and 'text/event-stream' in response.content_type:
+        return response
     accept = request.headers.get('Accept-Encoding', '')
     if 'gzip' not in accept:
         return response
@@ -229,7 +237,7 @@ def index():
                 result = run_full_analysis_from_birth(**cache_params)
                 bazi_cache.set(result, **cache_params)
             except Exception as e:
-                logger.error(f"Bazi analysis error: {type(e).__name__}")
+                logger.error(f"Bazi analysis error: {e}", exc_info=True)
                 return render_template("index.html", error="err_bazi_calc")
 
         # 添加综合分析
@@ -244,7 +252,7 @@ def index():
                 all_liunian.extend(d.get("liunian_list", []))
             result["liunian_comprehensive"] = analyze_liunian_comprehensive(all_liunian, birth_year, dm_elem)
         except Exception as e:
-            logger.error(f"Comprehensive analysis error: {type(e).__name__}: {e}")
+            logger.error(f"Comprehensive analysis error: {e}", exc_info=True)
             result["dayun_comprehensive"] = []
             result["liunian_comprehensive"] = []
 
@@ -258,12 +266,12 @@ def index():
                     birth_date=birth_date,
                     birth_time=birth_time or "",
                     gender=gender,
-                    result_json=json.dumps(result, ensure_ascii=False)
                 )
+                chart.set_result(result)
                 db.session.add(chart)
                 db.session.commit()
             except Exception as e:
-                logger.error(f"Save chart error: {type(e).__name__}")
+                logger.error(f"Save chart error: {e}", exc_info=True)
                 db.session.rollback()
 
         return render_template("result.html", result=result, result_json=json.dumps(result, ensure_ascii=False))
@@ -275,13 +283,13 @@ def index():
         try:
             chart = Chart.query.filter_by(id=int(load_id), user_id=session["user_id"]).first()
             if chart:
-                result = json.loads(chart.result_json)
+                result = chart.get_result()
                 # Rebuild interpretation for fresh analysis
                 try:
                     from core.interpretation_engine import build_comprehensive_interpretation
                     result["interpretation"] = build_comprehensive_interpretation(result)
                 except Exception as e:
-                    logger.error(f"Rebuild interpretation error: {e}")
+                    logger.error(f"Rebuild interpretation error: {e}", exc_info=True)
                 result.setdefault("dayun_comprehensive", [])
                 result.setdefault("liunian_comprehensive", [])
                 # Rebuild comprehensive analysis
@@ -297,12 +305,12 @@ def index():
                         birth_year = int(birth_date) if birth_date else 1990
                         result["dayun_comprehensive"] = analyze_dayun_comprehensive(result.get("dayun", []), birth_year, dm_elem)
                 except Exception as e:
-                    logger.error(f"Rebuild comprehensive error: {e}")
+                    logger.error(f"Rebuild comprehensive error: {e}", exc_info=True)
                 for d in result.get("dayun", []):
                     d.setdefault("liunian_list", [])
                 return render_template("result.html", result=result, result_json=json.dumps(result, ensure_ascii=False))
         except Exception as e:
-            logger.error(f"Load chart error: {type(e).__name__}: {e}")
+            logger.error(f"Load chart error: {e}", exc_info=True)
 
     user_chart = None
     own_chart = None
@@ -318,10 +326,10 @@ def index():
                 user_id=session["user_id"], is_own=True
             ).first()
             if charts:
-                latest_result = json.loads(charts[0].result_json)
+                latest_result = charts[0].get_result()
                 daily_fortune = calc_daily_fortune(latest_result)
         except Exception as e:
-            logger.error(f"Load history error: {type(e).__name__}")
+            logger.error(f"Load history error: {e}", exc_info=True)
 
     return render_template("index.html", user_chart=user_chart, own_chart=own_chart, daily_fortune=daily_fortune)
 
@@ -360,7 +368,7 @@ def register():
             db.session.commit()
             return redirect("/login")
         except Exception as e:
-            logger.error(f"Register error: {type(e).__name__}")
+            logger.error(f"Register error: {e}", exc_info=True)
             db.session.rollback()
             return render_template("register.html", error="err_register_fail")
 
@@ -405,8 +413,9 @@ def login():
 # ======================
 # 登出
 # ======================
-@app.route("/logout")
+@app.route("/logout", methods=["POST"])
 def logout():
+    validate_csrf_token()
     session.clear()
     return redirect("/")
 
@@ -418,13 +427,17 @@ def logout():
 @login_required
 def history():
     try:
-        records = Chart.query.filter_by(
+        page = request.args.get("page", 1, type=int)
+        per_page = 10
+        pagination = Chart.query.filter_by(
             user_id=session["user_id"]
-        ).order_by(Chart.created_at.desc()).all()
-        return render_template("history.html", history=records)
+        ).order_by(Chart.created_at.desc()).paginate(
+            page=page, per_page=per_page, error_out=False
+        )
+        return render_template("history.html", history=pagination.items, pagination=pagination)
     except Exception as e:
-        logger.error(f"History query error: {type(e).__name__}")
-        return render_template("history.html", history=[])
+        logger.error(f"History query error: {e}", exc_info=True)
+        return render_template("history.html", history=[], pagination=None)
 
 
 # ======================
@@ -444,7 +457,7 @@ def set_own_chart(chart_id):
         db.session.commit()
         return jsonify({"ok": True})
     except Exception as e:
-        logger.error(f"Set own chart error: {type(e).__name__}")
+        logger.error(f"Set own chart error: {e}", exc_info=True)
         db.session.rollback()
         return jsonify({"error": "failed"}), 500
 
@@ -460,7 +473,7 @@ def unset_own_chart(chart_id):
         db.session.commit()
         return jsonify({"ok": True})
     except Exception as e:
-        logger.error(f"Unset own chart error: {type(e).__name__}")
+        logger.error(f"Unset own chart error: {e}", exc_info=True)
         db.session.rollback()
         return jsonify({"error": "failed"}), 500
 
@@ -473,7 +486,7 @@ def unset_own_chart(chart_id):
 def ai_analysis():
     data = request.get_json(silent=True)
     if not data:
-        return safe_error_response("无效的请求", 400)
+        return safe_error_response("error_invalid_request", 400)
 
     result = data.get("result")
     lang = data.get("lang", "zh")
@@ -484,7 +497,15 @@ def ai_analysis():
         lang = "zh"
 
     if not result or not isinstance(result, dict):
-        return safe_error_response("缺少八字数据", 400)
+        return safe_error_response("error_missing_bazi_data", 400)
+
+    if not validate_result_dict(result):
+        return safe_error_response("error_invalid_result", 400)
+
+    # 用户级限流（防止滥用 AI API）
+    user_id = session.get("user_id")
+    if user_id and not check_user_api_rate_limit(user_id):
+        return safe_error_response("error_rate_limit", 429)
 
     if stream:
         def generate():
@@ -502,15 +523,18 @@ def ai_analysis():
 @app.route("/api/share-card", methods=["POST"])
 def share_card():
     if not HAS_PILLOW:
-        return safe_error_response("分享卡功能未启用", 501)
+        return safe_error_response("error_sharecard_disabled", 501)
 
     data = request.get_json(silent=True)
     if not data:
-        return safe_error_response("无效的请求", 400)
+        return safe_error_response("error_invalid_request", 400)
 
     result = data.get("result")
     if not result or not isinstance(result, dict):
-        return safe_error_response("缺少八字数据", 400)
+        return safe_error_response("error_missing_bazi_data", 400)
+
+    if not validate_result_dict(result):
+        return safe_error_response("error_invalid_result", 400)
 
     tmp_path = None
     try:
@@ -524,8 +548,8 @@ def share_card():
             "Content-Disposition": "attachment; filename=bazi_card.png"
         })
     except Exception as e:
-        logger.error(f"Share card error: {type(e).__name__}")
-        return safe_error_response("分享卡生成失败", 500)
+        logger.error(f"Share card error: {e}", exc_info=True)
+        return safe_error_response("error_sharecard_failed", 500)
     finally:
         # 清理临时文件
         if tmp_path and os.path.exists(tmp_path):
@@ -542,11 +566,14 @@ def share_card():
 def daily_fortune():
     data = request.get_json(silent=True)
     if not data:
-        return safe_error_response("无效的请求", 400)
+        return safe_error_response("error_invalid_request", 400)
 
     result = data.get("result")
     if not result or not isinstance(result, dict):
-        return safe_error_response("缺少八字数据", 400)
+        return safe_error_response("error_missing_bazi_data", 400)
+
+    if not validate_result_dict(result):
+        return safe_error_response("error_invalid_result", 400)
 
     date_str = data.get("date")
 
@@ -556,33 +583,60 @@ def daily_fortune():
         if date_str:
             # 验证日期格式
             if not re.match(r'^\d{4}-\d{2}-\d{2}$', str(date_str)):
-                return safe_error_response("日期格式无效", 400)
+                return safe_error_response("error_invalid_date_format", 400)
             target_date = date_cls.fromisoformat(str(date_str))
         fortune = calc_daily_fortune(result, target_date)
         return jsonify(fortune)
     except ValueError:
-        return safe_error_response("日期格式无效", 400)
+        return safe_error_response("error_invalid_date_format", 400)
     except Exception as e:
-        logger.error(f"Daily fortune error: {type(e).__name__}")
-        return safe_error_response("运势计算失败", 500)
+        logger.error(f"Daily fortune error: {e}", exc_info=True)
+        return safe_error_response("error_fortune_calc_failed", 500)
 
 
 @app.route("/api/weekly-fortune", methods=["POST"])
 def weekly_fortune():
     data = request.get_json(silent=True)
     if not data:
-        return safe_error_response("无效的请求", 400)
+        return safe_error_response("error_invalid_request", 400)
 
     result = data.get("result")
     if not result or not isinstance(result, dict):
-        return safe_error_response("缺少八字数据", 400)
+        return safe_error_response("error_missing_bazi_data", 400)
+
+    if not validate_result_dict(result):
+        return safe_error_response("error_invalid_result", 400)
 
     try:
         fortune = calc_weekly_fortune(result)
         return jsonify({"days": fortune})
     except Exception as e:
-        logger.error(f"Weekly fortune error: {type(e).__name__}")
-        return safe_error_response("运势计算失败", 500)
+        logger.error(f"Weekly fortune error: {e}", exc_info=True)
+        return safe_error_response("error_fortune_calc_failed", 500)
+
+
+@app.route("/api/monthly-fortune", methods=["POST"])
+def monthly_fortune():
+    data = request.get_json(silent=True)
+    if not data:
+        return safe_error_response("error_invalid_request", 400)
+
+    result = data.get("result")
+    if not result or not isinstance(result, dict):
+        return safe_error_response("error_missing_bazi_data", 400)
+
+    if not validate_result_dict(result):
+        return safe_error_response("error_invalid_result", 400)
+
+    year = data.get("year")
+    month = data.get("month")
+
+    try:
+        fortune = calc_monthly_fortune(result, year, month)
+        return jsonify(fortune)
+    except Exception as e:
+        logger.error(f"Monthly fortune error: {e}", exc_info=True)
+        return safe_error_response("error_fortune_calc_failed", 500)
 
 
 # ======================
@@ -592,20 +646,21 @@ def weekly_fortune():
 def compatibility():
     data = request.get_json(silent=True)
     if not data:
-        return safe_error_response("无效的请求", 400)
+        return safe_error_response("error_invalid_request", 400)
 
     result1 = data.get("result1")
     result2 = data.get("result2")
 
     if not result1 or not result2 or not isinstance(result1, dict) or not isinstance(result2, dict):
-        return safe_error_response("需要提供两个人的八字数据", 400)
+        return safe_error_response("error_missing_two_results", 400)
 
     try:
-        analysis = analyze_compatibility(result1, result2)
+        lang = data.get("lang", session.get("lang", "zh"))
+        analysis = analyze_compatibility(result1, result2, lang=lang)
         return jsonify(analysis)
     except Exception as e:
-        logger.error(f"Compatibility error: {type(e).__name__}")
-        return safe_error_response("合盘分析失败", 500)
+        logger.error(f"Compatibility error: {e}", exc_info=True)
+        return safe_error_response("error_compat_failed", 500)
 
 
 # ======================
@@ -614,15 +669,18 @@ def compatibility():
 @app.route("/api/export-pdf", methods=["POST"])
 def export_pdf():
     if not HAS_REPORTLAB:
-        return safe_error_response("PDF导出功能未启用", 501)
+        return safe_error_response("error_pdf_disabled", 501)
 
     data = request.get_json(silent=True)
     if not data:
-        return safe_error_response("无效的请求", 400)
+        return safe_error_response("error_invalid_request", 400)
 
     result = data.get("result")
     if not result or not isinstance(result, dict):
-        return safe_error_response("缺少八字数据", 400)
+        return safe_error_response("error_missing_bazi_data", 400)
+
+    if not validate_result_dict(result):
+        return safe_error_response("error_invalid_result", 400)
 
     try:
         pdf_buffer = generate_pdf_report(result)
@@ -632,8 +690,8 @@ def export_pdf():
             headers={"Content-Disposition": "attachment; filename=bazi_report.pdf"}
         )
     except Exception as e:
-        logger.error(f"PDF export error: {type(e).__name__}")
-        return safe_error_response("PDF导出失败", 500)
+        logger.error(f"PDF export error: {e}", exc_info=True)
+        return safe_error_response("error_pdf_failed", 500)
 
 
 # ======================
@@ -677,7 +735,25 @@ def set_lang(lang):
     if lang in ('zh', 'ja', 'en', 'ko', 'vi', 'my'):
         session['lang'] = lang
     next_url = request.args.get('next', '/')
+    # Prevent open redirect: only allow relative paths on the same host
+    if not next_url.startswith('/') or next_url.startswith('//'):
+        next_url = '/'
     return redirect(next_url)
+
+
+# ======================
+# Favicon（避免 404）
+# ======================
+@app.route("/favicon.ico")
+def favicon():
+    # 返回一个简单的太极图标 SVG
+    svg = '''<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+      <circle cx="50" cy="50" r="48" fill="#0c0a08" stroke="#c9a84c" stroke-width="2"/>
+      <path d="M50 2 A48 48 0 0 1 50 98 A24 24 0 0 1 50 50 A24 24 0 0 0 50 2" fill="#e8dcc8"/>
+      <circle cx="50" cy="26" r="6" fill="#0c0a08"/>
+      <circle cx="50" cy="74" r="6" fill="#e8dcc8"/>
+    </svg>'''
+    return Response(svg, mimetype="image/svg+xml")
 
 
 # ======================
@@ -693,29 +769,29 @@ def cache_stats():
 # ======================
 @app.errorhandler(404)
 def not_found(e):
-    return render_template("base.html"), 404
+    return render_template("404.html"), 404
 
 
 @app.errorhandler(405)
 def method_not_allowed(e):
-    return safe_error_response("请求方法不允许", 405)
+    return safe_error_response("error_method_not_allowed", 405)
 
 
 @app.errorhandler(413)
 def request_entity_too_large(e):
-    return safe_error_response("请求内容过大", 413)
+    return safe_error_response("error_payload_too_large", 413)
 
 
 @app.errorhandler(429)
 def too_many_requests(e):
-    return safe_error_response("请求过于频繁", 429)
+    return safe_error_response("error_too_many_requests", 429)
 
 
 @app.errorhandler(500)
 def internal_error(e):
     logger.error(f"Internal server error: {e}")
     db.session.rollback()
-    return safe_error_response("服务器内部错误", 500)
+    return safe_error_response("error_internal_server", 500)
 
 
 # ======================

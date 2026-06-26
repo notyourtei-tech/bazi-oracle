@@ -1,45 +1,6 @@
 
 # core/bazi_utils.py
-
-GAN_WUXING = {
-    "甲": "wood", "乙": "wood",
-    "丙": "fire", "丁": "fire",
-    "戊": "earth", "己": "earth",
-    "庚": "metal", "辛": "metal",
-    "壬": "water", "癸": "water"
-}
-
-ZHI_WUXING = {
-    "子": "water",
-    "丑": "earth",
-    "寅": "wood",
-    "卯": "wood",
-    "辰": "earth",
-    "巳": "fire",
-    "午": "fire",
-    "未": "earth",
-    "申": "metal",
-    "酉": "metal",
-    "戌": "earth",
-    "亥": "water"
-}
-
-ZHI = ["子", "丑", "寅", "卯", "辰", "巳", "午", "未", "申", "酉", "戌", "亥"]
-
-ZHI_HIDDEN_GAN = {
-    "子": ["癸"],
-    "丑": ["己", "癸", "辛"],
-    "寅": ["甲", "丙", "戊"],
-    "卯": ["乙"],
-    "辰": ["戊", "乙", "癸"],
-    "巳": ["丙", "戊", "庚"],
-    "午": ["丁", "己"],
-    "未": ["己", "丁", "乙"],
-    "申": ["庚", "壬", "戊"],
-    "酉": ["辛"],
-    "戌": ["戊", "辛", "丁"],
-    "亥": ["壬", "甲"]
-}
+from core.constants import GAN_WUXING, ZHI_WUXING, ZHI, ZHI_HIDDEN_GAN, TIANGAN, YIN_YANG, SHISHEN_MAP
 
 NAYIN_MAP = {
     "甲子": "nayin_gold_sea", "乙丑": "nayin_gold_sea",
@@ -107,11 +68,17 @@ def get_shishen(day_master_gan, other_gan):
     day_master_gan: 日主天干
     other_gan: 其他天干
     """
-    dm_wx = GAN_WUXING[day_master_gan]
-    other_wx = GAN_WUXING[other_gan]
+    dm_wx = GAN_WUXING.get(day_master_gan)
+    other_wx = GAN_WUXING.get(other_gan)
     
-    dm_yy = YIN_YANG[day_master_gan]
-    other_yy = YIN_YANG[other_gan]
+    if not dm_wx or not other_wx:
+        return "比肩"
+    
+    dm_yy = YIN_YANG.get(day_master_gan)
+    other_yy = YIN_YANG.get(other_gan)
+    
+    if dm_yy is None or other_yy is None:
+        return "比肩"
     
     is_same_yy = "same" if dm_yy == other_yy else "diff"
     
@@ -159,7 +126,7 @@ def get_kongwang(gan, zhi):
         g_idx = TIANGAN.index(gan)
         z_idx = ZHI.index(zhi)
     except (ValueError, AttributeError):
-        return None, None
+        return []
     dist = 10 - g_idx
     z_gui = (z_idx + dist) % 12
     kw1 = ZHI[(z_gui) % 12]

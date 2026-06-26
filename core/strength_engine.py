@@ -1,12 +1,5 @@
 # core/strength_engine.py
-
-GAN_WX = {
-    "甲": "wood", "乙": "wood",
-    "丙": "fire", "丁": "fire",
-    "戊": "earth", "己": "earth",
-    "庚": "metal", "辛": "metal",
-    "壬": "water", "癸": "water",
-}
+from core.constants import GAN_WX
 
 def analyze_strength(bazi, wuxing):
     day_gan = bazi["day"][0]

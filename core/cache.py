@@ -5,10 +5,12 @@ Same input parameters always produce the same result, so caching saves significa
 import time
 import hashlib
 import threading
+import json
+from collections import OrderedDict
 
 class BaziCache:
     def __init__(self, max_size=500, ttl_seconds=3600):
-        self._cache = {}
+        self._cache = OrderedDict()
         self._lock = threading.Lock()
         self._max_size = max_size
         self._ttl = ttl_seconds
@@ -24,6 +26,7 @@ class BaziCache:
         with self._lock:
             entry = self._cache.get(key)
             if entry and time.time() - entry['time'] < self._ttl:
+                self._cache.move_to_end(key)
                 self._hits += 1
                 return entry['value']
             self._misses += 1
@@ -32,9 +35,11 @@ class BaziCache:
     def set(self, value, **kwargs):
         key = self._make_key(**kwargs)
         with self._lock:
-            if len(self._cache) >= self._max_size:
-                oldest_key = min(self._cache, key=lambda k: self._cache[k]['time'])
-                del self._cache[oldest_key]
+            if key in self._cache:
+                self._cache.move_to_end(key)
+            else:
+                if len(self._cache) >= self._max_size:
+                    self._cache.popitem(last=False)
             self._cache[key] = {'value': value, 'time': time.time()}
 
     def stats(self):
@@ -48,5 +53,4 @@ class BaziCache:
                 'hit_rate': f'{rate:.1f}%'
             }
 
-import json
 bazi_cache = BaziCache(max_size=500, ttl_seconds=3600)

@@ -1,193 +1,214 @@
 # BaZi (八字) Auto Chart System
 
-> A professional Chinese Four Pillars of Destiny (BaZi) analysis system with AI-powered interpretations, true solar time calculations, multi-language support, and guided onboarding.
+> 基于真太阳时的专业八字排盘与分析系统，支持全球 90+ 国家、6 种语言、AI 深度解读。
 
-## ✨ Features
+## ✨ 功能特性
 
-### Core Analysis
-- **True Solar Time Calculation** - Uses actual city-level longitude data (200+ cities) with Equation of Time correction
-- **Four Pillars (四柱) Generation** - Year, Month, Day, Hour pillars based on astronomical solar terms
-- **Five Elements (五行) Analysis** - Detailed strength scoring with hidden stems
-- **Divine Stars (神煞) Analysis** - 20+ symbolic stars with detailed interpretations
-- **Personality Analysis** - Based on Day Master element and body strength
-- **Daily/Weekly/Monthly Fortune** - Personalized fortune based on your BaZi chart
-- **Comprehensive Life Advice** - Career, wealth, relationship, health, study, and social guidance
+### 核心排盘
+- **真太阳时计算** — 根据城市经度（200+ 城市）进行真太阳时修正，而非简单时区转换
+- **四柱八字生成** — 年柱以立春为界，月柱按节气换月，日柱公历推算，时柱按时辰划分
+- **节气天文计算** — 通过太阳黄经近似公式精确定位 24 节气时刻（精度到分钟）
+- **五行强弱分析** — 天干地支五行力量评分，身强身弱判断
+- **神煞标注** — 20+ 神煞星曜（天乙贵人、文昌、桃花、驿马等）
+- **十神分析** — 日主与其他天干的十神关系解读
+- **起运与大运** — 根据节气差计算起运年龄，顺逆推算 8 步大运
+- **大运流年详解** — 每步大运内逐年流年，涵盖健康、感情、财运、事业、学业、社交
 
-### AI-Powered Insights
-- **OpenRouter AI Integration** - Personalized, in-depth analysis of your destiny
-- **Streaming Response** - Real-time typewriter effect for analysis display
+### 运势系统
+- **每日运势** — 基于当日干支与日主关系计算运势评分
+- **每周运势** — 未来 7 天运势预测
+- **每月运势** — 整月运势概览与平均分
 
-### User Experience
-- **Language Selection Modal** - First-time users choose from 5 languages (中文, 日本語, English, 한국어, Tiếng Việt)
-- **Onboarding Tutorial** - 4-step guided introduction to the system
-- **My BaZi (我的八字)** - Mark any chart as your own, always displayed on homepage
-- **Consultation Page** - Dedicated page with WeChat/LINE QR codes for paid consultation
-- **Session Persistence** - Login state remembered for 30 days
+### 综合分析
+- **性格解读** — 基于日主五行、身强身弱、十神关系生成性格特征
+- **人生建议** — 事业、财运、感情、健康、学业、社交全方位建议
+- **神煞详解** — 每颗神煞的含义、影响、柱位说明
+- **五行详解** — 各五行的性质、季节、颜色、脏腑、性格、职业建议
 
-### Comprehensive Destiny Reading
-- **Grand Fortune (大运)** - 10-year cycle analysis with timeline visualization
-- **Annual Fortune (流年)** - Year-by-year predictions covering health, love, wealth, career, education, and social life
-- **Ten Gods (十神) Analysis** - Detailed personality traits based on Day Master relationships
+### AI 深度解读
+- **OpenRouter 集成** — 接入大语言模型生成个性化分析
+- **流式输出** — SSE 实时打字机效果展示
+- **多语言 prompt** — 支持中、英、日、韩、越 5 种语言的 AI 分析
 
-### Compatibility Analysis
-- **Two-Person Compatibility** - Analyze destiny compatibility between two people
-- **Five Elements Complementarity** - See how your elements balance each other
+### 用户体验
+- **语言选择弹窗** — 首次访问选择语言（中文、日本語、English、한국어、Tiếng Việt、မြန်မာ）
+- **引导教程** — 6 步新手引导
+- **我的八字** — 标记任意排盘为"我的八字"，首页常驻显示
+- **暗金高级感 UI** — 粒子星空、鼠标光晕、3D 卡片倾斜、打字机动效、滚动淡入
+- **PWA 支持** — Service Worker 离线缓存，可添加到手机桌面
 
-### Sharing & Export
-- **Beautiful Share Cards** - Generate shareable destiny cards (requires Pillow)
-- **PDF Report Export** - Professional formatted BaZi report (requires ReportLab)
-- **User Accounts** - Save charts, track fortune, and manage "My BaZi"
+### 导出与分享
+- **分享卡生成** — 生成精美命盘图片一键保存（需 Pillow）
+- **PDF 报告** — 导出专业排版的分析报告（需 ReportLab）
+- **用户账号** — 登录后保存排盘历史
 
-## 🌏 Supported Countries
+## 🌏 支持国家（90+）
 
-90+ countries with accurate solar time calculations:
+| 地区 | 国家 |
+|------|------|
+| 东亚 | 中国、日本、韩国、台湾、香港、澳门、蒙古 |
+| 东南亚 | 越南、泰国、菲律宾、马来西亚、新加坡、印尼、缅甸、柬埔寨、老挝、文莱 |
+| 南亚 | 印度、巴基斯坦、孟加拉国、斯里兰卡、尼泊尔、马尔代夫 |
+| 西亚/中亚 | 土耳其、沙特、阿联酋、卡塔尔、科威特、巴林、阿曼、以色列、约旦、黎巴嫩、伊拉克、伊朗、哈萨克斯坦、乌兹别克斯坦 |
+| 欧洲 | 英国、德国、法国、意大利、西班牙、葡萄牙、荷兰、比利时、瑞士、奥地利、瑞典、挪威、丹麦、芬兰、波兰、捷克、希腊、爱尔兰、罗马尼亚、乌克兰、匈牙利、俄罗斯 |
+| 美洲 | 美国、加拿大、墨西哥、危地马拉、古巴、牙买加、巴拿马、巴西、阿根廷、智利、哥伦比亚、秘鲁、委内瑞拉、厄瓜多尔 |
+| 非洲 | 埃及、南非、尼日利亚、肯尼亚、加纳、摩洛哥、埃塞俄比亚、坦桑尼亚、阿尔及利亚 |
+| 大洋洲 | 澳大利亚、新西兰、斐济 |
 
-**East Asia:** China, Japan, South Korea, Taiwan, Hong Kong, Macau, Mongolia
+## 🚀 快速开始
 
-**Southeast Asia:** Vietnam, Thailand, Philippines, Malaysia, Singapore, Indonesia, Myanmar, Cambodia, Laos, Brunei
-
-**South Asia:** India, Pakistan, Bangladesh, Sri Lanka, Nepal, Maldives
-
-**West & Central Asia:** Turkey, Saudi Arabia, UAE, Qatar, Kuwait, Bahrain, Oman, Israel, Jordan, Lebanon, Iraq, Iran, Kazakhstan, Uzbekistan
-
-**Europe:** UK, Germany, France, Italy, Spain, Portugal, Netherlands, Belgium, Switzerland, Austria, Sweden, Norway, Denmark, Finland, Poland, Czech Republic, Greece, Ireland, Romania, Ukraine, Hungary, Russia
-
-**Americas:** USA, Canada, Mexico, Guatemala, Cuba, Jamaica, Panama, Brazil, Argentina, Chile, Colombia, Peru, Venezuela, Ecuador
-
-**Africa:** Egypt, South Africa, Nigeria, Kenya, Ghana, Morocco, Ethiopia, Tanzania, Algeria
-
-**Oceania:** Australia, New Zealand, Fiji
-
-## 🚀 Quick Start
-
-### Prerequisites
+### 环境要求
 - Python 3.10+
 - pip
 
-### Installation
+### 安装
 
 ```bash
-# Clone the repository
+# 克隆仓库
 git clone https://github.com/yourusername/bazi-app.git
 cd bazi-app
 
-# Install dependencies
+# 安装依赖
 pip install -r requirements.txt
 
-# Initialize database
-flask init-db
+# 初始化数据库
+flask db upgrade
 
-# Run the application
+# 启动应用
 python app.py
 ```
 
-Open http://127.0.0.1:5000 in your browser.
+打开 http://127.0.0.1:5000
 
-### Environment Variables (Optional)
+### 可选配置
 
 ```bash
-# For AI-powered analysis (OpenRouter)
+# AI 深度解读（OpenRouter）
 set OPENROUTER_API_KEY=your_api_key_here
+
+# 强制 HTTPS（生产环境）
+set FORCE_HTTPS=1
 ```
 
-## 📁 Project Structure
+## 📁 项目结构
 
 ```
 bazi_app/
-├── app.py                  # Flask application & routes
-├── config.py               # Configuration
-├── requirements.txt        # Python dependencies
+├── app.py                    # Flask 应用 & 路由
+├── config.py                 # 配置（密钥、数据库、Session）
+├── requirements.txt          # Python 依赖
+├── migrations/               # Flask-Migrate 数据库迁移
+│
 ├── models/
-│   ├── user.py            # User authentication model
-│   └── chart.py           # Saved chart model (with is_own field)
+│   ├── user.py               # 用户模型（密码哈希）
+│   └── chart.py              # 排盘记录模型（含 is_own 字段）
+│
 ├── core/
-│   ├── pipeline.py        # Main analysis orchestrator
-│   ├── calendar_engine.py  # Solar terms & pillar calculation
-│   ├── geo_time_engine.py  # True solar time conversion
-│   ├── city_lookup.py     # City longitude database
-│   ├── wuxing_engine.py   # Five elements scoring
-│   ├── shensha_engine.py  # Divine stars calculation
-│   ├── personality_engine.py  # Personality analysis
-│   ├── interpretation_engine.py # Comprehensive interpretation
-│   ├── daily_fortune_engine.py  # Daily fortune calculation
-│   ├── compatibility_engine.py  # Two-person compatibility
-│   ├── comprehensive_analysis.py # Multi-dimension analysis
-│   ├── ai_engine.py       # OpenRouter AI integration
-│   ├── share_card.py      # Share card generation (Pillow)
-│   ├── pdf_engine.py      # PDF report generation (ReportLab)
-│   └── security.py        # Rate limiting, CSRF, validation
+│   ├── pipeline.py           # 主分析流水线（编排所有引擎）
+│   ├── calendar_engine.py    # 节气天文计算 & 四柱推算
+│   ├── geo_time_engine.py    # 真太阳时转换
+│   ├── city_lookup.py        # 城市经度数据库（200+ 城市）
+│   ├── bazi_utils.py         # 干支工具函数（五行、十神、纳音、空亡）
+│   ├── wuxing_engine.py      # 五行力量评分
+│   ├── shensha_engine.py     # 神煞计算（20+ 星曜）
+│   ├── personality_engine.py # 性格与身强身弱分析
+│   ├── interpretation_engine.py # 综合解读（神煞、五行、十神、性格、建议）
+│   ├── comprehensive_analysis.py # 大运流年多维度分析
+│   ├── daily_fortune_engine.py   # 每日/每周/每月运势
+│   ├── compatibility_engine.py   # 双人合盘分析
+│   ├── ai_engine.py          # OpenRouter AI 集成
+│   ├── share_card.py         # 分享卡生成（Pillow）
+│   ├── pdf_engine.py         # PDF 报告生成（ReportLab）
+│   ├── security.py           # 安全模块（CSRF、限流、验证）
+│   └── cache.py              # 内存缓存（LRU）
+│
 ├── templates/
-│   ├── base.html          # Base layout with nav, modals, footer
-│   ├── index.html         # Homepage with form & "My BaZi"
-│   ├── result.html        # Analysis result with tabbed view
-│   ├── history.html       # History with "Set as My BaZi"
-│   ├── consult.html       # Consultation page with QR codes
-│   ├── explain.html       # System explanation & disclaimer
-│   ├── login.html         # Login page
-│   └── register.html      # Registration page
+│   ├── base.html             # 基础布局（导航、弹窗、粒子、光晕）
+│   ├── index.html            # 首页（表单、我的八字、今日运势）
+│   ├── result.html           # 分析结果（标签页：命盘/分析/运势/建议）
+│   ├── history.html          # 历史记录
+│   ├── explain.html          # 系统说明与免责声明
+│   ├── consult.html          # 付费咨询页
+│   ├── glossary.html         # 术语表
+│   ├── login.html            # 登录
+│   └── register.html         # 注册
+│
 ├── static/
-│   ├── style.css          # Premium dark theme CSS
-│   ├── weixin.jpg         # WeChat QR code
-│   ├── line.jpg           # LINE QR code
-│   └── i18n/              # Multi-language files
-│       ├── zh.json        # Chinese (中文)
-│       ├── en.json        # English
-│       ├── ja.json        # Japanese (日本語)
-│       ├── ko.json        # Korean (한국어)
-│       └── vi.json        # Vietnamese (Tiếng Việt)
-└── data/
-    └── city_coords.json   # 200+ city longitude data
+│   ├── style.css             # 暗金高级感主题 CSS
+│   ├── timepicker.js         # 时钟式时间选择器
+│   ├── sw.js                 # PWA Service Worker
+│   ├── manifest.json         # PWA 配置
+│   ├── i18n/                 # 国际化（6 种语言）
+│   │   ├── zh.json           # 中文
+│   │   ├── en.json           # English
+│   │   ├── ja.json           # 日本語
+│   │   ├── ko.json           # 한국어
+│   │   ├── vi.json           # Tiếng Việt
+│   │   └── my.json           # မြန်မာ
+│   ├── weixin.jpg            # 微信二维码
+│   └── line.jpg              # LINE 二维码
+│
+├── data/
+│   └── city_coords.json      # 城市经度数据
+│
+└── tests/
+    └── test_core.py          # 核心引擎单元测试（23 项）
 ```
 
-## 🔒 Security Features
+## 🔒 安全特性
 
-- Rate limiting (120 requests/minute per IP)
-- XSS prevention with input sanitization
-- CSRF protection on all forms
-- Secure session management (HttpOnly, SameSite, 30-day expiry)
-- Security headers (HSTS, CSP, X-Frame-Options, X-Content-Type-Options)
-- Password hashing with Werkzeug
-- Login attempt brute-force protection
-- Blocked common attack paths (wp-admin, phpmyadmin, etc.)
+- 请求限流（120 次/分钟/IP）
+- XSS 防护（输入清理）
+- CSRF 保护（所有表单和 API）
+- 安全 Session 管理（HttpOnly、SameSite、30 天有效期）
+- 安全响应头（HSTS、CSP、X-Frame-Options）
+- 密码哈希（Werkzeug）
+- 登录暴力破解防护
+- 攻击路径拦截（wp-admin、phpmyadmin 等）
 
-## 🛠️ Tech Stack
+## 🛠️ 技术栈
 
-- **Backend:** Python Flask
-- **Database:** SQLite (SQLAlchemy ORM)
-- **Frontend:** HTML5, CSS3, Vanilla JavaScript
-- **AI:** OpenRouter API (optional)
-- **Charts:** Custom BaZi engine with astronomical calculations
-- **i18n:** Client-side JSON translation system (5 languages)
-- **Export:** Pillow (share cards), ReportLab (PDF reports)
+| 层级 | 技术 |
+|------|------|
+| 后端 | Python Flask、Flask-Migrate、SQLAlchemy |
+| 数据库 | SQLite（开发）/ PostgreSQL（生产） |
+| 前端 | HTML5、CSS3、Vanilla JavaScript |
+| AI | OpenRouter API（可选） |
+| 排盘 | 自研天文计算引擎 |
+| i18n | 客户端 JSON 翻译系统（6 语言） |
+| 导出 | Pillow（分享卡）、ReportLab（PDF） |
+| PWA | Service Worker + manifest.json |
 
-## 📱 Responsive Design
+## 🧪 测试
 
-- Mobile-first responsive layout
-- Bottom navigation for mobile devices
-- Touch-friendly buttons and inputs
-- Optimized for all screen sizes
-- Language selection modal for first-time visitors
+```bash
+# 运行所有测试
+python -m pytest tests/ -v
 
-## 🤝 Contributing
+# 仅运行核心引擎测试
+python -m pytest tests/test_core.py -v
+```
 
-Contributions are welcome! Please feel free to submit a Pull Request.
+## 📱 响应式设计
 
-1. Fork the repository
-2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
-3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
-4. Push to the branch (`git push origin feature/AmazingFeature`)
-5. Open a Pull Request
+- 桌面：最大宽度 1100px 居中
+- 平板（≤768px）：单列布局，底部导航
+- 手机（≤480px）：紧凑排版，禁用 3D 倾斜效果
+
+## 🤝 贡献
+
+欢迎贡献！请提交 Pull Request。
+
+1. Fork 仓库
+2. 创建功能分支 (`git checkout -b feature/AmazingFeature`)
+3. 提交更改 (`git commit -m 'Add some AmazingFeature'`)
+4. 推送到分支 (`git push origin feature/AmazingFeature`)
+5. 创建 Pull Request
 
 ## 📄 License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
-## 🙏 Acknowledgments
-
-- Traditional Chinese BaZi (Four Pillars) methodology
-- Astronomical solar terms calculation algorithms
-- OpenRouter AI for personalized analysis
+MIT License - 详见 [LICENSE](LICENSE)
 
 ---
 
-**Disclaimer:** This system provides BaZi analysis as cultural research and entertainment. Results are for personal reference only and should not be used as the basis for medical, legal, investment, or other high-risk decisions. For detailed personalized consultation, contact the author via WeChat or LINE (paid service).
+**免责声明：** 本系统提供的八字分析属于传统文化研究范畴，仅供个人参考，不构成任何医疗、法律、投资等高风险决策的依据。如需详细个人咨询，请通过微信或 LINE 联系作者（付费服务）。

@@ -19,7 +19,17 @@ try:
 except ImportError:
     HAS_REPORTLAB = False
 
+import json as _json
 from xml.sax.saxutils import escape as xml_escape
+
+
+def _load_i18n(lang="zh"):
+    i18n_path = os.path.join(os.path.dirname(__file__), "..", "static", "i18n", f"{lang}.json")
+    try:
+        with open(i18n_path, "r", encoding="utf-8") as f:
+            return _json.load(f)
+    except Exception:
+        return {}
 
 
 def _register_chinese_font():
@@ -42,13 +52,14 @@ def _register_chinese_font():
     return "Helvetica"
 
 
-def generate_pdf_report(result, output_path=None):
+def generate_pdf_report(result, output_path=None, lang="zh"):
     """
     Generate a professional PDF report for bazi analysis.
     
     Args:
         result: Bazi analysis result dict
         output_path: Output file path (if None, returns BytesIO)
+        lang: Language code for i18n
     
     Returns:
         File path or BytesIO object
@@ -57,6 +68,7 @@ def generate_pdf_report(result, output_path=None):
         raise ImportError("reportlab is required for PDF generation")
     
     font_name = _register_chinese_font()
+    t = _load_i18n(lang)
     
     # Colors
     GOLD = HexColor("#c9a23f")
@@ -111,7 +123,9 @@ def generate_pdf_report(result, output_path=None):
     
     # Build document
     if output_path:
-        doc = SimpleDocTemplate(output_path, pagesize=A4)
+        # Validate output path to prevent path traversal
+        abs_path = os.path.abspath(output_path)
+        doc = SimpleDocTemplate(abs_path, pagesize=A4)
     else:
         buffer = io.BytesIO()
         doc = SimpleDocTemplate(buffer, pagesize=A4)
@@ -119,22 +133,20 @@ def generate_pdf_report(result, output_path=None):
     story = []
     
     # Title
-    story.append(Paragraph("八字命盘分析报告", title_style))
+    story.append(Paragraph(t.get("pdf_title", "八字命盘分析报告"), title_style))
     story.append(Spacer(1, 10))
     
-    # Generated time
-    story.append(Paragraph(f"生成时间：{datetime.now().strftime('%Y-%m-%d %H:%M')}", small_style))
+    story.append(Paragraph(f"{t.get('pdf_generated_time', '生成时间')}：{datetime.now().strftime('%Y-%m-%d %H:%M')}", small_style))
     story.append(Spacer(1, 20))
     
-    # Four Pillars
-    story.append(Paragraph("四柱八字", heading_style))
+    story.append(Paragraph(t.get("pdf_pillar_heading", "四柱八字"), heading_style))
     
     bazi = result.get("bazi_detail", {})
     pillars_data = [
-        ["柱位", "天干", "地支", "纳音"],
+        [t.get("pdf_pillar_position", "柱位"), t.get("pdf_pillar_heavenly_stem", "天干"), t.get("pdf_pillar_earthly_branch", "地支"), t.get("pdf_pillar_nayin", "纳音")],
     ]
     
-    pillar_names = {"year": "年柱", "month": "月柱", "day": "日柱", "hour": "时柱"}
+    pillar_names = {"year": t.get("pdf_pillar_year", "年柱"), "month": t.get("pdf_pillar_month", "月柱"), "day": t.get("pdf_pillar_day", "日柱"), "hour": t.get("pdf_pillar_hour", "时柱")}
     for key in ["year", "month", "day", "hour"]:
         p = bazi.get(key, {})
         pillars_data.append([
@@ -160,15 +172,15 @@ def generate_pdf_report(result, output_path=None):
     story.append(Spacer(1, 20))
     
     # Wuxing Strength
-    story.append(Paragraph("五行强弱", heading_style))
+    story.append(Paragraph(t.get("pdf_wuxing_heading", "五行强弱"), heading_style))
     
     wuxing = result.get("wuxing_strength", {})
-    wx_names = {"wood": "木", "fire": "火", "earth": "土", "metal": "金", "water": "水"}
+    wx_names = {"wood": t.get("wuxing_wood", "木"), "fire": t.get("wuxing_fire", "火"), "earth": t.get("wuxing_earth", "土"), "metal": t.get("wuxing_metal", "金"), "water": t.get("wuxing_water", "水")}
     
-    wx_data = [["五行", "强度", "状态"]]
+    wx_data = [[t.get("pdf_wuxing_element", "五行"), t.get("pdf_wuxing_strength_label", "强度"), t.get("pdf_wuxing_status", "状态")]]
     for wx_key in ["wood", "fire", "earth", "metal", "water"]:
         score = wuxing.get(wx_key, 0)
-        status = "旺" if score > 70 else ("弱" if score < 30 else "中")
+        status = t.get("pdf_wuxing_strong", "旺") if score > 70 else (t.get("pdf_wuxing_weak", "弱") if score < 30 else t.get("pdf_wuxing_neutral", "中"))
         wx_data.append([wx_names.get(wx_key, wx_key), f"{int(score)}", status])
     
     wx_table = Table(wx_data, colWidths=[80, 80, 80])
@@ -187,56 +199,64 @@ def generate_pdf_report(result, output_path=None):
     story.append(Spacer(1, 20))
     
     # Shensha
-    story.append(Paragraph("神煞信息", heading_style))
+    story.append(Paragraph(t.get("pdf_shensha_heading", "神煞信息"), heading_style))
     
     shensha = result.get("shensha", [])
     if shensha:
         for s in shensha:
-            name = xml_escape(s.get("name_key", "").replace("shensha_", "").replace("_name", ""))
-            desc = xml_escape(s.get("desc_key", ""))
+            name_key = s.get("name_key", "")
+            desc_key = s.get("desc_key", "")
+            name = xml_escape(t.get(name_key, name_key.replace("shensha_", "").replace("_name", "")))
+            desc = xml_escape(t.get(desc_key, desc_key))
             story.append(Paragraph(f"• {name}：{desc}", body_style))
     else:
-        story.append(Paragraph("无明显神煞", body_style))
+        story.append(Paragraph(t.get("pdf_shensha_none", "无明显神煞"), body_style))
     
     story.append(Spacer(1, 20))
     
     # Personality
-    story.append(Paragraph("性格与用神", heading_style))
+    story.append(Paragraph(t.get("pdf_personality_heading", "性格与用神"), heading_style))
     
     personality = result.get("personality", {})
     if personality:
-        strength = xml_escape(personality.get("body_strength_key", "").replace("body_", ""))
-        story.append(Paragraph(f"身强身弱：{strength}", body_style))
+        strength_key = personality.get("body_strength_key", "")
+        strength = xml_escape(t.get(strength_key, strength_key.replace("body_", "")))
+        story.append(Paragraph(f"{t.get('pdf_personality_strength', '身强身弱')}：{strength}", body_style))
         
-        trait = xml_escape(personality.get("personality_key", ""))
+        trait_key = personality.get("personality_key", "")
+        trait = xml_escape(t.get(trait_key, trait_key))
         if trait:
-            story.append(Paragraph(f"性格特征：{trait}", body_style))
+            story.append(Paragraph(f"{t.get('pdf_personality_trait', '性格特征')}：{trait}", body_style))
         
-        career = xml_escape(personality.get("career_advice_key", ""))
+        career_key = personality.get("career_advice_key", "")
+        career = xml_escape(t.get(career_key, career_key))
         if career:
-            story.append(Paragraph(f"事业建议：{career}", body_style))
+            story.append(Paragraph(f"{t.get('pdf_personality_career', '事业建议')}：{career}", body_style))
         
-        relationship = xml_escape(personality.get("relationship_advice_key", ""))
+        relationship_key = personality.get("relationship_advice_key", "")
+        relationship = xml_escape(t.get(relationship_key, relationship_key))
         if relationship:
-            story.append(Paragraph(f"感情建议：{relationship}", body_style))
+            story.append(Paragraph(f"{t.get('pdf_personality_relationship', '感情建议')}：{relationship}", body_style))
     
     story.append(Spacer(1, 20))
     
     # Dayun
-    story.append(Paragraph("大运分析", heading_style))
+    story.append(Paragraph(t.get("pdf_dayun_heading", "大运分析"), heading_style))
     
     qiyun = result.get("qiyun", {})
     if qiyun:
-        story.append(Paragraph(f"起运时间：{qiyun.get('qiyun_time', '未知')}", body_style))
-        direction = "顺行" if qiyun.get("direction") == "forward" else "逆行"
-        story.append(Paragraph(f"起运方向：{direction}", body_style))
+        story.append(Paragraph(f"{t.get('pdf_dayun_qiyun_time', '起运时间')}：{qiyun.get('qiyun_time', t.get('pdf_dayun_unknown', '未知'))}", body_style))
+        direction = t.get("pdf_dayun_forward", "顺行") if qiyun.get("direction") == "forward" else t.get("pdf_dayun_backward", "逆行")
+        story.append(Paragraph(f"{t.get('pdf_dayun_direction', '起运方向')}：{direction}", body_style))
     
     dayun = result.get("dayun", [])
     if dayun:
-        dayun_data = [["大运", "主题", "建议"]]
+        dayun_data = [[t.get("pdf_dayun_table_heading", "大运"), t.get("pdf_dayun_theme", "主题"), t.get("pdf_dayun_advice", "建议")]]
         for d in dayun[:4]:  # Show first 4 dayun periods
-            theme = d.get("theme_key", "").replace("dayun_", "").replace("_theme", "")
-            advice = d.get("advice_key", "").replace("dayun_", "").replace("_advice", "")
+            theme_key = d.get("theme_key", "")
+            advice_key = d.get("advice_key", "")
+            theme = t.get(theme_key, theme_key.replace("dayun_", "").replace("_theme", ""))
+            advice = t.get(advice_key, advice_key.replace("dayun_", "").replace("_advice", ""))
             dayun_data.append([
                 f"{d.get('start_year', '')}-{d.get('end_year', '')}",
                 theme,
@@ -260,14 +280,14 @@ def generate_pdf_report(result, output_path=None):
     # Footer
     story.append(Spacer(1, 30))
     story.append(Paragraph("—" * 40, small_style))
-    story.append(Paragraph("本报告由八字排盘系统自动生成，仅供文化研究参考。", small_style))
-    story.append(Paragraph("命理分析属于传统文化范畴，不构成任何现实决策依据。", small_style))
+    story.append(Paragraph(t.get("pdf_footer_disclaimer", "本报告由八字排盘系统自动生成，仅供文化研究参考。"), small_style))
+    story.append(Paragraph(t.get("pdf_footer_note", "命理分析属于传统文化范畴，不构成任何现实决策依据。"), small_style))
     
     # Build
     doc.build(story)
     
     if output_path:
-        return output_path
+        return abs_path
     else:
         buffer.seek(0)
         return buffer

@@ -1,13 +1,6 @@
 # core/event_engine.py
 # 流年 → 事件映射引擎（V1）
-
-GAN_WUXING = {
-    "甲": "wood", "乙": "wood",
-    "丙": "fire", "丁": "fire",
-    "戊": "earth", "己": "earth",
-    "庚": "metal", "辛": "metal",
-    "壬": "water", "癸": "water"
-}
+from core.constants import GAN_WUXING, SHENG, KE
 
 # 十神关系（以日主为中心）
 TEN_GOD = {
@@ -16,23 +9,6 @@ TEN_GOD = {
     "ke_me": "官杀",
     "me_ke": "财",
     "me_sheng": "食伤"
-}
-
-# 五行关系
-SHENG = {
-    "wood": "fire",
-    "fire": "earth",
-    "earth": "metal",
-    "metal": "water",
-    "water": "wood"
-}
-
-KE = {
-    "wood": "earth",
-    "earth": "water",
-    "water": "fire",
-    "fire": "metal",
-    "metal": "wood"
 }
 
 
@@ -47,7 +23,7 @@ def _ten_god(day_wx: str, liunian_wx: str) -> str:
         return TEN_GOD["me_sheng"]
     if KE[day_wx] == liunian_wx:
         return TEN_GOD["me_ke"]
-    return "未知"
+    return "ten_god_unknown"
 
 
 def map_liunian_event(
@@ -81,41 +57,60 @@ def map_liunian_event(
     yongshen = yongshen_info.get("yongshen", [])
 
     # === 事业 ===
+    career_risk = False
     if ten_god in ["官杀", "印"]:
-        career = "事业压力增加，但有责任、考试、升迁机会"
+        career = "event_career_guansha"
+        career_risk = True
     elif ten_god == "食伤":
-        career = "表现欲增强，适合输出、创作、技术提升"
+        career = "event_career_food"
     elif ten_god == "比劫":
-        career = "竞争加剧，易与同事产生摩擦"
+        career = "event_career_bijian"
+        career_risk = True
     else:
-        career = "事业变化不大，以积累为主"
+        career = "event_career_default"
 
     # === 财运 ===
+    wealth_risk = False
     if ten_god == "财":
-        wealth = "有赚钱机会，但伴随风险，需理性决策"
+        wealth = "event_wealth_cai"
+        wealth_risk = True
     elif ten_god == "比劫":
-        wealth = "破财概率上升，注意借贷、人情支出"
+        wealth = "event_wealth_bijian"
+        wealth_risk = True
     else:
-        wealth = "财运平稳，重在规划"
+        wealth = "event_wealth_default"
 
     # === 感情 / 人际 ===
+    relationship_risk = False
     if ten_god in ["比劫", "食伤"]:
-        relationship = "情绪外放，易起争执，需注意沟通"
+        relationship = "event_relationship_bijian"
+        relationship_risk = True
     elif ten_god in ["印", "官杀"]:
-        relationship = "关系偏理性，可能因现实问题拉开距离"
+        relationship = "event_relationship_guansha"
     else:
-        relationship = "感情状态稳定"
+        relationship = "event_relationship_default"
 
     # === 健康 ===
-    if liu_wx not in yongshen:
-        health = "五行失衡，注意对应脏腑与作息"
+    health_risk = False
+    if yongshen and liu_wx not in yongshen:
+        health = "event_health_imbalance"
+        health_risk = True
     else:
-        health = "整体状态尚可，保持规律即可"
+        health = "event_health_default"
+
+    risk_tags = {
+        "career": career_risk,
+        "wealth": wealth_risk,
+        "relationship": relationship_risk,
+        "health": health_risk,
+        "yongshen": bool(yongshen) and not any(wx in yongshen for wx in ["water", "metal", "wood", "fire", "earth"])
+    }
 
     return {
         "ten_god": ten_god,
         "career": career,
         "wealth": wealth,
         "relationship": relationship,
-        "health": health
+        "health": health,
+        "risk_tags": risk_tags
     }

@@ -1,4 +1,6 @@
 # core/geo_time_engine.py
+from __future__ import annotations
+
 from datetime import datetime, timedelta, timezone
 from core.city_lookup import lookup_city_longitude
 
@@ -81,7 +83,7 @@ COUNTRY_GEO_CONFIG = {
     "GR": {"name": "希腊", "timezone": "Europe/Athens", "tz_offset_hours": 2.0, "center_longitude": 23.7},
     "IE": {"name": "爱尔兰", "timezone": "Europe/Dublin", "tz_offset_hours": 0.0, "center_longitude": -6.3},
     "RO": {"name": "罗马尼亚", "timezone": "Europe/Bucharest", "tz_offset_hours": 2.0, "center_longitude": 26.1},
-    "UA": {"name": "乌克兰", "timezone": "Europe/Kiev", "tz_offset_hours": 2.0, "center_longitude": 30.5},
+    "UA": {"name": "乌克兰", "timezone": "Europe/Kyiv", "tz_offset_hours": 2.0, "center_longitude": 30.5},
     "HU": {"name": "匈牙利", "timezone": "Europe/Budapest", "tz_offset_hours": 1.0, "center_longitude": 19.0},
     # 非洲
     "EG": {"name": "埃及", "timezone": "Africa/Cairo", "tz_offset_hours": 2.0, "center_longitude": 31.2},

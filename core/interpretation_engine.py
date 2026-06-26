@@ -10,28 +10,28 @@ from core.shensha_engine import compute_shensha
 # 神煞名称与详细解释
 # ========================
 SHENSHA_EXPLANATIONS = {
-    "shensha_tianyi_name": {"title_key": "shensha_tianyi_title", "category_key": "shensha_tianyi_cat", "summary_key": "shensha_tianyi_summary", "detail_key": "shensha_tianyi_detail", "career_key": "shensha_tianyi_career", "health_key": "shensha_tianyi_health", "relationship_key": "shensha_tianyi_relationship", "advice_key": "shensha_tianyi_advice", "category": "吉星"},
-    "shensha_yima_name": {"title_key": "shensha_yima_title", "category_key": "shensha_yima_cat", "summary_key": "shensha_yima_summary", "detail_key": "shensha_yima_detail", "career_key": "shensha_yima_career", "health_key": "shensha_yima_health", "relationship_key": "shensha_yima_relationship", "advice_key": "shensha_yima_advice", "category": "动星"},
-    "shensha_taohua_name": {"title_key": "shensha_taohua_title", "category_key": "shensha_taohua_cat", "summary_key": "shensha_taohua_summary", "detail_key": "shensha_taohua_detail", "career_key": "shensha_taohua_career", "health_key": "shensha_taohua_health", "relationship_key": "shensha_taohua_relationship", "advice_key": "shensha_taohua_advice", "category": "感情星"},
-    "shensha_wenchang_name": {"title_key": "shensha_wenchang_title", "category_key": "shensha_wenchang_cat", "summary_key": "shensha_wenchang_summary", "detail_key": "shensha_wenchang_detail", "career_key": "shensha_wenchang_career", "health_key": "shensha_wenchang_health", "relationship_key": "shensha_wenchang_relationship", "advice_key": "shensha_wenchang_advice", "category": "文星"},
-    "shensha_jiangxing_name": {"title_key": "shensha_jiangxing_title", "category_key": "shensha_jiangxing_cat", "summary_key": "shensha_jiangxing_summary", "detail_key": "shensha_jiangxing_detail", "career_key": "shensha_jiangxing_career", "health_key": "shensha_jiangxing_health", "relationship_key": "shensha_jiangxing_relationship", "advice_key": "shensha_jiangxing_advice", "category": "权星"},
-    "shensha_huagai_name": {"title_key": "shensha_huagai_title", "category_key": "shensha_huagai_cat", "summary_key": "shensha_huagai_summary", "detail_key": "shensha_huagai_detail", "career_key": "shensha_huagai_career", "health_key": "shensha_huagai_health", "relationship_key": "shensha_huagai_relationship", "advice_key": "shensha_huagai_advice", "category": "艺星"},
-    "shensha_yangren_name": {"title_key": "shensha_yangren_title", "category_key": "shensha_yangren_cat", "summary_key": "shensha_yangren_summary", "detail_key": "shensha_yangren_detail", "career_key": "shensha_yangren_career", "health_key": "shensha_yangren_health", "relationship_key": "shensha_yangren_relationship", "advice_key": "shensha_yangren_advice", "category": "凶星"},
-    "shensha_lushen_name": {"title_key": "shensha_lushen_title", "category_key": "shensha_lushen_cat", "summary_key": "shensha_lushen_summary", "detail_key": "shensha_lushen_detail", "career_key": "shensha_lushen_career", "health_key": "shensha_lushen_health", "relationship_key": "shensha_lushen_relationship", "advice_key": "shensha_lushen_advice", "category": "吉星"},
-    "shensha_hongluan_name": {"title_key": "shensha_hongluan_title", "category_key": "shensha_hongluan_cat", "summary_key": "shensha_hongluan_summary", "detail_key": "shensha_hongluan_detail", "career_key": "shensha_hongluan_career", "health_key": "shensha_hongluan_health", "relationship_key": "shensha_hongluan_relationship", "advice_key": "shensha_hongluan_advice", "category": "喜星"},
-    "shensha_tianxi_name": {"title_key": "shensha_tianxi_title", "category_key": "shensha_tianxi_cat", "summary_key": "shensha_tianxi_summary", "detail_key": "shensha_tianxi_detail", "career_key": "shensha_tianxi_career", "health_key": "shensha_tianxi_health", "relationship_key": "shensha_tianxi_relationship", "advice_key": "shensha_tianxi_advice", "category": "喜星"},
-    "shensha_jinyu_name": {"title_key": "shensha_jinyu_title", "category_key": "shensha_jinyu_cat", "summary_key": "shensha_jinyu_summary", "detail_key": "shensha_jinyu_detail", "career_key": "shensha_jinyu_career", "health_key": "shensha_jinyu_health", "relationship_key": "shensha_jinyu_relationship", "advice_key": "shensha_jinyu_advice", "category": "富贵星"},
-    "shensha_kuigang_name": {"title_key": "shensha_kuigang_title", "category_key": "shensha_kuigang_cat", "summary_key": "shensha_kuigang_summary", "detail_key": "shensha_kuigang_detail", "career_key": "shensha_kuigang_career", "health_key": "shensha_kuigang_health", "relationship_key": "shensha_kuigang_relationship", "advice_key": "shensha_kuigang_advice", "category": "特殊星"},
-    "shensha_guchen_name": {"title_key": "shensha_guchen_title", "category_key": "shensha_guchen_cat", "summary_key": "shensha_guchen_summary", "detail_key": "shensha_guchen_detail", "career_key": "shensha_guchen_career", "health_key": "shensha_guchen_health", "relationship_key": "shensha_guchen_relationship", "advice_key": "shensha_guchen_advice", "category": "孤独星"},
-    "shensha_guasu_name": {"title_key": "shensha_guasu_title", "category_key": "shensha_guasu_cat", "summary_key": "shensha_guasu_summary", "detail_key": "shensha_guasu_detail", "career_key": "shensha_guasu_career", "health_key": "shensha_guasu_health", "relationship_key": "shensha_guasu_relationship", "advice_key": "shensha_guasu_advice", "category": "孤独星"},
-    "shensha_jiesha_name": {"title_key": "shensha_jiesha_title", "category_key": "shensha_jiesha_cat", "summary_key": "shensha_jiesha_summary", "detail_key": "shensha_jiesha_detail", "career_key": "shensha_jiesha_career", "health_key": "shensha_jiesha_health", "relationship_key": "shensha_jiesha_relationship", "advice_key": "shensha_jiesha_advice", "category": "凶星"},
-    "shensha_zaisha_name": {"title_key": "shensha_zaisha_title", "category_key": "shensha_zaisha_cat", "summary_key": "shensha_zaisha_summary", "detail_key": "shensha_zaisha_detail", "career_key": "shensha_zaisha_career", "health_key": "shensha_zaisha_health", "relationship_key": "shensha_zaisha_relationship", "advice_key": "shensha_zaisha_advice", "category": "凶星"},
-    "shensha_wangshen_name": {"title_key": "shensha_wangshen_title", "category_key": "shensha_wangshen_cat", "summary_key": "shensha_wangshen_summary", "detail_key": "shensha_wangshen_detail", "career_key": "shensha_wangshen_career", "health_key": "shensha_wangshen_health", "relationship_key": "shensha_wangshen_relationship", "advice_key": "shensha_wangshen_advice", "category": "凶星"},
-    "shensha_tiande_name": {"title_key": "shensha_tiande_title", "category_key": "shensha_tiande_cat", "summary_key": "shensha_tiande_summary", "detail_key": "shensha_tiande_detail", "career_key": "shensha_tiande_career", "health_key": "shensha_tiande_health", "relationship_key": "shensha_tiande_relationship", "advice_key": "shensha_tiande_advice", "category": "吉星"},
-    "shensha_yuede_name": {"title_key": "shensha_yuede_title", "category_key": "shensha_yuede_cat", "summary_key": "shensha_yuede_summary", "detail_key": "shensha_yuede_detail", "career_key": "shensha_yuede_career", "health_key": "shensha_yuede_health", "relationship_key": "shensha_yuede_relationship", "advice_key": "shensha_yuede_advice", "category": "吉星"},
-    "shensha_xuetang_name": {"title_key": "shensha_xuetang_title", "category_key": "shensha_xuetang_cat", "summary_key": "shensha_xuetang_summary", "detail_key": "shensha_xuetang_detail", "career_key": "shensha_xuetang_career", "health_key": "shensha_xuetang_health", "relationship_key": "shensha_xuetang_relationship", "advice_key": "shensha_xuetang_advice", "category": "文星"},
-    "shensha_taiji_name": {"title_key": "shensha_taiji_title", "category_key": "shensha_taiji_cat", "summary_key": "shensha_taiji_summary", "detail_key": "shensha_taiji_detail", "career_key": "shensha_taiji_career", "health_key": "shensha_taiji_health", "relationship_key": "shensha_taiji_relationship", "advice_key": "shensha_taiji_advice", "category": "特殊星"},
-    "shensha_tianyimed_name": {"title_key": "shensha_tianyimed_title", "category_key": "shensha_tianyimed_cat", "summary_key": "shensha_tianyimed_summary", "detail_key": "shensha_tianyimed_detail", "career_key": "shensha_tianyimed_career", "health_key": "shensha_tianyimed_health", "relationship_key": "shensha_tianyimed_relationship", "advice_key": "shensha_tianyimed_advice", "category": "特殊星"},
+    "shensha_tianyi_name": {"title_key": "shensha_tianyi_title", "category_key": "shensha_tianyi_cat", "summary_key": "shensha_tianyi_summary", "detail_key": "shensha_tianyi_detail", "career_key": "shensha_tianyi_career", "health_key": "shensha_tianyi_health", "relationship_key": "shensha_tianyi_relationship", "advice_key": "shensha_tianyi_advice", "category": "shensha_cat_jixing"},
+    "shensha_yima_name": {"title_key": "shensha_yima_title", "category_key": "shensha_yima_cat", "summary_key": "shensha_yima_summary", "detail_key": "shensha_yima_detail", "career_key": "shensha_yima_career", "health_key": "shensha_yima_health", "relationship_key": "shensha_yima_relationship", "advice_key": "shensha_yima_advice", "category": "shensha_cat_dongxing"},
+    "shensha_taohua_name": {"title_key": "shensha_taohua_title", "category_key": "shensha_taohua_cat", "summary_key": "shensha_taohua_summary", "detail_key": "shensha_taohua_detail", "career_key": "shensha_taohua_career", "health_key": "shensha_taohua_health", "relationship_key": "shensha_taohua_relationship", "advice_key": "shensha_taohua_advice", "category": "shensha_cat_ganqingxing"},
+    "shensha_wenchang_name": {"title_key": "shensha_wenchang_title", "category_key": "shensha_wenchang_cat", "summary_key": "shensha_wenchang_summary", "detail_key": "shensha_wenchang_detail", "career_key": "shensha_wenchang_career", "health_key": "shensha_wenchang_health", "relationship_key": "shensha_wenchang_relationship", "advice_key": "shensha_wenchang_advice", "category": "shensha_cat_wenxing"},
+    "shensha_jiangxing_name": {"title_key": "shensha_jiangxing_title", "category_key": "shensha_jiangxing_cat", "summary_key": "shensha_jiangxing_summary", "detail_key": "shensha_jiangxing_detail", "career_key": "shensha_jiangxing_career", "health_key": "shensha_jiangxing_health", "relationship_key": "shensha_jiangxing_relationship", "advice_key": "shensha_jiangxing_advice", "category": "shensha_cat_quanxing"},
+    "shensha_huagai_name": {"title_key": "shensha_huagai_title", "category_key": "shensha_huagai_cat", "summary_key": "shensha_huagai_summary", "detail_key": "shensha_huagai_detail", "career_key": "shensha_huagai_career", "health_key": "shensha_huagai_health", "relationship_key": "shensha_huagai_relationship", "advice_key": "shensha_huagai_advice", "category": "shensha_cat_yixing"},
+    "shensha_yangren_name": {"title_key": "shensha_yangren_title", "category_key": "shensha_yangren_cat", "summary_key": "shensha_yangren_summary", "detail_key": "shensha_yangren_detail", "career_key": "shensha_yangren_career", "health_key": "shensha_yangren_health", "relationship_key": "shensha_yangren_relationship", "advice_key": "shensha_yangren_advice", "category": "shensha_cat_xiongxing"},
+    "shensha_lushen_name": {"title_key": "shensha_lushen_title", "category_key": "shensha_lushen_cat", "summary_key": "shensha_lushen_summary", "detail_key": "shensha_lushen_detail", "career_key": "shensha_lushen_career", "health_key": "shensha_lushen_health", "relationship_key": "shensha_lushen_relationship", "advice_key": "shensha_lushen_advice", "category": "shensha_cat_jixing"},
+    "shensha_hongluan_name": {"title_key": "shensha_hongluan_title", "category_key": "shensha_hongluan_cat", "summary_key": "shensha_hongluan_summary", "detail_key": "shensha_hongluan_detail", "career_key": "shensha_hongluan_career", "health_key": "shensha_hongluan_health", "relationship_key": "shensha_hongluan_relationship", "advice_key": "shensha_hongluan_advice", "category": "shensha_cat_xixing"},
+    "shensha_tianxi_name": {"title_key": "shensha_tianxi_title", "category_key": "shensha_tianxi_cat", "summary_key": "shensha_tianxi_summary", "detail_key": "shensha_tianxi_detail", "career_key": "shensha_tianxi_career", "health_key": "shensha_tianxi_health", "relationship_key": "shensha_tianxi_relationship", "advice_key": "shensha_tianxi_advice", "category": "shensha_cat_xixing"},
+    "shensha_jinyu_name": {"title_key": "shensha_jinyu_title", "category_key": "shensha_jinyu_cat", "summary_key": "shensha_jinyu_summary", "detail_key": "shensha_jinyu_detail", "career_key": "shensha_jinyu_career", "health_key": "shensha_jinyu_health", "relationship_key": "shensha_jinyu_relationship", "advice_key": "shensha_jinyu_advice", "category": "shensha_cat_fuguixing"},
+    "shensha_kuigang_name": {"title_key": "shensha_kuigang_title", "category_key": "shensha_kuigang_cat", "summary_key": "shensha_kuigang_summary", "detail_key": "shensha_kuigang_detail", "career_key": "shensha_kuigang_career", "health_key": "shensha_kuigang_health", "relationship_key": "shensha_kuigang_relationship", "advice_key": "shensha_kuigang_advice", "category": "shensha_cat_teshuxing"},
+    "shensha_guchen_name": {"title_key": "shensha_guchen_title", "category_key": "shensha_guchen_cat", "summary_key": "shensha_guchen_summary", "detail_key": "shensha_guchen_detail", "career_key": "shensha_guchen_career", "health_key": "shensha_guchen_health", "relationship_key": "shensha_guchen_relationship", "advice_key": "shensha_guchen_advice", "category": "shensha_cat_guduxing"},
+    "shensha_guasu_name": {"title_key": "shensha_guasu_title", "category_key": "shensha_guasu_cat", "summary_key": "shensha_guasu_summary", "detail_key": "shensha_guasu_detail", "career_key": "shensha_guasu_career", "health_key": "shensha_guasu_health", "relationship_key": "shensha_guasu_relationship", "advice_key": "shensha_guasu_advice", "category": "shensha_cat_guduxing"},
+    "shensha_jiesha_name": {"title_key": "shensha_jiesha_title", "category_key": "shensha_jiesha_cat", "summary_key": "shensha_jiesha_summary", "detail_key": "shensha_jiesha_detail", "career_key": "shensha_jiesha_career", "health_key": "shensha_jiesha_health", "relationship_key": "shensha_jiesha_relationship", "advice_key": "shensha_jiesha_advice", "category": "shensha_cat_xiongxing"},
+    "shensha_zaisha_name": {"title_key": "shensha_zaisha_title", "category_key": "shensha_zaisha_cat", "summary_key": "shensha_zaisha_summary", "detail_key": "shensha_zaisha_detail", "career_key": "shensha_zaisha_career", "health_key": "shensha_zaisha_health", "relationship_key": "shensha_zaisha_relationship", "advice_key": "shensha_zaisha_advice", "category": "shensha_cat_xiongxing"},
+    "shensha_wangshen_name": {"title_key": "shensha_wangshen_title", "category_key": "shensha_wangshen_cat", "summary_key": "shensha_wangshen_summary", "detail_key": "shensha_wangshen_detail", "career_key": "shensha_wangshen_career", "health_key": "shensha_wangshen_health", "relationship_key": "shensha_wangshen_relationship", "advice_key": "shensha_wangshen_advice", "category": "shensha_cat_xiongxing"},
+    "shensha_tiande_name": {"title_key": "shensha_tiande_title", "category_key": "shensha_tiande_cat", "summary_key": "shensha_tiande_summary", "detail_key": "shensha_tiande_detail", "career_key": "shensha_tiande_career", "health_key": "shensha_tiande_health", "relationship_key": "shensha_tiande_relationship", "advice_key": "shensha_tiande_advice", "category": "shensha_cat_jixing"},
+    "shensha_yuede_name": {"title_key": "shensha_yuede_title", "category_key": "shensha_yuede_cat", "summary_key": "shensha_yuede_summary", "detail_key": "shensha_yuede_detail", "career_key": "shensha_yuede_career", "health_key": "shensha_yuede_health", "relationship_key": "shensha_yuede_relationship", "advice_key": "shensha_yuede_advice", "category": "shensha_cat_jixing"},
+    "shensha_xuetang_name": {"title_key": "shensha_xuetang_title", "category_key": "shensha_xuetang_cat", "summary_key": "shensha_xuetang_summary", "detail_key": "shensha_xuetang_detail", "career_key": "shensha_xuetang_career", "health_key": "shensha_xuetang_health", "relationship_key": "shensha_xuetang_relationship", "advice_key": "shensha_xuetang_advice", "category": "shensha_cat_wenxing"},
+    "shensha_taiji_name": {"title_key": "shensha_taiji_title", "category_key": "shensha_taiji_cat", "summary_key": "shensha_taiji_summary", "detail_key": "shensha_taiji_detail", "career_key": "shensha_taiji_career", "health_key": "shensha_taiji_health", "relationship_key": "shensha_taiji_relationship", "advice_key": "shensha_taiji_advice", "category": "shensha_cat_teshuxing"},
+    "shensha_tianyimed_name": {"title_key": "shensha_tianyimed_title", "category_key": "shensha_tianyimed_cat", "summary_key": "shensha_tianyimed_summary", "detail_key": "shensha_tianyimed_detail", "career_key": "shensha_tianyimed_career", "health_key": "shensha_tianyimed_health", "relationship_key": "shensha_tianyimed_relationship", "advice_key": "shensha_tianyimed_advice", "category": "shensha_cat_teshuxing"},
 }
 
 # ========================
@@ -39,114 +39,114 @@ SHENSHA_EXPLANATIONS = {
 # ========================
 SHISHEN_EXPLANATIONS = {
     "比肩": {
-        "title": "比肩",
-        "category": "同类",
-        "meaning": "与日主相同五行和阴阳的天干，代表自我、独立、竞争。",
-        "personality": "比肩旺者性格独立、自信、有主见，喜欢自己做决定。为人正直、重义气，但有时过于固执、不听劝告。竞争意识强，不甘人后。",
-        "career": "适合独立创业、自主经营、自由职业等需要独立性的工作。也适合与人合伙，但要注意权益分配。",
-        "wealth": "比肩旺则财运起伏较大，容易有朋友借钱或合伙破财的情况。需要学会理财和拒绝。",
-        "relationship": "在感情中比较独立，不太依赖伴侣。婚姻中要注意给对方空间，避免太过自我。",
-        "health": "比肩旺者一般身体素质好，但要注意不要过度劳累。",
-        "advice": "学会合作与分享，不要什么事都自己扛。适当借助他人的力量。"
+        "title": "shishen_bijian_title",
+        "category": "shishen_bijian_cat",
+        "meaning": "shishen_bijian_meaning",
+        "personality": "shishen_bijian_personality",
+        "career": "shishen_bijian_career",
+        "wealth": "shishen_bijian_wealth",
+        "relationship": "shishen_bijian_relationship",
+        "health": "shishen_bijian_health",
+        "advice": "shishen_bijian_advice"
     },
     "劫财": {
-        "title": "劫财",
-        "category": "同类",
-        "meaning": "与日主相同五行但阴阳相反的天干，代表竞争、破耗、冲动。",
-        "personality": "劫财旺者性格豪爽、大方、敢于冒险，社交能力强。但容易冲动消费、被人利用。有赌性，做事有时不够谨慎。",
-        "career": "适合销售、公关、娱乐、餐饮等需要社交和冒险精神的行业。",
-        "wealth": "劫财主破耗，花钱大手大脚，容易被人骗财。需要加强理财意识。",
-        "relationship": "感情上比较主动，但也容易因为朋友而忽略伴侣。要注意平衡社交和家庭。",
-        "health": "劫财主消耗，要注意不要过度透支身体。",
-        "advice": "控制消费冲动，谨慎交友，不要轻信他人的投资建议。"
+        "title": "shishen_jiecai_title",
+        "category": "shishen_jiecai_cat",
+        "meaning": "shishen_jiecai_meaning",
+        "personality": "shishen_jiecai_personality",
+        "career": "shishen_jiecai_career",
+        "wealth": "shishen_jiecai_wealth",
+        "relationship": "shishen_jiecai_relationship",
+        "health": "shishen_jiecai_health",
+        "advice": "shishen_jiecai_advice"
     },
     "食神": {
-        "title": "食神",
-        "category": "我生",
-        "meaning": "日主所生且与日主同阴阳的天干，代表才华、享受、口福。",
-        "personality": "食神旺者性格温和、乐观、有才华，善于表达和创作。喜欢美食和享受生活，有时有些懒散。为人善良、有口福。",
-        "career": "适合餐饮、美食、演艺、创作、教育等需要才华和表现力的行业。",
-        "wealth": "食神主口福和享受，财运一般稳定，适合靠才华赚钱。",
-        "relationship": "食神旺者感情丰富，善于表达爱意，婚姻生活甜蜜。",
-        "health": "食神主享受，要注意不要过度美食而导致肥胖。",
-        "advice": "发挥才华，享受生活，但不要过于安逸。"
+        "title": "shishen_shishen_title",
+        "category": "shishen_shishen_cat",
+        "meaning": "shishen_shishen_meaning",
+        "personality": "shishen_shishen_personality",
+        "career": "shishen_shishen_career",
+        "wealth": "shishen_shishen_wealth",
+        "relationship": "shishen_shishen_relationship",
+        "health": "shishen_shishen_health",
+        "advice": "shishen_shishen_advice"
     },
     "伤官": {
-        "title": "伤官",
-        "category": "我生",
-        "meaning": "日主所生但与日主阴阳相反的天干，代表叛逆、创新、口才。",
-        "personality": "伤官旺者思维敏捷、叛逆心强、口才好、有创造力。但容易骄傲自大、得罪人。不喜欢被约束，追求自由。",
-        "career": "适合创意、设计、演艺、写作、咨询等需要创新和口才的行业。",
-        "wealth": "伤官生财能力强，但花钱也大，需要学会开源节流。",
-        "relationship": "伤官旺者在感情中比较挑剔，容易与伴侣发生口角。",
-        "health": "伤官主消耗，要注意不要过度用脑和说话。",
-        "advice": "把创新和口才用在正途上，不要过于锋芒毕露。"
+        "title": "shishen_shangguan_title",
+        "category": "shishen_shangguan_cat",
+        "meaning": "shishen_shangguan_meaning",
+        "personality": "shishen_shangguan_personality",
+        "career": "shishen_shangguan_career",
+        "wealth": "shishen_shangguan_wealth",
+        "relationship": "shishen_shangguan_relationship",
+        "health": "shishen_shangguan_health",
+        "advice": "shishen_shangguan_advice"
     },
     "正财": {
-        "title": "正财",
-        "category": "我克",
-        "meaning": "日主所克且与日主阴阳相反的天干，代表稳定收入、妻子（男命）、务实。",
-        "personality": "正财旺者性格务实、勤恳、注重实际利益。做事踏实、不投机取巧，为人诚实可靠。但有时过于保守，缺乏冒险精神。",
-        "career": "适合会计、银行、行政、财务等稳定务实的行业。",
-        "wealth": "正财主稳定收入，财运稳定但不会暴富。适合长期投资和储蓄。",
-        "relationship": "正财代表正缘，感情稳定，婚姻幸福。男命以正财为妻星。",
-        "health": "正财旺者生活规律，一般健康较好。",
-        "advice": "保持勤恳务实的态度，稳定积累财富。"
+        "title": "shishen_zhengcai_title",
+        "category": "shishen_zhengcai_cat",
+        "meaning": "shishen_zhengcai_meaning",
+        "personality": "shishen_zhengcai_personality",
+        "career": "shishen_zhengcai_career",
+        "wealth": "shishen_zhengcai_wealth",
+        "relationship": "shishen_zhengcai_relationship",
+        "health": "shishen_zhengcai_health",
+        "advice": "shishen_zhengcai_advice"
     },
     "偏财": {
-        "title": "偏财",
-        "category": "我克",
-        "meaning": "日主所克且与日主同阴阳的天干，代表意外之财、父亲、交际。",
-        "personality": "偏财旺者性格开朗、大方、善于交际，有投资眼光。但容易贪图享受、花钱如流水。人缘好，异性缘也不错。",
-        "career": "适合投资、贸易、销售、公关、娱乐等需要交际和眼光的行业。",
-        "wealth": "偏财主意外之财，财运起伏较大。适合投资和投机，但要注意风险。",
-        "relationship": "偏财旺者异性缘好，但感情上容易花心。要注意专一。",
-        "health": "偏财主享受，要注意不要过度纵欲。",
-        "advice": "善用投资眼光，但要控制风险。感情上要专一。"
+        "title": "shishen_piancai_title",
+        "category": "shishen_piancai_cat",
+        "meaning": "shishen_piancai_meaning",
+        "personality": "shishen_piancai_personality",
+        "career": "shishen_piancai_career",
+        "wealth": "shishen_piancai_wealth",
+        "relationship": "shishen_piancai_relationship",
+        "health": "shishen_piancai_health",
+        "advice": "shishen_piancai_advice"
     },
     "正官": {
-        "title": "正官",
-        "category": "克我",
-        "meaning": "克日主且与日主阴阳相反的天干，代表权力、地位、丈夫（女命）。",
-        "personality": "正官旺者性格正直、有责任感、守规矩、有领导才能。为人正派、有权威感。但有时过于保守、拘泥于形式。",
-        "career": "适合公务员、管理层、法律、教育等需要权威和责任的行业。",
-        "wealth": "正官主地位和权力，财运一般稳定，靠正当收入赚钱。",
-        "relationship": "正官代表正缘，感情稳定。女命以正官为夫星。",
-        "health": "正官旺者生活规律，但要注意不要过于操劳。",
-        "advice": "发挥领导才能，但要灵活变通，不要过于死板。"
+        "title": "shishen_zhengguan_title",
+        "category": "shishen_zhengguan_cat",
+        "meaning": "shishen_zhengguan_meaning",
+        "personality": "shishen_zhengguan_personality",
+        "career": "shishen_zhengguan_career",
+        "wealth": "shishen_zhengguan_wealth",
+        "relationship": "shishen_zhengguan_relationship",
+        "health": "shishen_zhengguan_health",
+        "advice": "shishen_zhengguan_advice"
     },
     "七杀": {
-        "title": "七杀",
-        "category": "克我",
-        "meaning": "克日主且与日主同阴阳的天干，代表压力、挑战、权力。",
-        "personality": "七杀旺者性格刚强、有魄力、敢于冒险。有领导才能和决断力，但脾气大、容易冲动。压力大但抗压能力强。",
-        "career": "适合军警、法律、竞技、管理等需要魄力和决断力的行业。",
-        "wealth": "七杀主竞争和压力，财运起伏较大。需要努力拼搏才能获得财富。",
-        "relationship": "七杀旺者在感情中比较强势，容易与伴侣发生冲突。",
-        "health": "七杀主压力和意外，要注意安全和心理健康。",
-        "advice": "把压力转化为动力，但要注意控制脾气和安全。"
+        "title": "shishen_qisha_title",
+        "category": "shishen_qisha_cat",
+        "meaning": "shishen_qisha_meaning",
+        "personality": "shishen_qisha_personality",
+        "career": "shishen_qisha_career",
+        "wealth": "shishen_qisha_wealth",
+        "relationship": "shishen_qisha_relationship",
+        "health": "shishen_qisha_health",
+        "advice": "shishen_qisha_advice"
     },
     "正印": {
-        "title": "正印",
-        "category": "生我",
-        "meaning": "生助日主且与日主阴阳相反的天干，代表母亲、贵人、学历。",
-        "personality": "正印旺者性格温和、善良、有包容心。重视学习和修养，有宗教或哲学倾向。为人慈祥、有爱心。但有时过于理想化。",
-        "career": "适合教育、文化、宗教、慈善、心理咨询等需要爱心和修养的行业。",
-        "wealth": "正印主贵人和学历，财运一般稳定，靠知识和贵人赚钱。",
-        "relationship": "正印旺者感情温和，婚姻稳定。对伴侣有包容心。",
-        "health": "正印旺者心态平和，一般健康较好。",
-        "advice": "多学习提升自己，善用贵人运，发挥爱心和包容力。"
+        "title": "shishen_zhengyin_title",
+        "category": "shishen_zhengyin_cat",
+        "meaning": "shishen_zhengyin_meaning",
+        "personality": "shishen_zhengyin_personality",
+        "career": "shishen_zhengyin_career",
+        "wealth": "shishen_zhengyin_wealth",
+        "relationship": "shishen_zhengyin_relationship",
+        "health": "shishen_zhengyin_health",
+        "advice": "shishen_zhengyin_advice"
     },
     "偏印": {
-        "title": "偏印",
-        "category": "生我",
-        "meaning": "生助日主且与日主同阴阳的天干，代表偏门学问、继母、孤独。",
-        "personality": "偏印旺者思维独特、直觉敏锐、有创造力。喜欢研究偏门学问，对神秘文化有兴趣。但容易孤独、不合群。有时过于多疑。",
-        "career": "适合研究、占卜、中医、心理咨询、艺术创作等需要独特思维的行业。",
-        "wealth": "偏印主偏门收入，财运不稳定。适合靠独特技能赚钱。",
-        "relationship": "偏印旺者在感情中比较被动，容易孤独。",
-        "health": "偏印主孤独，要注意心理健康，多与人交流。",
-        "advice": "发挥独特思维的优势，但要注意融入社会，不要过于封闭。"
+        "title": "shishen_pianyin_title",
+        "category": "shishen_pianyin_cat",
+        "meaning": "shishen_pianyin_meaning",
+        "personality": "shishen_pianyin_personality",
+        "career": "shishen_pianyin_career",
+        "wealth": "shishen_pianyin_wealth",
+        "relationship": "shishen_pianyin_relationship",
+        "health": "shishen_pianyin_health",
+        "advice": "shishen_pianyin_advice"
     }
 }
 
@@ -155,35 +155,35 @@ SHISHEN_EXPLANATIONS = {
 # ========================
 WUXING_EXPLANATIONS = {
     "wood": {
-        "title": "木",
+        "title_key": "wuxing_wood",
         "nature_key": "wx_wood_nature", "season_key": "wx_wood_season",
         "color_key": "wx_wood_color", "organ_key": "wx_wood_organ",
         "personality_key": "wx_wood_personality", "career_key": "wx_wood_career",
         "health_key": "wx_wood_health", "advice_key": "wx_wood_advice"
     },
     "fire": {
-        "title": "火",
+        "title_key": "wuxing_fire",
         "nature_key": "wx_fire_nature", "season_key": "wx_fire_season",
         "color_key": "wx_fire_color", "organ_key": "wx_fire_organ",
         "personality_key": "wx_fire_personality", "career_key": "wx_fire_career",
         "health_key": "wx_fire_health", "advice_key": "wx_fire_advice"
     },
     "earth": {
-        "title": "土",
+        "title_key": "wuxing_earth",
         "nature_key": "wx_earth_nature", "season_key": "wx_earth_season",
         "color_key": "wx_earth_color", "organ_key": "wx_earth_organ",
         "personality_key": "wx_earth_personality", "career_key": "wx_earth_career",
         "health_key": "wx_earth_health", "advice_key": "wx_earth_advice"
     },
     "metal": {
-        "title": "金",
+        "title_key": "wuxing_metal",
         "nature_key": "wx_metal_nature", "season_key": "wx_metal_season",
         "color_key": "wx_metal_color", "organ_key": "wx_metal_organ",
         "personality_key": "wx_metal_personality", "career_key": "wx_metal_career",
         "health_key": "wx_metal_health", "advice_key": "wx_metal_advice"
     },
     "water": {
-        "title": "水",
+        "title_key": "wuxing_water",
         "nature_key": "wx_water_nature", "season_key": "wx_water_season",
         "color_key": "wx_water_color", "organ_key": "wx_water_organ",
         "personality_key": "wx_water_personality", "career_key": "wx_water_career",
@@ -235,7 +235,28 @@ SHISHEN_I18N = {
 SHISHEN_CHINESE_TO_KEY = {
     "比肩": "bijian", "劫财": "jiecai", "食神": "shishen",
     "伤官": "shangguan", "正财": "zhengcai", "偏财": "piancai",
-    "正官": "zhengguan", "七杀": "qisha", "正印": "zhengyin", "偏印": "pianyin"
+    "正官": "zhengguan", "七杀": "qisha",     "正印": "zhengyin", "偏印": "pianyin"
+}
+
+SHENSHA_CAT_MAP = {
+    "吉星": "shensha_cat_jixing", "动星": "shensha_cat_dongxing",
+    "感情星": "shensha_cat_ganqingxing", "文星": "shensha_cat_wenxing",
+    "权星": "shensha_cat_quanxing", "艺星": "shensha_cat_yixing",
+    "凶星": "shensha_cat_xiongxing", "喜星": "shensha_cat_xixing",
+    "富贵星": "shensha_cat_fuguixing", "特殊星": "shensha_cat_teshuxing",
+    "孤独星": "shensha_cat_guduxing"
+}
+
+SHISHEN_I18N_FIELDS = {
+    "title": "shishen_{pinyin}_title",
+    "category": "shishen_{pinyin}_cat",
+    "meaning": "shishen_{pinyin}_meaning",
+    "personality": "shishen_{pinyin}_personality",
+    "career": "shishen_{pinyin}_career",
+    "wealth": "shishen_{pinyin}_wealth",
+    "relationship": "shishen_{pinyin}_relationship",
+    "health": "shishen_{pinyin}_health",
+    "advice": "shishen_{pinyin}_advice"
 }
 
 def _build_shensha_detail(shensha_list):
@@ -265,9 +286,9 @@ def _build_shensha_detail(shensha_list):
                 "category": explanation["category"]
             }
             
-            if explanation["category"] in ["吉星", "文星", "权星", "喜星", "富贵星"]:
+            if explanation["category"] in ["shensha_cat_jixing", "shensha_cat_wenxing", "shensha_cat_quanxing", "shensha_cat_xixing", "shensha_cat_fuguixing"]:
                 good_stars.append(star_info)
-            elif explanation["category"] in ["凶星", "孤独星"]:
+            elif explanation["category"] in ["shensha_cat_xiongxing", "shensha_cat_guduxing"]:
                 bad_stars.append(star_info)
             else:
                 neutral_stars.append(star_info)
@@ -295,7 +316,7 @@ def _get_pillar_name(pillar_key):
 def _build_wuxing_detail(wuxing_strength, bazi_detail):
     """构建五行详细分析"""
     if not wuxing_strength:
-        return {"analysis": "无法进行五行分析。"}
+        return {"analysis": "err_wuxing_analysis"}
     
     # 排序
     sorted_wx = sorted(wuxing_strength.items(), key=lambda x: x[1], reverse=True)
@@ -306,7 +327,7 @@ def _build_wuxing_detail(wuxing_strength, bazi_detail):
     total = sum(wuxing_strength.values())
     
     # 分析
-    wx_map = {"wood": "木", "fire": "火", "earth": "土", "metal": "金", "water": "水"}
+    wx_map = {"wood": "wuxing_wood", "fire": "wuxing_fire", "earth": "wuxing_earth", "metal": "wuxing_metal", "water": "wuxing_water"}
     
     # 生成详细分析
     analysis_parts = []
@@ -314,12 +335,12 @@ def _build_wuxing_detail(wuxing_strength, bazi_detail):
     # 最旺的五行
     strong_wx = strongest[0]
     strong_explain = WUXING_EXPLANATIONS.get(strong_wx, {})
-    analysis_parts.append(f"命盘中{wx_map[strong_wx]}行最旺（{strongest[1]:.1f}分），{strong_explain.get('personality_key', '')}")
+    analysis_parts.append(f"wx_analysis_strong_{strong_wx}")
     
     # 最弱的五行
     weak_wx = weakest[0]
     weak_explain = WUXING_EXPLANATIONS.get(weak_wx, {})
-    analysis_parts.append(f"{wx_map[weak_wx]}行最弱（{weakest[1]:.1f}分），{weak_explain.get('personality_key', '')}")
+    analysis_parts.append(f"wx_analysis_weak_{weak_wx}")
     
     # 五行平衡分析
     avg = total / 5
@@ -327,30 +348,30 @@ def _build_wuxing_detail(wuxing_strength, bazi_detail):
     for wx, score in sorted_wx:
         diff = score - avg
         if diff > avg * 0.3:
-            balance_parts.append(f"{wx_map[wx]}偏旺")
+            balance_parts.append(wx)
         elif diff < -avg * 0.3:
-            balance_parts.append(f"{wx_map[wx]}偏弱")
+            balance_parts.append(wx)
     
     if balance_parts:
-        analysis_parts.append(f"五行{'、'.join(balance_parts)}")
+        analysis_parts.append("wx_analysis_imbalanced")
     else:
-        analysis_parts.append("五行相对平衡")
+        analysis_parts.append("wx_analysis_balanced")
     
     # 生成建议
     advice_parts = []
     for wx, score in sorted_wx:
         explain = WUXING_EXPLANATIONS.get(wx, {})
         if score < avg * 0.5:
-            advice_parts.append(f"建议补充{wx_map[wx]}：{explain.get('advice', '')}")
+            advice_parts.append(f"wx_advice_supplement_{wx}")
         elif score > avg * 1.5:
-            advice_parts.append(f"{wx_map[wx]}过旺，{explain.get('advice', '')}")
+            advice_parts.append(f"wx_advice_overstrong_{wx}")
     
     return {
         "scores": wuxing_strength,
         "strongest": {"element": wx_map[strongest[0]], "score": strongest[1]},
         "weakest": {"element": wx_map[weakest[0]], "score": weakest[1]},
-        "analysis_key": "wx_analysis_strong_" + strong_wx + "_weak_" + weak_wx if balance_parts else "wx_analysis_balanced",
-        "advice": advice_parts if advice_parts else ["五行相对平衡，保持即可。"],
+        "analysis_parts": analysis_parts,
+        "advice": advice_parts if advice_parts else ["wx_advice_balanced"],
         "elements_detail": {
             wx: {
                 "name": wx_map[wx],
@@ -375,7 +396,7 @@ def _build_shishen_detail(bazi_detail):
     day_gan = day.get("gan", "")
     
     if not day_gan:
-        return {"analysis": "无法进行十神分析。"}
+        return {"analysis": "err_shishen_analysis"}
     
     pillars_analysis = []
     
@@ -431,9 +452,9 @@ def _build_personality_detail(bazi_detail, personality, wuxing_strength):
     day_gan = day.get("gan", "")
     
     if not day_gan:
-        return {"analysis": "无法进行性格分析。"}
+        return {"analysis": "err_personality_analysis"}
     
-    from core.analysis import STEM_ELEMENT
+    from core.constants import STEM_ELEMENT
     
     # 日主五行
     dm_element = STEM_ELEMENT.get(day_gan, "")
@@ -472,9 +493,9 @@ def _build_life_advice(bazi_detail, personality, wuxing_strength, shensha_list):
     day_gan = day.get("gan", "")
     
     if not day_gan:
-        return {"advice": "无法生成人生建议。"}
+        return {"advice": "err_life_advice"}
     
-    from core.analysis import STEM_ELEMENT
+    from core.constants import STEM_ELEMENT
     
     dm_element = STEM_ELEMENT.get(day_gan, "")
     body_strength = personality.get("body_strength_key", "")
@@ -496,11 +517,11 @@ def _build_life_advice(bazi_detail, personality, wuxing_strength, shensha_list):
 def _get_career_advice(element, body_strength, wuxing_strength):
     """事业建议"""
     career_map = {
-        "wood": "advice_career_wood",
-        "fire": "advice_career_fire",
-        "earth": "advice_career_earth",
-        "metal": "advice_career_metal",
-        "water": "advice_career_water"
+        "木": "advice_career_wood",
+        "火": "advice_career_fire",
+        "土": "advice_career_earth",
+        "金": "advice_career_metal",
+        "水": "advice_career_water"
     }
     base_key = career_map.get(element, "advice_career_default")
     if "strong" in body_strength:
@@ -512,11 +533,11 @@ def _get_career_advice(element, body_strength, wuxing_strength):
 def _get_wealth_advice(element, wuxing_strength):
     """财运建议"""
     wealth_map = {
-        "wood": "advice_wealth_wood",
-        "fire": "advice_wealth_fire",
-        "earth": "advice_wealth_earth",
-        "metal": "advice_wealth_metal",
-        "water": "advice_wealth_water"
+        "木": "advice_wealth_wood",
+        "火": "advice_wealth_fire",
+        "土": "advice_wealth_earth",
+        "金": "advice_wealth_metal",
+        "水": "advice_wealth_water"
     }
     return wealth_map.get(element, "advice_wealth_default")
 
@@ -524,11 +545,11 @@ def _get_wealth_advice(element, wuxing_strength):
 def _get_relationship_advice(element, wuxing_strength):
     """感情建议"""
     relationship_map = {
-        "wood": "advice_love_wood",
-        "fire": "advice_love_fire",
-        "earth": "advice_love_earth",
-        "metal": "advice_love_metal",
-        "water": "advice_love_water"
+        "木": "advice_love_wood",
+        "火": "advice_love_fire",
+        "土": "advice_love_earth",
+        "金": "advice_love_metal",
+        "水": "advice_love_water"
     }
     return relationship_map.get(element, "advice_love_default")
 
@@ -536,11 +557,11 @@ def _get_relationship_advice(element, wuxing_strength):
 def _get_health_advice(element, wuxing_strength):
     """健康建议"""
     health_map = {
-        "wood": "advice_health_wood",
-        "fire": "advice_health_fire",
-        "earth": "advice_health_earth",
-        "metal": "advice_health_metal",
-        "water": "advice_health_water"
+        "木": "advice_health_wood",
+        "火": "advice_health_fire",
+        "土": "advice_health_earth",
+        "金": "advice_health_metal",
+        "水": "advice_health_water"
     }
     return health_map.get(element, "advice_health_default")
 
@@ -548,11 +569,11 @@ def _get_health_advice(element, wuxing_strength):
 def _get_study_advice(element, wuxing_strength):
     """学业建议"""
     study_map = {
-        "wood": "advice_study_wood",
-        "fire": "advice_study_fire",
-        "earth": "advice_study_earth",
-        "metal": "advice_study_metal",
-        "water": "advice_study_water"
+        "木": "advice_study_wood",
+        "火": "advice_study_fire",
+        "土": "advice_study_earth",
+        "金": "advice_study_metal",
+        "水": "advice_study_water"
     }
     return study_map.get(element, "advice_study_default")
 
@@ -563,11 +584,11 @@ def _get_social_advice(element, shensha_list):
     has_tianyi = any(s.get("name_key") == "shensha_tianyi_name" for s in shensha_list)
     
     social_map = {
-        "wood": "advice_social_wood",
-        "fire": "advice_social_fire",
-        "earth": "advice_social_earth",
-        "metal": "advice_social_metal",
-        "water": "advice_social_water"
+        "木": "advice_social_wood",
+        "火": "advice_social_fire",
+        "土": "advice_social_earth",
+        "金": "advice_social_metal",
+        "水": "advice_social_water"
     }
     key = social_map.get(element, "advice_social_default")
     

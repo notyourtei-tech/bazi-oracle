@@ -1,3 +1,4 @@
+from __future__ import annotations
 
 from datetime import datetime
 
@@ -178,6 +179,8 @@ def run_full_analysis_from_birth(
     try:
         result["interpretation"] = build_comprehensive_interpretation(result)
     except Exception as e:
+        import logging
+        logging.getLogger(__name__).error(f"Interpretation build failed: {e}", exc_info=True)
         result["interpretation"] = {}
     
     return result

@@ -2,7 +2,18 @@
 Compatibility Analysis Engine
 Analyzes compatibility between two bazi charts
 """
+import os
+import json as _json
 from core.bazi_utils import GAN_WUXING, ZHI_WUXING
+
+
+def _load_i18n(lang="zh"):
+    i18n_path = os.path.join(os.path.dirname(__file__), "..", "static", "i18n", f"{lang}.json")
+    try:
+        with open(i18n_path, "r", encoding="utf-8") as f:
+            return _json.load(f)
+    except Exception:
+        return {}
 
 
 WUXING_GENERATE = {
@@ -15,17 +26,19 @@ WUXING_OVERCOME = {
 }
 
 
-def analyze_compatibility(result1, result2):
+def analyze_compatibility(result1, result2, lang="zh"):
     """
     Analyze compatibility between two bazi charts.
     
     Args:
         result1: First person's bazi result dict
         result2: Second person's bazi result dict
+        lang: Language code for i18n
     
     Returns:
         dict with compatibility analysis
     """
+    t = _load_i18n(lang)
     # Get day masters
     dm1_gan = result1.get("bazi_detail", {}).get("day", {}).get("gan", "甲")
     dm2_gan = result2.get("bazi_detail", {}).get("day", {}).get("gan", "甲")
@@ -72,23 +85,23 @@ def analyze_compatibility(result1, result2):
     # Determine compatibility level
     if overall >= 80:
         level = "excellent"
-        level_text = "天作之合"
+        level_text = t.get("compat_level_excellent", "天作之合")
         emoji = "💕"
     elif overall >= 65:
         level = "good"
-        level_text = "相得益彰"
+        level_text = t.get("compat_level_good", "相得益彰")
         emoji = "✨"
     elif overall >= 50:
         level = "neutral"
-        level_text = "平淡稳定"
+        level_text = t.get("compat_level_neutral", "平淡稳定")
         emoji = "🤝"
     elif overall >= 35:
         level = "challenging"
-        level_text = "需要磨合"
+        level_text = t.get("compat_level_challenging", "需要磨合")
         emoji = "⚡"
     else:
         level = "difficult"
-        level_text = "挑战较多"
+        level_text = t.get("compat_level_difficult", "挑战较多")
         emoji = "🔥"
     
     return {
@@ -109,8 +122,8 @@ def analyze_compatibility(result1, result2):
             "wuxing": dm2_wx,
             "body_strength": p2.get("body_strength_key", ""),
         },
-        "analysis": _generate_analysis(dm1_wx, dm2_wx, wx1, wx2, scores, level),
-        "advice": _generate_advice(dm1_wx, dm2_wx, level),
+        "analysis": _generate_analysis(dm1_wx, dm2_wx, wx1, wx2, scores, level, t),
+        "advice": _generate_advice(dm1_wx, dm2_wx, level, t),
     }
 
 
@@ -189,55 +202,56 @@ def _calc_branch_harmony(zhi1, zhi2):
     return 55  # Neutral
 
 
-def _generate_analysis(wx1, wx2, wx1_strength, wx2_strength, scores, level):
+def _generate_analysis(wx1, wx2, wx1_strength, wx2_strength, scores, level, t=None):
     """Generate detailed compatibility analysis text."""
-    wx_names = {"wood": "木", "fire": "火", "earth": "土", "metal": "金", "water": "水"}
+    if t is None:
+        t = {}
+    wx_names = {"wood": t.get("wuxing_wood", "木"), "fire": t.get("wuxing_fire", "火"), "earth": t.get("wuxing_earth", "土"), "metal": t.get("wuxing_metal", "金"), "water": t.get("wuxing_water", "水")}
     
     parts = []
     
-    # Element relationship
     if wx1 == wx2:
-        parts.append(f"两人日主同属{wx_names[wx1]}，性格相近，容易理解对方。")
+        parts.append(t.get("compat_analysis_same_element", "两人日主同属{element}，性格相近，容易理解对方。").format(element=wx_names[wx1]))
     elif WUXING_GENERATE.get(wx1) == wx2:
-        parts.append(f"甲为{wx_names[wx1]}，乙为{wx_names[wx2]}，{wx_names[wx1]}生{wx_names[wx2]}，甲对乙有天然的滋养和帮助。")
+        parts.append(t.get("compat_analysis_gen1", "甲为{elem1}，乙为{elem2}，{elem1}生{elem2}，甲对乙有天然的滋养和帮助。").format(elem1=wx_names[wx1], elem2=wx_names[wx2]))
     elif WUXING_GENERATE.get(wx2) == wx1:
-        parts.append(f"甲为{wx_names[wx1]}，乙为{wx_names[wx2]}，{wx_names[wx2]}生{wx_names[wx1]}，乙对甲有天然的支持。")
+        parts.append(t.get("compat_analysis_gen2", "甲为{elem1}，乙为{elem2}，{elem2}生{elem1}，乙对甲有天然的支持。").format(elem1=wx_names[wx1], elem2=wx_names[wx2]))
     elif WUXING_OVERCOME.get(wx1) == wx2:
-        parts.append(f"甲为{wx_names[wx1]}，乙为{wx_names[wx2]}，{wx_names[wx1]}克{wx_names[wx2]}，相处中甲可能给乙压力。")
+        parts.append(t.get("compat_analysis_overcome1", "甲为{elem1}，乙为{elem2}，{elem1}克{elem2}，相处中甲可能给乙压力。").format(elem1=wx_names[wx1], elem2=wx_names[wx2]))
     elif WUXING_OVERCOME.get(wx2) == wx1:
-        parts.append(f"甲为{wx_names[wx1]}，乙为{wx_names[wx2]}，{wx_names[wx2]}克{wx_names[wx1]}，相处中乙可能给甲压力。")
+        parts.append(t.get("compat_analysis_overcome2", "甲为{elem1}，乙为{elem2}，{elem2}克{elem1}，相处中乙可能给甲压力。").format(elem1=wx_names[wx1], elem2=wx_names[wx2]))
     
-    # Element complementarity
     weak_elements = []
     for element in ["wood", "fire", "earth", "metal", "water"]:
         if wx1_strength.get(element, 0) < 25 and wx2_strength.get(element, 0) < 25:
             weak_elements.append(wx_names[element])
     
     if weak_elements:
-        parts.append(f"两人共同缺乏{'、'.join(weak_elements)}元素，建议在生活中补充相关能量。")
+        parts.append(t.get("compat_analysis_weak_elements", "两人共同缺乏{elements}元素，建议在生活中补充相关能量。").format(elements="、".join(weak_elements)))
     
-    # Overall assessment
     if level in ["excellent", "good"]:
-        parts.append("整体来看，两人的命盘互补性强，相处融洽。")
+        parts.append(t.get("compat_analysis_overall_good", "整体来看，两人的命盘互补性强，相处融洽。"))
     elif level == "neutral":
-        parts.append("整体来看，两人需要互相理解和包容。")
+        parts.append(t.get("compat_analysis_overall_neutral", "整体来看，两人需要互相理解和包容。"))
     else:
-        parts.append("整体来看，两人相处需要更多耐心和智慧。")
+        parts.append(t.get("compat_analysis_overall_bad", "整体来看，两人相处需要更多耐心和智慧。"))
     
     return "".join(parts)
 
 
-def _generate_advice(wx1, wx2, level):
+def _generate_advice(wx1, wx2, level, t=None):
     """Generate relationship advice."""
-    wx_names = {"wood": "木", "fire": "火", "earth": "土", "metal": "金", "water": "水"}
+    if t is None:
+        t = {}
+    wx_names = {"wood": t.get("wuxing_wood", "木"), "fire": t.get("wuxing_fire", "火"), "earth": t.get("wuxing_earth", "土"), "metal": t.get("wuxing_metal", "金"), "water": t.get("wuxing_water", "水")}
     
     if level == "excellent":
-        return f"天作之合！{wx_names[wx1]}与{wx_names[wx2]}的组合非常和谐，珍惜彼此，共同成长。"
+        return t.get("compat_advice_excellent", "天作之合！{elem1}与{elem2}的组合非常和谐，珍惜彼此，共同成长。").format(elem1=wx_names[wx1], elem2=wx_names[wx2])
     elif level == "good":
-        return f"{wx_names[wx1]}与{wx_names[wx2]}的组合相得益彰，多沟通、多理解，感情会越来越好。"
+        return t.get("compat_advice_good", "{elem1}与{elem2}的组合相得益彰，多沟通、多理解，感情会越来越好。").format(elem1=wx_names[wx1], elem2=wx_names[wx2])
     elif level == "neutral":
-        return f"{wx_names[wx1]}与{wx_names[wx2]}的组合平淡稳定，需要主动制造浪漫和惊喜。"
+        return t.get("compat_advice_neutral", "{elem1}与{elem2}的组合平淡稳定，需要主动制造浪漫和惊喜。").format(elem1=wx_names[wx1], elem2=wx_names[wx2])
     elif level == "challenging":
-        return f"{wx_names[wx1]}与{wx_names[wx2]}的组合需要磨合，学会换位思考，互相包容。"
+        return t.get("compat_advice_challenging", "{elem1}与{elem2}的组合需要磨合，学会换位思考，互相包容。").format(elem1=wx_names[wx1], elem2=wx_names[wx2])
     else:
-        return f"{wx_names[wx1]}与{wx_names[wx2]}的组合挑战较多，需要极大的耐心和智慧来经营。"
+        return t.get("compat_advice_difficult", "{elem1}与{elem2}的组合挑战较多，需要极大的耐心和智慧来经营。").format(elem1=wx_names[wx1], elem2=wx_names[wx2])

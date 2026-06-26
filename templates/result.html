@@ -68,6 +68,9 @@
         </div>
         {% endfor %}
       </div>
+      <div style="text-align: center; margin-top: 16px;">
+        <canvas id="wuxingRadar"></canvas>
+      </div>
     </div>
   </div>
 
@@ -167,7 +170,7 @@
       {% for wx_key, wx_data in result.interpretation.wuxing_detail.elements_detail.items() %}
       <div style="padding: 14px; background: var(--bg-secondary); border-radius: var(--radius-md); border: 1px solid var(--border); margin-bottom: 10px;">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-          <div style="font-size: 15px; font-weight: 700;" class="wx-{{ wx_key }}">{{ wx_data.name }}</div>
+          <div style="font-size: 15px; font-weight: 700;" class="wx-{{ wx_key }}" data-i18n="{{ wx_data.name }}"></div>
           <span style="font-size: 12px; color: var(--text-muted);">{{ wx_data.score|int }}<span data-i18n="score_unit">分</span> · {{ wx_data.percentage }}%</span>
         </div>
         <div style="font-size: 13px; color: var(--text); line-height: 1.5;" data-i18n="{{ wx_data.personality_key }}"></div>
@@ -192,7 +195,7 @@
       {% for pillar in result.interpretation.shishen_detail.pillars %}
       <div style="margin-bottom: 12px; padding: 14px; background: var(--bg-secondary); border-radius: var(--radius-md); border: 1px solid var(--border);">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-          <div style="font-size: 15px; font-weight: 700;"><span data-i18n="pillar_{{ pillar.pillar_name }}"></span>（{{ pillar.gan }}）</div>
+          <div style="font-size: 15px; font-weight: 700;"><span data-i18n="pillar_{{ pillar.pillar_name }}"></span> ({{ pillar.gan }})</div>
           <span style="font-size: 13px; padding: 3px 10px; background: rgba(212,168,67,0.15); border-radius: 12px; color: var(--gold);"><span data-i18n="{{ pillar.shishen_key }}"></span></span>
         </div>
         <div style="font-size: 13px; color: var(--text-muted); margin-bottom: 6px;" data-i18n="{{ pillar.meaning_key }}"></div>
@@ -256,8 +259,11 @@
         </div>
       </div>
       <div style="margin-bottom: 16px; font-size: 14px;">
-        <span data-i18n="qiyun_start">起运</span>：{{ result.qiyun.qiyun_time }}，<span data-i18n="direction">方向</span>：
+        <span data-i18n="qiyun_start">起运</span>: {{ result.qiyun.qiyun_time }}, <span data-i18n="direction">方向</span>:
         <span data-i18n="{{ 'direction_forward' if result.qiyun.direction=='forward' else 'direction_backward' }}"></span>
+      </div>
+      <div style="margin-bottom: 20px; overflow-x: auto; -webkit-overflow-scrolling: touch;">
+        <canvas id="dayunTimeline" style="display: block; margin: 0 auto;"></canvas>
       </div>
       {% for d in result.dayun %}
       <div style="margin-bottom: 20px; padding: 16px; background: var(--bg-secondary); border-radius: var(--radius-md); border: 1px solid var(--border);">
@@ -327,9 +333,9 @@
         </div>
       </div>
       <div style="display: flex; flex-direction: column; gap: 10px; font-size: 14px;">
-        <div>💼 <span data-i18n="career_advice_label">事业：</span><span data-i18n="{{ result.personality.career_advice_key }}"></span></div>
-        <div>💕 <span data-i18n="relationship_advice_label">感情：</span><span data-i18n="{{ result.personality.relationship_advice_key }}"></span></div>
-        <div>⚠️ <span data-i18n="risk_advice_label">风险：</span><span data-i18n="{{ result.personality.risk_advice_key }}"></span></div>
+        <div>💼 <span data-i18n="career_advice_label">事业建议</span>: <span data-i18n="{{ result.personality.career_advice_key }}"></span></div>
+        <div>💕 <span data-i18n="relationship_advice_label">感情建议</span>: <span data-i18n="{{ result.personality.relationship_advice_key }}"></span></div>
+        <div>⚠️ <span data-i18n="risk_advice_label">风险提示</span>: <span data-i18n="{{ result.personality.risk_advice_key }}"></span></div>
       </div>
     </div>
 
@@ -378,9 +384,9 @@
         <div class="action-icon">📄</div>
         <span class="action-label" data-i18n="export_pdf">导出PDF</span>
       </div>
-      <div class="action-card" onclick="generateShareCard()">
-        <div class="action-icon">📤</div>
-        <span class="action-label" data-i18n="share_card">分享卡</span>
+      <div class="action-card" onclick="downloadShareCard()">
+        <div class="action-icon">🖼️</div>
+        <span class="action-label" data-i18n="save_image">保存图片</span>
       </div>
       <a href="/" class="action-card">
         <div class="action-icon">🔄</div>
@@ -423,6 +429,7 @@
         btn.classList.add('active');
       }
     });
+    window.scrollTo(0, 0);
   }
 
   // Liunian card toggle
@@ -483,13 +490,16 @@
     fetch('/api/share-card', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ result: baziResult }) })
     .then(r => { if (!r.ok) throw new Error(); return r.blob(); })
     .then(blob => { const u = URL.createObjectURL(blob); const a = document.createElement('a'); a.href = u; a.download = 'bazi_card.png'; a.click(); URL.revokeObjectURL(u); })
-    .catch(() => alert(I18N.share_card_fail || '分享卡生成失败'));
+    .catch(() => alert(I18N.share_card_fail || ''));
+  }
+  function downloadShareCard() {
+    generateShareCard();
   }
   function exportPDF() {
     fetch('/api/export-pdf', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ result: baziResult }) })
     .then(r => { if (!r.ok) throw new Error(); return r.blob(); })
     .then(blob => { const u = URL.createObjectURL(blob); const a = document.createElement('a'); a.href = u; a.download = 'bazi_report.pdf'; a.click(); URL.revokeObjectURL(u); })
-    .catch(() => alert(I18N.pdf_export_fail || 'PDF导出失败'));
+    .catch(() => alert(I18N.pdf_export_fail || ''));
   }
 
   setTimeout(loadDailyFortune, 500);
@@ -498,7 +508,7 @@
     if (navigator.share) {
       navigator.share({ title: 'BaZi', text: I18N.app_title_short || 'BaZi', url: window.location.href });
     } else {
-      alert(I18N.share_copy_link || 'Link copied!');
+      alert(I18N.share_copy_link || '');
     }
   }
   function shareToLine() {
@@ -509,5 +519,176 @@
     var url = 'https://wa.me/?text=' + encodeURIComponent((I18N.app_title_short || 'BaZi') + ' ' + window.location.href);
     window.open(url, '_blank');
   }
+
+  // ========================
+  // 五行雷达图
+  // ========================
+  // 五行雷达图（响应式）
+  // ========================
+  (function() {
+    var canvas = document.getElementById('wuxingRadar');
+    if (!canvas) return;
+    var container = canvas.parentElement;
+    var dpr = window.devicePixelRatio || 1;
+    var size = Math.min(container.offsetWidth, 320);
+    canvas.width = size * dpr;
+    canvas.height = size * dpr;
+    canvas.style.width = size + 'px';
+    canvas.style.height = size + 'px';
+    var ctx = canvas.getContext('2d');
+    ctx.scale(dpr, dpr);
+
+    var wuxing = baziResult.wuxing_strength || {};
+    var labels = ['wood', 'fire', 'earth', 'metal', 'water'];
+    var colors = ['#7ab87a', '#d98060', '#c9a84c', '#a0a8b8', '#6aa8b8'];
+    var cx = size / 2, cy = size / 2, r = size * 0.36;
+    var n = labels.length;
+    var angleStep = (Math.PI * 2) / n;
+    var startAngle = -Math.PI / 2;
+    var fontSize = Math.max(11, Math.round(size / 22));
+
+    // 背景网格
+    for (var level = 1; level <= 5; level++) {
+      var lr = r * level / 5;
+      ctx.beginPath();
+      for (var i = 0; i <= n; i++) {
+        var a = startAngle + i * angleStep;
+        var x = cx + lr * Math.cos(a);
+        var y = cy + lr * Math.sin(a);
+        i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+      }
+      ctx.closePath();
+      ctx.strokeStyle = 'rgba(201,168,76,0.15)';
+      ctx.lineWidth = 1;
+      ctx.stroke();
+    }
+
+    // 轴线
+    for (var i = 0; i < n; i++) {
+      var a = startAngle + i * angleStep;
+      ctx.beginPath();
+      ctx.moveTo(cx, cy);
+      ctx.lineTo(cx + r * Math.cos(a), cy + r * Math.sin(a));
+      ctx.strokeStyle = 'rgba(201,168,76,0.2)';
+      ctx.stroke();
+    }
+
+    // 数据多边形
+    ctx.beginPath();
+    for (var i = 0; i <= n; i++) {
+      var idx = i % n;
+      var a = startAngle + idx * angleStep;
+      var val = (wuxing[labels[idx]] || 0) / 100;
+      var x = cx + r * val * Math.cos(a);
+      var y = cy + r * val * Math.sin(a);
+      i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+    }
+    ctx.closePath();
+    ctx.fillStyle = 'rgba(201,168,76,0.15)';
+    ctx.fill();
+    ctx.strokeStyle = '#c9a84c';
+    ctx.lineWidth = 2;
+    ctx.stroke();
+
+    // 数据点 + 标签
+    var zhLabels = {wood: '木', fire: '火', earth: '土', metal: '金', water: '水'};
+    for (var i = 0; i < n; i++) {
+      var a = startAngle + i * angleStep;
+      var val = (wuxing[labels[i]] || 0) / 100;
+      var x = cx + r * val * Math.cos(a);
+      var y = cy + r * val * Math.sin(a);
+
+      ctx.beginPath();
+      ctx.arc(x, y, Math.max(3, size / 80), 0, Math.PI * 2);
+      ctx.fillStyle = colors[i];
+      ctx.fill();
+
+      var lx = cx + (r + fontSize + 4) * Math.cos(a);
+      var ly = cy + (r + fontSize + 4) * Math.sin(a);
+      ctx.fillStyle = '#e8dcc8';
+      ctx.font = fontSize + 'px "Noto Serif SC", serif';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText(zhLabels[labels[i]], lx, ly);
+    }
+  })();
+
+  // ========================
+  // 大运时间线（响应式）
+  // ========================
+  (function() {
+    var canvas = document.getElementById('dayunTimeline');
+    if (!canvas) return;
+    var dayun = baziResult.dayun || [];
+    if (!dayun.length) return;
+
+    var dpr = window.devicePixelRatio || 1;
+    var isMobile = window.innerWidth <= 480;
+    var segW = isMobile ? 90 : 90;
+    var padX = 20, padY = 24, barH = 40;
+    var n = dayun.length;
+    var totalW = segW * n + padX * 2;
+    var totalH = padY + barH + 30;
+
+    canvas.width = totalW * dpr;
+    canvas.height = totalH * dpr;
+    canvas.style.width = totalW + 'px';
+    canvas.style.height = totalH + 'px';
+    var ctx = canvas.getContext('2d');
+    ctx.scale(dpr, dpr);
+
+    var wxColors = {wood:'#7ab87a', fire:'#d98060', earth:'#c9a84c', metal:'#a0a8b8', water:'#6aa8b8'};
+    var stemWx = {甲:'wood',乙:'wood',丙:'fire',丁:'fire',戊:'earth',己:'earth',庚:'metal',辛:'metal',壬:'water',癸:'water'};
+    var qiyunAge = baziResult.qiyun && baziResult.qiyun.qiyun_age ? baziResult.qiyun.qiyun_age.years : 6;
+    var gzFont = isMobile ? 'bold 13px' : 'bold 15px';
+    var yrFont = isMobile ? '10px' : '11px';
+
+    // 连接线
+    ctx.strokeStyle = 'rgba(201,168,76,0.3)';
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(padX, padY + barH / 2);
+    ctx.lineTo(padX + segW * n, padY + barH / 2);
+    ctx.stroke();
+
+    for (var i = 0; i < n; i++) {
+      var d = dayun[i];
+      var x = padX + i * segW;
+      var y = padY;
+      var gan = d.gz ? d.gz[0] : '';
+      var color = wxColors[stemWx[gan]] || '#c9a84c';
+
+      // 柱体
+      ctx.fillStyle = color;
+      ctx.globalAlpha = 0.25;
+      ctx.beginPath();
+      ctx.roundRect(x + 2, y, segW - 4, barH, 4);
+      ctx.fill();
+      ctx.globalAlpha = 1;
+
+      ctx.strokeStyle = color;
+      ctx.lineWidth = 1.5;
+      ctx.beginPath();
+      ctx.roundRect(x + 2, y, segW - 4, barH, 4);
+      ctx.stroke();
+
+      // 干支
+      ctx.fillStyle = '#e8dcc8';
+      ctx.font = gzFont + ' "Noto Serif SC", serif';
+      ctx.textAlign = 'center';
+      ctx.fillText(d.gz || '', x + segW / 2, y + 17);
+
+      // 年份
+      ctx.fillStyle = '#8a7a62';
+      ctx.font = yrFont + ' system-ui, sans-serif';
+      ctx.fillText(d.start_year + '-' + d.end_year, x + segW / 2, y + 33);
+
+      // 上方年龄
+      var ageLabel = (qiyunAge + i * 10) + '岁';
+      ctx.fillStyle = '#c9a84c';
+      ctx.font = '11px system-ui, sans-serif';
+      ctx.fillText(ageLabel, x + segW / 2, y - 6);
+    }
+  })();
 </script>
 {% endblock %}

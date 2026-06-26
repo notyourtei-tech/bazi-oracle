@@ -29,7 +29,7 @@
       {% set res = own_chart.get_result() %}
       <div style="display: flex; gap: 16px; flex-wrap: wrap; align-items: center;">
         <div style="flex: 1; min-width: 180px;">
-          <div style="font-size: 15px; font-weight: 600; margin-bottom: 4px;">{{ own_chart.name or t('unnamed') }}</div>
+          <div style="font-size: 15px; font-weight: 600; margin-bottom: 4px;">{% if own_chart.name %}{{ own_chart.name }}{% else %}<span data-i18n="unnamed">未命名</span>{% endif %}</div>
           <div style="font-size: 12px; color: var(--text-muted);">{{ own_chart.birth_date }} {% if own_chart.gender == 'male' %}♂{% else %}♀{% endif %} {% if own_chart.birth_time %}{{ own_chart.birth_time }}{% endif %}</div>
         </div>
         <div style="display: flex; gap: 12px; flex-wrap: wrap;">
@@ -367,7 +367,7 @@ function validateForm() {
   var genderChecked = document.querySelector('input[name="gender"]:checked');
   if (!genderChecked) {
     shakeField('genderGroupWrap');
-    showError('genderError', I18N.validate_gender || 'Please select gender');
+    showError('genderError', I18N.validate_gender || '');
     valid = false;
   }
 
@@ -375,7 +375,7 @@ function validateForm() {
   var country = document.getElementById('birthCountryHidden').value;
   if (!country) {
     shakeField('countryGroupWrap');
-    showError('countryError', I18N.validate_country || 'Please select birth country');
+    showError('countryError', I18N.validate_country || '');
     valid = false;
   }
 
@@ -385,7 +385,7 @@ function validateForm() {
   var day = document.getElementById('birthDay').value;
   if (!year || !month || !day) {
     shakeField('dateGroupWrap');
-    showError('dateError', I18N.validate_date || 'Please select birth date');
+    showError('dateError', I18N.validate_date || '');
     valid = false;
   }
 
@@ -516,7 +516,7 @@ function selectRadio(el, name, value) {
   const feedbackEl = document.getElementById('genderFeedback');
   if (feedbackEl) {
     const key = value === 'male' ? 'gender_selected_male' : 'gender_selected_female';
-    feedbackEl.textContent = I18N[key] || (value === 'male' ? 'Male ♂' : 'Female ♀');
+    feedbackEl.textContent = I18N[key] || '';
     feedbackEl.classList.remove('show');
     void feedbackEl.offsetWidth;
     feedbackEl.classList.add('show');

@@ -6,6 +6,103 @@
     <h1 class="page-title" data-i18n="explain_title">系统说明与免责声明</h1>
   </div>
 
+  <!-- 系统简介 -->
+  <div class="card animate-slide" style="border-top: 2px solid var(--gold);">
+    <div class="card-header">
+      <div class="card-title">
+        <span class="card-title-icon">☯</span>
+        <span>系统简介</span>
+      </div>
+    </div>
+    <div style="color: var(--text-secondary); font-size: 14px; line-height: 1.9;">
+      <p style="margin-bottom: 10px;">本系统是一套基于传统命理学的<strong style="color: var(--gold);">八字自动排盘与分析系统</strong>。输入出生年月日时，系统将自动完成四柱排盘、五行分析、神煞标注、大运流年推算，并生成综合命理解读。</p>
+      <p style="margin-bottom: 10px;">与传统排盘工具不同，本系统采用<strong style="color: var(--gold);">真太阳时</strong>进行计算，而非简单的时区时间。这意味着同一时刻出生在不同城市的人，排盘结果可能不同——这更接近命理学的实际要求。</p>
+      <p>系统支持全球 <strong style="color: var(--gold);">90+ 国家</strong>、200+ 城市的经度数据，覆盖东亚、东南亚、南亚、中东、欧洲、美洲、非洲和大洋洲。</p>
+    </div>
+  </div>
+
+  <!-- 计算原理 -->
+  <div class="card animate-slide">
+    <div class="card-header">
+      <div class="card-title">
+        <span class="card-title-icon">🔬</span>
+        <span>计算原理</span>
+      </div>
+    </div>
+    <div style="color: var(--text-secondary); font-size: 14px; line-height: 1.9;">
+      <div style="margin-bottom: 14px;">
+        <div style="font-weight: 600; color: var(--gold); margin-bottom: 6px;">1. 真太阳时转换</div>
+        <p>系统根据用户所在城市的经度，将出生时间从标准时区时间转换为真太阳时。计算公式：</p>
+        <div style="padding: 10px 14px; background: rgba(201,168,76,0.06); border-radius: 8px; margin: 8px 0; font-family: monospace; font-size: 13px; color: var(--text);">
+          真太阳时 = 当地时间 + (城市经度 - 时区基准经度) × 4分钟
+        </div>
+        <p>例如：北京（东经116.4°）使用北京时间（东经120°基准），差值约 -14 分钟。</p>
+      </div>
+
+      <div style="margin-bottom: 14px;">
+        <div style="font-weight: 600; color: var(--gold); margin-bottom: 6px;">2. 节气计算</div>
+        <p>月柱以<strong>十二节</strong>（立春、惊蛰、清明等）为界，而非农历月份。系统通过天文近似公式计算太阳黄经，精确定位每个节气的 UTC 时刻（精度到分钟级），避免了传统按日查表的误差。</p>
+      </div>
+
+      <div style="margin-bottom: 14px;">
+        <div style="font-weight: 600; color: var(--gold); margin-bottom: 6px;">3. 四柱推算</div>
+        <p>年柱以立春为界（非公历1月1日）；月柱按节气换月；日柱以公历日期推算（锚点：1984年1月31日为甲子日）；时柱按真太阳时的时辰划分（子时跨日：23:00-00:59）。</p>
+      </div>
+
+      <div>
+        <div style="font-weight: 600; color: var(--gold); margin-bottom: 6px;">4. 起运与大运</div>
+        <p>起运时间根据出生太阳时与最近节气的时间差换算（传统口径：3天折合1年）。男命阳年顺行、阴年逆行；女命反之。每步大运管10年，共排8步。</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- 功能模块 -->
+  <div class="card animate-slide">
+    <div class="card-header">
+      <div class="card-title">
+        <span class="card-title-icon">🧩</span>
+        <span>功能模块</span>
+      </div>
+    </div>
+    <div style="color: var(--text-secondary); font-size: 14px; line-height: 1.9;">
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+        <div style="padding: 12px; background: rgba(201,168,76,0.05); border-radius: 8px; border: 1px solid var(--border);">
+          <div style="font-weight: 600; color: var(--gold); margin-bottom: 4px;">📊 五行分析</div>
+          <div style="font-size: 13px;">计算天干地支的五行力量分布，判断身强身弱，给出平衡建议。</div>
+        </div>
+        <div style="padding: 12px; background: rgba(201,168,76,0.05); border-radius: 8px; border: 1px solid var(--border);">
+          <div style="font-weight: 600; color: var(--gold); margin-bottom: 4px;">⭐ 神煞标注</div>
+          <div style="font-size: 13px;">20+ 神煞星曜（天乙贵人、文昌、桃花、驿马等），标注在对应柱位。</div>
+        </div>
+        <div style="padding: 12px; background: rgba(201,168,76,0.05); border-radius: 8px; border: 1px solid var(--border);">
+          <div style="font-weight: 600; color: var(--gold); margin-bottom: 4px;">👤 性格解读</div>
+          <div style="font-size: 13px;">基于日主五行、身强身弱、十神关系，生成性格特征与风险提示。</div>
+        </div>
+        <div style="padding: 12px; background: rgba(201,168,76,0.05); border-radius: 8px; border: 1px solid var(--border);">
+          <div style="font-weight: 600; color: var(--gold); margin-bottom: 4px;">⏳ 大运流年</div>
+          <div style="font-size: 13px;">8步大运 + 每年流年，涵盖健康、感情、财运、事业、学业、社交六维度。</div>
+        </div>
+        <div style="padding: 12px; background: rgba(201,168,76,0.05); border-radius: 8px; border: 1px solid var(--border);">
+          <div style="font-weight: 600; color: var(--gold); margin-bottom: 4px;">📅 每日运势</div>
+          <div style="font-size: 13px;">基于当日干支与命主的日主关系，计算每日运势评分、幸运色、幸运数。</div>
+        </div>
+        <div style="padding: 12px; background: rgba(201,168,76,0.05); border-radius: 8px; border: 1px solid var(--border);">
+          <div style="font-weight: 600; color: var(--gold); margin-bottom: 4px;">🤖 AI 解读</div>
+          <div style="font-size: 13px;">接入 OpenRouter API，生成个性化深度分析（需配置 API Key）。</div>
+        </div>
+        <div style="padding: 12px; background: rgba(201,168,76,0.05); border-radius: 8px; border: 1px solid var(--border);">
+          <div style="font-weight: 600; color: var(--gold); margin-bottom: 4px;">🖼️ 分享卡</div>
+          <div style="font-size: 13px;">生成精美的命盘分享图片，一键保存到手机（需安装 Pillow）。</div>
+        </div>
+        <div style="padding: 12px; background: rgba(201,168,76,0.05); border-radius: 8px; border: 1px solid var(--border);">
+          <div style="font-weight: 600; color: var(--gold); margin-bottom: 4px;">📄 PDF 报告</div>
+          <div style="font-size: 13px;">导出专业排版的 PDF 分析报告，包含四柱、五行、神煞、大运（需安装 ReportLab）。</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 误差说明 -->
   <div class="card animate-slide">
     <div class="card-header">
       <div class="card-title">
@@ -13,13 +110,19 @@
         <span data-i18n="verify_title">误差说明</span>
       </div>
     </div>
-    <div style="color: var(--text-secondary); font-size: 14px; line-height: 1.8;">
+    <div style="color: var(--text-secondary); font-size: 14px; line-height: 1.9;">
       <p data-i18n="verify_p1" style="margin-bottom: 8px;"></p>
       <p data-i18n="verify_p2" style="margin-bottom: 8px;"></p>
-      <p data-i18n="verify_p3"></p>
+      <p data-i18n="verify_p3" style="margin-bottom: 8px;"></p>
+      <div style="padding: 12px; background: rgba(201,168,76,0.06); border-radius: 8px; border-left: 3px solid var(--gold); margin-top: 8px;">
+        <div style="font-size: 13px; color: var(--text);">
+          <strong>精度参考：</strong>节气时刻误差约 ±10 分钟（天文近似公式）；城市经度精度到小数点后一位（约 ±6 公里）；日柱无误差（公历直接推算）。
+        </div>
+      </div>
     </div>
   </div>
 
+  <!-- 免责声明 -->
   <div class="card animate-slide">
     <div class="card-header">
       <div class="card-title">
@@ -27,13 +130,14 @@
         <span data-i18n="disclaimer_title">免责声明</span>
       </div>
     </div>
-    <div style="color: var(--text-secondary); font-size: 14px; line-height: 1.8;">
+    <div style="color: var(--text-secondary); font-size: 14px; line-height: 1.9;">
       <p data-i18n="disclaimer_p1" style="margin-bottom: 8px;"></p>
       <p data-i18n="disclaimer_p2" style="margin-bottom: 8px;"></p>
       <p data-i18n="disclaimer_p3"></p>
     </div>
   </div>
 
+  <!-- 五行说明 -->
   <div class="card animate-slide">
     <div class="card-header">
       <div class="card-title">
@@ -41,12 +145,35 @@
         <span data-i18n="wuxing_explain_title">五行说明</span>
       </div>
     </div>
-    <div style="color: var(--text-secondary); font-size: 14px; line-height: 1.8;">
+    <div style="color: var(--text-secondary); font-size: 14px; line-height: 1.9;">
       <p data-i18n="wuxing_explain_p1" style="margin-bottom: 8px;"></p>
-      <p data-i18n="wuxing_explain_p2"></p>
+      <p data-i18n="wuxing_explain_p2" style="margin-bottom: 12px;"></p>
+      <div style="display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px;">
+        <div style="text-align: center; padding: 10px; background: rgba(122,184,122,0.1); border-radius: 8px; border: 1px solid rgba(122,184,122,0.2);">
+          <div style="font-size: 20px; font-weight: 700; color: var(--wx-wood);">木</div>
+          <div style="font-size: 11px; color: var(--text-muted);">春 · 东 · 肝</div>
+        </div>
+        <div style="text-align: center; padding: 10px; background: rgba(217,128,96,0.1); border-radius: 8px; border: 1px solid rgba(217,128,96,0.2);">
+          <div style="font-size: 20px; font-weight: 700; color: var(--wx-fire);">火</div>
+          <div style="font-size: 11px; color: var(--text-muted);">夏 · 南 · 心</div>
+        </div>
+        <div style="text-align: center; padding: 10px; background: rgba(201,168,76,0.1); border-radius: 8px; border: 1px solid rgba(201,168,76,0.2);">
+          <div style="font-size: 20px; font-weight: 700; color: var(--wx-earth);">土</div>
+          <div style="font-size: 11px; color: var(--text-muted);">四季 · 中 · 脾</div>
+        </div>
+        <div style="text-align: center; padding: 10px; background: rgba(160,168,184,0.1); border-radius: 8px; border: 1px solid rgba(160,168,184,0.2);">
+          <div style="font-size: 20px; font-weight: 700; color: var(--wx-metal);">金</div>
+          <div style="font-size: 11px; color: var(--text-muted);">秋 · 西 · 肺</div>
+        </div>
+        <div style="text-align: center; padding: 10px; background: rgba(106,168,184,0.1); border-radius: 8px; border: 1px solid rgba(106,168,184,0.2);">
+          <div style="font-size: 20px; font-weight: 700; color: var(--wx-water);">水</div>
+          <div style="font-size: 11px; color: var(--text-muted);">冬 · 北 · 肾</div>
+        </div>
+      </div>
     </div>
   </div>
 
+  <!-- 用神说明 -->
   <div class="card animate-slide">
     <div class="card-header">
       <div class="card-title">
@@ -54,12 +181,13 @@
         <span data-i18n="yongshen_explain_title">用神说明</span>
       </div>
     </div>
-    <div style="color: var(--text-secondary); font-size: 14px; line-height: 1.8;">
+    <div style="color: var(--text-secondary); font-size: 14px; line-height: 1.9;">
       <p data-i18n="yongshen_explain_p1" style="margin-bottom: 8px;"></p>
       <p data-i18n="yongshen_explain_p2"></p>
     </div>
   </div>
 
+  <!-- 大运说明 -->
   <div class="card animate-slide">
     <div class="card-header">
       <div class="card-title">
@@ -67,15 +195,49 @@
         <span data-i18n="dayun_explain_title">大运说明</span>
       </div>
     </div>
-    <div style="color: var(--text-secondary); font-size: 14px; line-height: 1.8;">
+    <div style="color: var(--text-secondary); font-size: 14px; line-height: 1.9;">
       <p data-i18n="dayun_explain_p1" style="margin-bottom: 8px;"></p>
       <p data-i18n="dayun_explain_p2" style="margin-bottom: 8px;"></p>
       <p data-i18n="dayun_explain_p3"></p>
     </div>
   </div>
 
+  <!-- 技术架构 -->
+  <div class="card animate-slide">
+    <div class="card-header">
+      <div class="card-title">
+        <span class="card-title-icon">🏗️</span>
+        <span>技术架构</span>
+      </div>
+    </div>
+    <div style="color: var(--text-secondary); font-size: 14px; line-height: 1.9;">
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+        <div>
+          <div style="font-weight: 600; color: var(--gold); margin-bottom: 6px;">后端</div>
+          <div style="font-size: 13px;">
+            • Python Flask 框架<br>
+            • SQLite + SQLAlchemy ORM<br>
+            • Flask-Migrate 数据库迁移<br>
+            • 天文近似算法计算节气<br>
+            • 真太阳时经度修正
+          </div>
+        </div>
+        <div>
+          <div style="font-weight: 600; color: var(--gold); margin-bottom: 6px;">前端</div>
+          <div style="font-size: 13px;">
+            • 原生 HTML5 + CSS3<br>
+            • Vanilla JavaScript（无框架依赖）<br>
+            • PWA 支持（Service Worker）<br>
+            • 暗金高级感 UI 设计<br>
+            • 6 种语言 i18n 国际化
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <a href="/" class="btn btn-secondary" style="display: inline-flex; margin-top: 16px;">
-    ← <span data-i18n="back">返回</span>
+    ← <span data-i18n="back">重新排盘</span>
   </a>
 </div>
 {% endblock %}

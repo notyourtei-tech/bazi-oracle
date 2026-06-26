@@ -111,10 +111,11 @@ def _find_term_time(year: int, target_deg: float) -> datetime:
     # 初始猜测：按目标黄经大概分布在一年中的位置
     # 目标角度映射到日序
     approx_day = int(((target_deg % 360) / 360.0) * 365.2422)
-    start = datetime(year, 1, 1, tzinfo=timezone.utc) + timedelta(days=max(0, approx_day-20))
-    end   = datetime(year, 1, 1, tzinfo=timezone.utc) + timedelta(days=min(365, approx_day+20))
+    # 搜索窗口必须足够宽以覆盖实际节气日期（地球轨道偏心率导致线性映射偏差可达80+天）
+    start = datetime(year, 1, 1, tzinfo=timezone.utc) + timedelta(days=max(0, approx_day-90))
+    end   = datetime(year, 1, 1, tzinfo=timezone.utc) + timedelta(days=min(365, approx_day+90))
 
-    # 若角度在 300+（冬季）可能出现在年初或年末，补宽窗口
+    # 角度在 270-360（冬季）的节气可能出现在年初或年末，需要跨年搜索
     if target_deg >= 270:
         start = datetime(year, 1, 1, tzinfo=timezone.utc) - timedelta(days=40)
         end   = datetime(year, 2, 28, tzinfo=timezone.utc) + timedelta(days=40)
@@ -148,17 +149,26 @@ def _find_term_time(year: int, target_deg: float) -> datetime:
         t0, f0 = t, f
         t += step
 
-    # 兜底：返回窗口中间（极少发生）
+    # 兜底：返回窗口中间（极少发生，需记录警告）
+    import logging
+    logging.getLogger(__name__).warning(
+        f"_find_term_time: failed to locate solar term for deg={target_deg} in year={year}, "
+        f"using midpoint fallback — result may be inaccurate"
+    )
     return start + (end - start)/2
 
 
+_solar_terms_cache = {}
+
 def build_solar_terms_24(year: int) -> List[SolarTerm]:
+    if year in _solar_terms_cache:
+        return _solar_terms_cache[year]
     terms = []
     for name, deg in SOLAR_TERMS_24:
         utc_dt = _find_term_time(year, float(deg))
         terms.append(SolarTerm(name=name, target_deg=float(deg), utc_dt=utc_dt))
-    # 按时间排序（有些会跨年）
     terms.sort(key=lambda x: x.utc_dt)
+    _solar_terms_cache[year] = terms
     return terms
 
 
@@ -238,15 +248,18 @@ def _day_index_from_anchor(date_local: datetime) -> int:
     return delta_days % 60
 
 
-def _hour_branch_index(solar_true_dt_local: datetime) -> int:
+def _hour_branch_index(solar_true_dt_local: datetime) -> tuple:
     """
     子时：23:00-00:59，丑：01:00-02:59...
+    返回 (hour_branch_index, is_early_zishi)
+    is_early_zishi=True 表示 23:00-23:59（早子时，日干需顺推）
     """
     h = solar_true_dt_local.hour
-    # 子时跨日，规则：23-0
     if h == 23:
-        return 0
-    return ((h + 1) // 2) % 12
+        return (0, True)   # 早子时，次日
+    if h == 0:
+        return (0, False)  # 晚子时，当日
+    return (((h + 1) // 2) % 12, False)
 
 
 def _hour_stem_index(day_stem_index: int, hour_branch_index: int) -> int:
@@ -283,9 +296,10 @@ def compute_bazi_from_solar_time(
     d_gan, d_zhi = _gz_from_index(day_idx60)
     day_stem_index = day_idx60 % 10
 
-    # 时柱（按太阳时）
-    hb = _hour_branch_index(solar_true_dt_local)
-    hs = _hour_stem_index(day_stem_index, hb)
+    # 时柱（按太阳时）— 早子时(23:00-23:59)日干顺推一位
+    hb, is_early_zishi = _hour_branch_index(solar_true_dt_local)
+    effective_day_stem = (day_stem_index + 1) % 10 if is_early_zishi else day_stem_index
+    hs = _hour_stem_index(effective_day_stem, hb)
     h_gan = TIANGAN[hs]
     h_zhi = DIZHI[hb]
 

@@ -1,32 +1,6 @@
 # core/analysis.py
 # 用五行关系 + 年龄阶段，生成更细致的大运 / 流年分析 + 命格总评
-
-STEMS = ["甲", "乙", "丙", "丁", "戊", "己", "庚", "辛", "壬", "癸"]
-BRANCHES = ["子", "丑", "寅", "卯", "辰", "巳", "午", "未", "申", "酉", "戌", "亥"]
-
-STEM_ELEMENT = {
-    "甲": "木", "乙": "木",
-    "丙": "火", "丁": "火",
-    "戊": "土", "己": "土",
-    "庚": "金", "辛": "金",
-    "壬": "水", "癸": "水",
-}
-
-GENERATE = {
-    "木": "火",
-    "火": "土",
-    "土": "金",
-    "金": "水",
-    "水": "木",
-}
-
-CONTROL = {
-    "木": "土",
-    "土": "水",
-    "水": "火",
-    "火": "金",
-    "金": "木",
-}
+from core.constants import TIANGAN as STEMS, ZHI as BRANCHES, STEM_ELEMENT, GENERATE_CN as GENERATE, OVERCOME_CN as OVERCOME, GENERATED_BY_CN as GENERATED_BY, OVERCOME_BY_CN as OVERCOME_BY
 
 
 def year_ganzhi(year: int) -> str:
@@ -58,9 +32,9 @@ def relation_between(dm_elem: str, other_elem: str) -> str:
         return "help"      # 生我
     if GENERATE.get(dm_elem) == other_elem:
         return "drain"     # 我生
-    if CONTROL.get(dm_elem) == other_elem:
+    if OVERCOME.get(dm_elem) == other_elem:
         return "attack"    # 我克
-    if CONTROL.get(other_elem) == dm_elem:
+    if OVERCOME.get(other_elem) == dm_elem:
         return "stress"    # 克我
     if dm_elem == other_elem:
         return "self"      # 同类
@@ -68,22 +42,22 @@ def relation_between(dm_elem: str, other_elem: str) -> str:
 
 
 def life_stage(age_start: int) -> str:
-    """根据年龄段给一个“人生阶段”的标签"""
+    """根据年龄段给一个"人生阶段"的标签"""
     if age_start < 12:
-        return "童年 / 基础打底期"
+        return "analysis_stage_childhood"
     if age_start < 22:
-        return "学生 / 青春探索期"
+        return "analysis_stage_student"
     if age_start < 32:
-        return "初入社会 / 打怪升级期"
+        return "analysis_stage_early_career"
     if age_start < 42:
-        return "事业发展 / 定位期"
+        return "analysis_stage_career_dev"
     if age_start < 52:
-        return "中年调整 / 结构升级期"
+        return "analysis_stage_midlife"
     if age_start < 62:
-        return "成熟收成 / 布局期"
+        return "analysis_stage_mature"
     if age_start < 72:
-        return "晚年享受 / 传承期"
-    return "养生慢活 / 回顾期"
+        return "analysis_stage_later_years"
+    return "analysis_stage_retirement"
 
 
 # =======================
@@ -92,34 +66,34 @@ def life_stage(age_start: int) -> str:
 
 DAYUN_TPL = {
     "help": [
-        "这一运贵人明显，适合主动出击，多去结识新圈子、上新项目。只要你肯迈开步，机会就会自己浮上来。",
-        "整体顺势而上，资源、人脉都更愿意靠近你。适合换赛道、升学深造、跳槽到更大的平台。",
-        "适合把之前积累的东西拿出来用，用好贵人和平台，多去争取头衔、证书、职级上的抬升。",
+        "dayun_tpl_help_0",
+        "dayun_tpl_help_1",
+        "dayun_tpl_help_2",
     ],
     "self": [
-        "这一运自我意识变强，会更想按自己的想法活。适合确立个人风格、IP 或职业方向，但不要把所有桥都烧掉。",
-        "会有『我就想试一次』的冲动，适合创业、副业、转专业，但务必保留一点安全垫。",
-        "容易形成自己的一套价值观，与家庭或环境有些观念拉扯，要学会在坚持和妥协之间找平衡。",
+        "dayun_tpl_self_0",
+        "dayun_tpl_self_1",
+        "dayun_tpl_self_2",
     ],
     "attack": [
-        "这是竞争味道很重的一运，容易面对考试、升职、业绩指标或职场斗争。适合冲刺，但要学会用策略而不是硬刚。",
-        "外部环境会逼你成长，可能出现换工作、换城市、换圈子等关键节点，趁机修炼谈判力与边界感。",
-        "适合主动争取位置，尤其是想走管理、业务一线、业绩导向岗位的，会有比较多打仗的机会。",
+        "dayun_tpl_attack_0",
+        "dayun_tpl_attack_1",
+        "dayun_tpl_attack_2",
     ],
     "drain": [
-        "这一运更像『蓄力期』，付出会多于及时回报。适合学习、修行、建作品集，把时间花在能沉淀的东西上。",
-        "生活节奏可能有点忙乱，容易一心多用。要学会取舍，不要什么都想兼顾，否则身心容易透支。",
-        "适合默默打基础：读书、考证、练技能、调整体质。短期看不出效果，但会在下一两运慢慢体现出来。",
+        "dayun_tpl_drain_0",
+        "dayun_tpl_drain_1",
+        "dayun_tpl_drain_2",
     ],
     "stress": [
-        "责任感会被强行拉满，可能要照顾家人、扛家庭经济、面对长期的工作压力。宜稳守，不宜乱赌一把。",
-        "这一运容易被现实拽着走，内心压力大时，记得定期运动、倾诉，避免情绪积压变成身体问题。",
-        "规则和制度感会变强，适合学会在系统里玩游戏——懂流程、懂汇报、懂如何保护自己。",
+        "dayun_tpl_stress_0",
+        "dayun_tpl_stress_1",
+        "dayun_tpl_stress_2",
     ],
     "neutral": [
-        "整体比较平稳，不会特别大起大落。适合慢慢整理人生结构：钱、人、时间、健康都做一些微调。",
-        "这一运可以把节奏放得相对舒服，留一点空间给兴趣爱好，顺便看看有没有新的可能性冒出来。",
-        "适合做长期但不那么急的事：学一门新的语言、技术、乐器，或者养成真正对你有好处的习惯。",
+        "dayun_tpl_neutral_0",
+        "dayun_tpl_neutral_1",
+        "dayun_tpl_neutral_2",
     ]
 }
 
@@ -136,19 +110,19 @@ def build_dayun_text(age_start: int, gz: str, dm_elem: str, yun_elem: str, index
 
     extra = ""
 
-    # 根据年龄阶段加一点“当时会发生什么类型事件”的提示
+    # 根据年龄阶段加一点"当时会发生什么类型事件"的提示
     if age_start < 12:
-        extra = " 多对应家庭环境、父母工作变动、搬家、升学等，对你的成长气氛影响大。"
+        extra = "dayun_event_hint_childhood"
     elif age_start < 22:
-        extra = " 主要反映在学业、同学圈、人际关系以及早期恋爱体验上。"
+        extra = "dayun_event_hint_student"
     elif age_start < 32:
-        extra = " 多与找工作、实习、踏入社会、第一次换工作或独立生活有关。"
+        extra = "dayun_event_hint_early_career"
     elif age_start < 42:
-        extra = " 容易出现事业方向调整、收入结构变化、成家立业等关键选择。"
+        extra = "dayun_event_hint_career_dev"
     elif age_start < 52:
-        extra = " 常见主题是家庭责任、房产、子女教育、事业定位再升级。"
+        extra = "dayun_event_hint_midlife"
     else:
-        extra = " 更多体现在健康、生活质量、家庭氛围与内心状态的调整上。"
+        extra = "dayun_event_hint_mature"
 
     return head + tpl + "（阶段关键词：" + stage + "）" + extra
 
@@ -159,34 +133,34 @@ def build_dayun_text(age_start: int, gz: str, dm_elem: str, yun_elem: str, index
 
 LIUNIAN_TPL = {
     "help": [
-        "人际助力明显，贵人、老师、上司或客户比较给力，适合主动提出自己的想法。",
-        "适合开启新计划：换专业、换组、换工作、搬家、留学等，都容易遇到愿意帮助你的人。",
-        "整体氛围偏顺，一些之前卡住的事情容易突然有突破口，可以多试几次。",
+        "liunian_tpl_help_0",
+        "liunian_tpl_help_1",
+        "liunian_tpl_help_2",
     ],
     "self": [
-        "自我意愿很强的一年，会特别在意『我真正想要什么』，适合做一些人生方向的决定。",
-        "更想按照自己节奏来，不太想被安排。注意和家人、同事在沟通方式上多一点温柔。",
-        "容易爆发个人表达欲：想做内容、想发声、想改变形象，是适合重塑自我标签的一年。",
+        "liunian_tpl_self_0",
+        "liunian_tpl_self_1",
+        "liunian_tpl_self_2",
     ],
     "attack": [
-        "竞争与对抗感偏重，可能遇到考试、升职、业绩压力，或者感情关系里的硬碰硬。",
-        "需要多用策略而不是情绪，适合提升谈判、表达和边界感，学会说“不”。",
-        "这一年适合去争，也适合认清哪些东西不值得你继续耗下去，做减法很重要。",
+        "liunian_tpl_attack_0",
+        "liunian_tpl_attack_1",
+        "liunian_tpl_attack_2",
     ],
     "drain": [
-        "忙碌奔波，事情很多，容易觉得时间不够用。适合把精力集中在最重要的两三件事上。",
-        "学习、考证、做项目、照顾家人等消耗型事务会比较多，别把自己排得太满。",
-        "适合静下心来打磨技能或作品，短期虽然累，但对后面一两年很关键。",
+        "liunian_tpl_drain_0",
+        "liunian_tpl_drain_1",
+        "liunian_tpl_drain_2",
     ],
     "stress": [
-        "责任和压力感偏重，容易被现实课题推着走：钱、健康、家人、合同等都要上心。",
-        "如果身体开始发出信号（失眠、焦虑、暴饮暴食），要认真对待，必要时求助专业资源。",
-        "外部要求高的一年，适合把基础打牢、把风险控制好，不太适合做大赌博式的决定。",
+        "liunian_tpl_stress_0",
+        "liunian_tpl_stress_1",
+        "liunian_tpl_stress_2",
     ],
     "neutral": [
-        "整体起伏不大，生活比较按部就班。适合修复关系、整理房间和心情，给自己一点喘息空间。",
-        "可以用来尝试新兴趣、发展副业雏形，没那么多硬性考核，反而容易实验出新方向。",
-        "适合做年度复盘：看看哪些习惯值得保留，哪些人和事可以慢慢放下。",
+        "liunian_tpl_neutral_0",
+        "liunian_tpl_neutral_1",
+        "liunian_tpl_neutral_2",
     ]
 }
 
@@ -200,17 +174,17 @@ def build_liunian_text(year: int, gz: str, dm_elem: str, year_elem: str, age: in
 
     # 补一点“事件类型”
     if age < 18:
-        extra = " 主题多和读书、考试、同学、人际圈、兴趣班、搬家或父母工作变动有关。"
+        extra = "liunian_event_hint_child"
     elif age < 28:
-        extra = " 多和升学、求职、实习、初入社会、人际扩张、早期感情体验相关。"
+        extra = "liunian_event_hint_youth"
     elif age < 38:
-        extra = " 容易遇到换工作、加薪、转方向、同居或结婚等关键现实选择。"
+        extra = "liunian_event_hint_adult"
     elif age < 48:
-        extra = " 常见议题是事业稳定度、家庭结构、子女、房产和中期规划。"
+        extra = "liunian_event_hint_middle"
     elif age < 60:
-        extra = " 多和资产配置、健康管理、子女发展、父母照护相关。"
+        extra = "liunian_event_hint_senior"
     else:
-        extra = " 更看重生活质量、身体状态与精神愉悦，适合把节奏放慢一点。"
+        extra = "liunian_event_hint_elderly"
 
     return head + tpl + extra
 
@@ -285,25 +259,25 @@ def analyze_liunian(ec, birth_year: int):
 
 def simple_shensha(day_zhi: str):
     """
-    非传统严谨版，只是给用户一点“神煞味道”的说明。
+    非传统严谨版，只是给用户一点"神煞味道"的说明。
     """
     stars = []
 
     # 桃花：感情、人缘比较活跃
     if day_zhi in ["子", "午", "卯", "酉"]:
-        stars.append("桃花：异性缘、人际魅力比较强，容易被注意到。")
+        stars.append("shensha_text_taohua")
 
     # 文昌：学习、写作、考试
     if day_zhi in ["寅", "卯", "辰", "巳"]:
-        stars.append("文昌：头脑灵活，适合学习、写作、设计相关工作。")
+        stars.append("shensha_text_wenchang")
 
     # 驿马：动荡、奔波
     if day_zhi in ["申", "子", "辰"]:
-        stars.append("驿马：一生不太安分，容易搬家、换环境、出差或留学。")
+        stars.append("shensha_text_yima")
 
     # 华盖：思考多，比较独立
     if day_zhi in ["戌", "丑", "辰", "未"]:
-        stars.append("华盖：思考多，比较有主见，也有点孤高感，需要自己的空间。")
+        stars.append("shensha_text_huagai")
 
     return stars
 

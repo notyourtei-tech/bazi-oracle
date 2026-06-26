@@ -1,5 +1,4 @@
-
-# core/personality_engine.py
+from __future__ import annotations
 
 def calculate_body_strength(dm_wx, month_zhi_wx):
     """
@@ -21,9 +20,21 @@ def calculate_body_strength(dm_wx, month_zhi_wx):
     is_strong = month_zhi_wx in STRONG_MAP.get(dm_wx, [])
     
     if is_strong:
-        return {"key": "body_strong", "desc_key": "body_strong_desc"}
+        return {
+            "key": "body_strong", 
+            "desc_key": "body_strong_desc",
+            "career_key": "body_strong_career",
+            "daily_key": "body_strong_daily",
+            "caution_key": "body_strong_caution"
+        }
     else:
-        return {"key": "body_weak", "desc_key": "body_weak_desc"}
+        return {
+            "key": "body_weak", 
+            "desc_key": "body_weak_desc",
+            "career_key": "body_weak_career",
+            "daily_key": "body_weak_daily",
+            "caution_key": "body_weak_caution"
+        }
 
 def get_wuxing_advice(wuxing_strength):
     """

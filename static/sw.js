@@ -1,8 +1,8 @@
 // sw.js - Service Worker for PWA
-var CACHE_NAME = 'bazi-v1';
+var CACHE_NAME = 'bazi-v2';
 var STATIC_ASSETS = [
   '/',
-  '/static/style.css',
+  '/static/style.css?v=8.0',
   '/static/timepicker.js',
   '/static/i18n/zh.json',
   '/static/i18n/en.json',
@@ -34,18 +34,40 @@ self.addEventListener('activate', function(event) {
 });
 
 self.addEventListener('fetch', function(event) {
-  // Network first for HTML/API, cache first for static assets
-  if (event.request.url.includes('/api/') || event.request.headers.get('accept') === 'text/html') {
+  var url = new URL(event.request.url);
+
+  // API requests: network only
+  if (url.pathname.startsWith('/api/')) {
+    event.respondWith(fetch(event.request));
+    return;
+  }
+
+  // HTML pages: network first, fallback to cache
+  var accept = event.request.headers.get('accept') || '';
+  if (accept.indexOf('text/html') !== -1) {
     event.respondWith(
-      fetch(event.request).catch(function() {
+      fetch(event.request).then(function(response) {
+        var clone = response.clone();
+        caches.open(CACHE_NAME).then(function(cache) { cache.put(event.request, clone); });
+        return response;
+      }).catch(function() {
         return caches.match(event.request);
       })
     );
-  } else {
-    event.respondWith(
-      caches.match(event.request).then(function(response) {
-        return response || fetch(event.request);
-      })
-    );
+    return;
   }
+
+  // Static assets: cache first, fallback to network
+  event.respondWith(
+    caches.match(event.request).then(function(response) {
+      if (response) return response;
+      return fetch(event.request).then(function(resp) {
+        if (resp && resp.status === 200) {
+          var clone = resp.clone();
+          caches.open(CACHE_NAME).then(function(cache) { cache.put(event.request, clone); });
+        }
+        return resp;
+      });
+    })
+  );
 });

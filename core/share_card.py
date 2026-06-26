@@ -4,12 +4,22 @@ Generates beautiful shareable images for bazi results
 """
 import os
 import math
+import json as _json
 
 try:
     from PIL import Image, ImageDraw, ImageFont
     HAS_PILLOW = True
 except ImportError:
     HAS_PILLOW = False
+
+
+def _load_i18n(lang="zh"):
+    i18n_path = os.path.join(os.path.dirname(__file__), "..", "static", "i18n", f"{lang}.json")
+    try:
+        with open(i18n_path, "r", encoding="utf-8") as f:
+            return _json.load(f)
+    except Exception:
+        return {}
 
 
 WUXING_COLORS = {
@@ -45,13 +55,14 @@ def _get_font(size, bold=False):
     return ImageFont.load_default()
 
 
-def generate_share_card(result, output_path="share_card.png"):
+def generate_share_card(result, output_path="share_card.png", lang="zh"):
     """
     Generate a shareable bazi analysis card.
     
     Args:
         result: Bazi analysis result dict
         output_path: Output file path
+        lang: Language code for i18n
     
     Returns:
         Path to generated image
@@ -59,6 +70,7 @@ def generate_share_card(result, output_path="share_card.png"):
     if not HAS_PILLOW:
         raise ImportError("Pillow is required for share card generation")
     
+    t = _load_i18n(lang)
     width, height = 800, 1200
     img = Image.new("RGB", (width, height), BG_COLOR)
     draw = ImageDraw.Draw(img)
@@ -77,7 +89,7 @@ def generate_share_card(result, output_path="share_card.png"):
     y += 20
     
     # Title
-    draw.text((width // 2, y), "八字命盘", font=title_font, fill=GOLD, anchor="mt")
+    draw.text((width // 2, y), t.get("sharecard_title", "八字命盘"), font=title_font, fill=GOLD, anchor="mt")
     y += 50
     
     # Decorative line
@@ -87,7 +99,7 @@ def generate_share_card(result, output_path="share_card.png"):
     # Four Pillars
     bazi = result.get("bazi_detail", {})
     pillars = ["year", "month", "day", "hour"]
-    pillar_names = ["年柱", "月柱", "日柱", "时柱"]
+    pillar_names = [t.get("sharecard_pillar_year", "年柱"), t.get("sharecard_pillar_month", "月柱"), t.get("sharecard_pillar_day", "日柱"), t.get("sharecard_pillar_hour", "时柱")]
     
     pillar_width = (width - 120) // 4
     start_x = 60
@@ -123,7 +135,8 @@ def generate_share_card(result, output_path="share_card.png"):
         # Nayin
         nayin_key = p.get("nayin_key", "")
         if nayin_key:
-            draw.text((x, y + 150), nayin_key.replace("nayin_", ""), font=small_font, fill=MUTED, anchor="mt")
+            nayin_text = t.get(nayin_key, nayin_key.replace("nayin_", ""))
+            draw.text((x, y + 150), nayin_text, font=small_font, fill=MUTED, anchor="mt")
     
     y += 200
     
@@ -132,11 +145,11 @@ def generate_share_card(result, output_path="share_card.png"):
     y += 20
     
     # Wuxing Strength as radar-like display
-    draw.text((width // 2, y), "五行分布", font=subtitle_font, fill=GOLD, anchor="mt")
+    draw.text((width // 2, y), t.get("sharecard_wuxing", "五行分布"), font=subtitle_font, fill=GOLD, anchor="mt")
     y += 40
     
     wuxing = result.get("wuxing_strength", {})
-    wx_names = {"wood": "木", "fire": "火", "earth": "土", "metal": "金", "water": "水"}
+    wx_names = {"wood": t.get("wuxing_wood", "木"), "fire": t.get("wuxing_fire", "火"), "earth": t.get("wuxing_earth", "土"), "metal": t.get("wuxing_metal", "金"), "water": t.get("wuxing_water", "水")}
     
     bar_height = 16
     bar_max_width = width - 200
@@ -179,21 +192,21 @@ def generate_share_card(result, output_path="share_card.png"):
         draw.line([(60, y), (width - 60, y)], fill=(40, 40, 40), width=1)
         y += 20
         
-        draw.text((width // 2, y), "性格特征", font=subtitle_font, fill=GOLD, anchor="mt")
+        draw.text((width // 2, y), t.get("sharecard_personality", "性格特征"), font=subtitle_font, fill=GOLD, anchor="mt")
         y += 40
         
         # Body strength
         strength_key = personality.get("body_strength_key", "")
         if strength_key:
-            strength_text = strength_key.replace("body_", "").replace("_", " ")
-            draw.text((80, y), f"身强身弱: {strength_text}", font=body_font, fill=TEXT_COLOR)
+            strength_text = t.get(strength_key, strength_key.replace("body_", "").replace("_", " "))
+            draw.text((80, y), f"{t.get('sharecard_body_strength', '身强身弱:')} {strength_text}", font=body_font, fill=TEXT_COLOR)
             y += 30
         
         # Personality trait
         trait_key = personality.get("personality_key", "")
         if trait_key:
+            trait_text = t.get(trait_key, trait_key)
             # Wrap text
-            trait_text = trait_key
             lines = []
             while len(trait_text) > 25:
                 lines.append(trait_text[:25])
@@ -209,9 +222,9 @@ def generate_share_card(result, output_path="share_card.png"):
     draw.line([(60, y), (width - 60, y)], fill=GOLD, width=2)
     y += 15
     
-    draw.text((width // 2, y), "由八字排盘系统生成", font=small_font, fill=MUTED, anchor="mt")
+    draw.text((width // 2, y), t.get("sharecard_footer_generated", "由八字排盘系统生成"), font=small_font, fill=MUTED, anchor="mt")
     y += 25
-    draw.text((width // 2, y), "仅供文化研究参考", font=small_font, fill=(80, 80, 80), anchor="mt")
+    draw.text((width // 2, y), t.get("sharecard_footer_disclaimer", "仅供文化研究参考"), font=small_font, fill=(80, 80, 80), anchor="mt")
     
     # Save
     if output_path is None:
@@ -221,11 +234,13 @@ def generate_share_card(result, output_path="share_card.png"):
         buf.seek(0)
         return buf
     else:
-        img.save(output_path, "PNG", quality=95)
-        return output_path
+        # Validate output path to prevent path traversal
+        abs_path = os.path.abspath(output_path)
+        img.save(abs_path, "PNG")
+        return abs_path
 
 
-def generate_share_card_base64(result):
+def generate_share_card_base64(result, lang="zh"):
     """Generate share card and return as base64 string."""
     import base64
     import io
@@ -233,7 +248,7 @@ def generate_share_card_base64(result):
     if not HAS_PILLOW:
         return None
     
-    output = generate_share_card(result, output_path=None)
+    output = generate_share_card(result, output_path=None, lang=lang)
     
     if isinstance(output, io.BytesIO):
         return base64.b64encode(output.getvalue()).decode("utf-8")

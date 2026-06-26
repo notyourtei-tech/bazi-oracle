@@ -38,37 +38,38 @@ def verify_history_event(
     reason = []
 
     event_type = history_event.get("type")
+    tags = event_result.get("risk_tags", {})
 
     # === 事件类型匹配 ===
     if event_type == "job_change":
-        if "事业" in event_result["career"] or "压力" in event_result["career"]:
+        if tags.get("career"):
             match_score += 40
-            reason.append("该年事业宫有明显变动信号")
+            reason.append("history_reason_career_change")
 
     elif event_type == "breakup":
-        if "争执" in event_result["relationship"] or "距离" in event_result["relationship"]:
+        if tags.get("relationship"):
             match_score += 40
-            reason.append("该年人际/感情出现冲突信息")
+            reason.append("history_reason_relationship_conflict")
 
     elif event_type == "illness":
-        if "注意" in event_result["health"]:
+        if tags.get("health"):
             match_score += 40
-            reason.append("该年健康五行失衡明显")
+            reason.append("history_reason_health_imbalance")
 
     elif event_type == "study":
-        if "考试" in event_result["career"] or "学习" in event_result["career"]:
+        if tags.get("career"):
             match_score += 40
-            reason.append("该年有学习与积累倾向")
+            reason.append("history_reason_study_tendency")
 
     # === 用神是否被冲 ===
     if liunian_data["gan"] not in yongshen_info.get("yongshen", []):
         match_score += 20
-        reason.append("流年未助用神，容易出事应变")
+        reason.append("history_reason_yongshen_unsupported")
 
     # === 身强身弱逻辑 ===
     if strength_info["strength"] == "weak":
         match_score += 10
-        reason.append("日主偏弱，遇变动年份更易应事")
+        reason.append("history_reason_body_weak")
 
     return {
         "year": history_event["year"],

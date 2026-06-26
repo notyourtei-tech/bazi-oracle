@@ -32,6 +32,6 @@ class Config:
     }
     OPENROUTER_API_KEY = os.environ.get('OPENROUTER_API_KEY', '')
     SESSION_COOKIE_HTTPONLY = True
-    SESSION_COOKIE_SECURE = True
+    SESSION_COOKIE_SECURE = os.environ.get('FLASK_ENV') == 'production' or os.environ.get('FORCE_HTTPS') == 'true'
     SESSION_COOKIE_SAMESITE = 'Lax'
     MAX_CONTENT_LENGTH = 1 * 1024 * 1024  # 1MB

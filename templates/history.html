@@ -61,8 +61,29 @@
     </div>
   {% endif %}
 
+  {% if pagination and pagination.pages > 1 %}
+  <div style="display: flex; justify-content: center; gap: 8px; margin: 20px 0; flex-wrap: wrap;">
+    {% if pagination.has_prev %}
+      <a href="/history?page={{ pagination.prev_num }}" class="btn btn-secondary" style="padding: 8px 14px; font-size: 13px;">← 上一页</a>
+    {% endif %}
+    {% for p in pagination.iter_pages(left_edge=1, right_edge=1, left_current=2, right_current=2) %}
+      {% if p %}
+        <a href="/history?page={{ p }}" class="btn {% if p == pagination.page %}btn-primary{% else %}btn-secondary{% endif %}" style="padding: 8px 14px; font-size: 13px; min-width: 36px;">{{ p }}</a>
+      {% else %}
+        <span style="padding: 8px 6px; color: var(--text-muted);">...</span>
+      {% endif %}
+    {% endfor %}
+    {% if pagination.has_next %}
+      <a href="/history?page={{ pagination.next_num }}" class="btn btn-secondary" style="padding: 8px 14px; font-size: 13px;">下一页 →</a>
+    {% endif %}
+  </div>
+  <div style="text-align: center; font-size: 12px; color: var(--text-muted); margin-bottom: 12px;">
+    共 {{ pagination.total }} 条记录，第 {{ pagination.page }}/{{ pagination.pages }} 页
+  </div>
+  {% endif %}
+
   <a href="/" class="btn btn-secondary" style="display: inline-flex; margin-top: 16px;">
-    ← <span data-i18n="back">返回</span>
+    ← <span data-i18n="back">重新排盘</span>
   </a>
 </div>
 

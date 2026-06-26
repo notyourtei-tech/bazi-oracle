@@ -1,21 +1,6 @@
 # core/yongshen_validator.py
 # 用神准确度自校验引擎（A1）
 
-GAN_WUXING = {
-    "甲": "wood", "乙": "wood",
-    "丙": "fire", "丁": "fire",
-    "戊": "earth", "己": "earth",
-    "庚": "metal", "辛": "metal",
-    "壬": "water", "癸": "water"
-}
-
-KE = {
-    "wood": "earth",
-    "earth": "water",
-    "water": "fire",
-    "fire": "metal",
-    "metal": "wood"
-}
 
 def evaluate_yongshen_accuracy(
     yongshen_info: dict,

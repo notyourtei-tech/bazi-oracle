@@ -2,17 +2,7 @@
 Comprehensive Multi-Dimension Analysis Engine
 Provides detailed analysis for health, love, wealth, career, exams, friendship, etc.
 """
-
-STEMS = ["甲", "乙", "丙", "丁", "戊", "己", "庚", "辛", "壬", "癸"]
-BRANCHES = ["子", "丑", "寅", "卯", "辰", "巳", "午", "未", "申", "酉", "戌", "亥"]
-
-STEM_ELEMENT = {
-    "甲": "木", "乙": "木", "丙": "火", "丁": "火", "戊": "土",
-    "己": "土", "庚": "金", "辛": "金", "壬": "水", "癸": "水",
-}
-
-GENERATE = {"木": "火", "火": "土", "土": "金", "金": "水", "水": "木"}
-CONTROL = {"木": "土", "土": "水", "水": "火", "火": "金", "金": "木"}
+from core.constants import TIANGAN as STEMS, ZHI as BRANCHES, STEM_ELEMENT, GENERATE_CN as GENERATE, OVERCOME_CN as CONTROL
 
 # 各维度的详细分析模板 - 使用 i18n key
 HEALTH_ANALYSIS = {
@@ -90,20 +80,20 @@ def get_relation(dm_elem, other_elem):
 def get_life_stage(age):
     """Get life stage label based on age."""
     if age < 12:
-        return "童年基础期"
+        return "comp_stage_childhood"
     if age < 22:
-        return "青春探索期"
+        return "comp_stage_youth"
     if age < 32:
-        return "社会打怪期"
+        return "comp_stage_social"
     if age < 42:
-        return "事业发展期"
+        return "comp_stage_career"
     if age < 52:
-        return "中年调整期"
+        return "comp_stage_midlife"
     if age < 62:
-        return "成熟收成期"
+        return "comp_stage_mature"
     if age < 72:
-        return "晚年享受期"
-    return "养生慢活期"
+        return "comp_stage_later"
+    return "comp_stage_retirement"
 
 
 def analyze_dayun_comprehensive(dayun_data, birth_year, dm_elem):
@@ -190,34 +180,34 @@ def _get_likely_events(rel, age, stage):
     """Get likely events based on relationship and age."""
     events = {
         "help": [
-            "可能遇到贵人相助，获得好的机会",
-            "适合开启新项目或尝试新事物",
-            "人际关系顺利，容易得到支持"
+            "comp_events_help_0",
+            "comp_events_help_1",
+            "comp_events_help_2"
         ],
         "self": [
-            "可能会有个人成长的重要时刻",
-            "适合确立自己的目标和方向",
-            "可能会遇到一些挑战但能克服"
+            "comp_events_self_0",
+            "comp_events_self_1",
+            "comp_events_self_2"
         ],
         "drain": [
-            "可能会感到忙碌，事情较多",
-            "适合学习新技能，为未来做准备",
-            "需要耐心，成果会慢慢显现"
+            "comp_events_drain_0",
+            "comp_events_drain_1",
+            "comp_events_drain_2"
         ],
         "attack": [
-            "可能会遇到竞争或挑战",
-            "适合提升自己的实力",
-            "需要处理好人际关系"
+            "comp_events_attack_0",
+            "comp_events_attack_1",
+            "comp_events_attack_2"
         ],
         "stress": [
-            "可能会遇到一些压力或困难",
-            "需要保持积极心态",
-            "适合稳扎稳打，不要冲动"
+            "comp_events_stress_0",
+            "comp_events_stress_1",
+            "comp_events_stress_2"
         ],
         "neutral": [
-            "生活按部就班，不会有大的波动",
-            "适合做一些日常的事情",
-            "保持平常心就好"
+            "comp_events_neutral_0",
+            "comp_events_neutral_1",
+            "comp_events_neutral_2"
         ]
     }
     return events.get(rel, events["neutral"])
@@ -227,34 +217,34 @@ def _get_watch_out(rel, age):
     """Get things to watch out for."""
     watch = {
         "help": [
-            "虽然运势好，但不要过于自信",
-            "珍惜帮助你的人，不要过河拆桥",
-            "好运时也要保持谦虚"
+            "comp_watch_help_0",
+            "comp_watch_help_1",
+            "comp_watch_help_2"
         ],
         "self": [
-            "不要过于固执，要学会倾听他人",
-            "保持开放心态，接受不同意见",
-            "注意与家人朋友的沟通"
+            "comp_watch_self_0",
+            "comp_watch_self_1",
+            "comp_watch_self_2"
         ],
         "drain": [
-            "不要因为忙碌而忽视健康",
-            "学会取舍，不要什么都想做",
-            "保持耐心，不要急于求成"
+            "comp_watch_drain_0",
+            "comp_watch_drain_1",
+            "comp_watch_drain_2"
         ],
         "attack": [
-            "注意处理好人际关系",
-            "不要冲动做决定",
-            "保持冷静，理性分析"
+            "comp_watch_attack_0",
+            "comp_watch_attack_1",
+            "comp_watch_attack_2"
         ],
         "stress": [
-            "注意身体健康，定期体检",
-            "不要给自己太大压力",
-            "学会释放压力，保持心情愉悦"
+            "comp_watch_stress_0",
+            "comp_watch_stress_1",
+            "comp_watch_stress_2"
         ],
         "neutral": [
-            "保持良好的生活习惯",
-            "不要因为平淡而懈怠",
-            "持续学习，提升自己"
+            "comp_watch_neutral_0",
+            "comp_watch_neutral_1",
+            "comp_watch_neutral_2"
         ]
     }
     return watch.get(rel, watch["neutral"])
@@ -264,34 +254,34 @@ def _get_what_to_do(rel, age, stage):
     """Get recommended actions."""
     do = {
         "help": [
-            "主动出击，抓住机会",
-            "拓展人脉，结交新朋友",
-            "尝试新事物，挑战自己"
+            "comp_do_help_0",
+            "comp_do_help_1",
+            "comp_do_help_2"
         ],
         "self": [
-            "确立自己的目标和方向",
-            "保持自我，不要随波逐流",
-            "提升自己的专业能力"
+            "comp_do_self_0",
+            "comp_do_self_1",
+            "comp_do_self_2"
         ],
         "drain": [
-            "学习新技能，为未来做准备",
-            "保持耐心，稳扎稳打",
-            "做好时间管理，提高效率"
+            "comp_do_drain_0",
+            "comp_do_drain_1",
+            "comp_do_drain_2"
         ],
         "attack": [
-            "提升自己的实力",
-            "处理好人际关系",
-            "保持冷静，理性决策"
+            "comp_do_attack_0",
+            "comp_do_attack_1",
+            "comp_do_attack_2"
         ],
         "stress": [
-            "保持积极心态",
-            "注意身体健康",
-            "稳扎稳打，不要冲动"
+            "comp_do_stress_0",
+            "comp_do_stress_1",
+            "comp_do_stress_2"
         ],
         "neutral": [
-            "保持良好的生活习惯",
-            "持续学习，提升自己",
-            "珍惜身边的人"
+            "comp_do_neutral_0",
+            "comp_do_neutral_1",
+            "comp_do_neutral_2"
         ]
     }
     return do.get(rel, do["neutral"])

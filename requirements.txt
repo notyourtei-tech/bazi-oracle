@@ -11,6 +11,8 @@ pytz==2025.2
 requests==2.32.5 
 gunicorn==21.2.0 
 python-dotenv==1.2.2
+Flask-Migrate==4.1.0
+pytest>=8.0.0
 
 # 可选依赖（安装后启用对应功能）
 # pip install Pillow    -> 启用分享卡生成
