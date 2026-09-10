@@ -14,10 +14,41 @@ def _get_secret_key():
     if os.path.exists(key_file):
         with open(key_file, 'r') as f:
             return f.read().strip()
-    # 首次生成，写入文件
+    # 首次生成，写入文件并限制权限（仅当前用户可读写）
     key = secrets.token_hex(32)
-    with open(key_file, 'w') as f:
-        f.write(key)
+    try:
+        with open(key_file, 'w') as f:
+            f.write(key)
+    except OSError:
+        # Serverless function bundles are read-only. Production should provide
+        # SECRET_KEY, but an in-memory fallback keeps the function bootable.
+        return key
+    # 限制文件权限：Unix chmod 600；Windows 尝试用 win32security 或回退到仅当前用户
+    try:
+        if os.name != 'nt':
+            os.chmod(key_file, 0o600)
+        else:
+            try:
+                import win32security
+                import win32con
+                sd = win32security.GetFileSecurity(key_file, win32con.DACL_SECURITY_INFORMATION)
+                dacl = win32security.ACL()
+                user_sid = win32security.ConvertSidAccountName(
+                    win32security.GetUserName(), win32con.SID_TYPE_USER
+                )
+                dacl.AddAccessAllowedAce(
+                    win32security.ACL_REVISION,
+                    win32con.FILE_GENERIC_READ | win32con.FILE_GENERIC_WRITE,
+                    user_sid
+                )
+                sd.SetSecurityDescriptorDacl(1, dacl, 0)
+                win32security.SetFileSecurity(key_file, win32con.DACL_SECURITY_INFORMATION, sd)
+            except ImportError:
+                # pywin32 不可用，使用简单文件属性限制
+                import ctypes
+                ctypes.windll.kernel32.SetFileAttributesW(key_file, 0x80)  # FILE_ATTRIBUTE_NORMAL
+    except Exception:
+        pass
     return key
 
 
