@@ -56,7 +56,15 @@
   --shadow-lg: 0 8px 32px rgba(0,0,0,0.14);
 }
 
-html { font-size: 16px; -webkit-text-size-adjust: 100%; }
+html {
+  width: 100%;
+  min-height: 100%;
+  font-size: 16px;
+  -webkit-text-size-adjust: 100%;
+  overflow-x: clip;
+  overscroll-behavior-x: none;
+  touch-action: manipulation;
+}
 
 body {
   background: var(--bg);
@@ -65,8 +73,19 @@ body {
   line-height: 1.6;
   min-height: 100vh;
   -webkit-font-smoothing: antialiased;
-  overflow-x: hidden;
+  overflow-x: clip;
+  overscroll-behavior-y: none;
 }
+
+html.is-scroll-locked,
+body.is-scroll-locked {
+  overflow: hidden;
+  overscroll-behavior: none;
+}
+
+img,
+svg,
+canvas { max-width: 100%; }
 
 /* =========================================
    Canvas & Spotlight
@@ -513,6 +532,8 @@ select.form-input {
   left: 0; right: 0;
   max-height: 320px;
   overflow-y: auto;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
   background: var(--card);
   border: 1px solid var(--border);
   border-radius: var(--radius-md);
@@ -1330,6 +1351,10 @@ select.form-input {
   z-index: 9998;
   align-items: center;
   justify-content: center;
+  min-height: 100dvh;
+  padding: max(16px, env(safe-area-inset-top)) max(16px, env(safe-area-inset-right)) max(16px, env(safe-area-inset-bottom)) max(16px, env(safe-area-inset-left));
+  overflow-y: auto;
+  overscroll-behavior: contain;
 }
 
 .time-picker-overlay.active { display: flex; }
@@ -1340,6 +1365,10 @@ select.form-input {
   border-radius: var(--radius-lg);
   padding: 24px;
   width: 300px;
+  max-width: 100%;
+  max-height: calc(100dvh - 32px);
+  overflow-y: auto;
+  overscroll-behavior: contain;
   text-align: center;
 }
 
@@ -1474,6 +1503,10 @@ select.form-input {
   z-index: 10000;
   align-items: center;
   justify-content: center;
+  min-height: 100dvh;
+  padding: max(16px, env(safe-area-inset-top)) max(16px, env(safe-area-inset-right)) max(16px, env(safe-area-inset-bottom)) max(16px, env(safe-area-inset-left));
+  overflow-y: auto;
+  overscroll-behavior: contain;
 }
 
 .lang-modal-overlay.hidden { display: none; }
@@ -1484,6 +1517,10 @@ select.form-input {
   border-radius: var(--radius-lg);
   padding: 32px;
   width: 340px;
+  max-width: 100%;
+  max-height: calc(100dvh - 32px);
+  overflow-y: auto;
+  overscroll-behavior: contain;
   text-align: center;
 }
 
@@ -1564,6 +1601,10 @@ select.form-input {
   z-index: 10001;
   align-items: center;
   justify-content: center;
+  min-height: 100dvh;
+  padding: max(16px, env(safe-area-inset-top)) max(16px, env(safe-area-inset-right)) max(16px, env(safe-area-inset-bottom)) max(16px, env(safe-area-inset-left));
+  overflow-y: auto;
+  overscroll-behavior: contain;
 }
 
 .onboard-overlay.hidden { display: none; }
@@ -1574,6 +1615,10 @@ select.form-input {
   border-radius: var(--radius-lg);
   padding: 32px;
   width: 380px;
+  max-width: 100%;
+  max-height: calc(100dvh - 32px);
+  overflow-y: auto;
+  overscroll-behavior: contain;
   text-align: center;
   position: relative;
 }
@@ -1709,6 +1754,15 @@ select.form-input {
    Responsive
    ========================================= */
 @media (max-width: 768px) {
+  body { min-height: 100dvh; }
+  .container { min-width: 0; }
+  .form-input,
+  .custom-select-trigger,
+  select.form-input { font-size: 16px; }
+  button,
+  .nav-item,
+  .custom-select-trigger,
+  .time-picker-display { touch-action: manipulation; }
   .container { padding: 64px 16px 80px; }
   .hero-title { font-size: 36px; }
   .page-title { font-size: 28px; }
@@ -1740,7 +1794,7 @@ select.form-input {
   .actions-grid { grid-template-columns: repeat(3, 1fr); gap: 8px; }
   .action-card { padding: 14px 8px; }
   .tilt-card { transform: none !important; }
-  .time-picker-modal { width: 280px; padding: 20px; }
+  .time-picker-modal { width: min(280px, 100%); padding: 20px 16px; }
   .time-picker-clock { width: 180px; height: 180px; }
   .time-picker-selected-digit { font-size: 30px; }
   .form-row { gap: 8px; }

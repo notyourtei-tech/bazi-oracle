@@ -2,14 +2,14 @@
 <html lang="{{ session.get('lang', 'zh') }}">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <meta name="theme-color" content="#0a0a0f">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <link rel="manifest" href="{{ url_for('static', filename='manifest.json') }}">
   <script nonce="{{ csp_nonce }}">
     if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('{{ url_for('static', filename='sw.js') }}?v=6');
+      navigator.serviceWorker.register('{{ url_for('static', filename='sw.js') }}?v=7');
     }
   </script>
   <title data-i18n="app_title"></title>
@@ -23,7 +23,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}?v=9.1">
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}?v=9.2">
 
   <script nonce="{{ csp_nonce }}">
     function escapeHtml(text) {
@@ -157,7 +157,7 @@
       document.getElementById('themeToggle').addEventListener('click', toggleTheme);
       document.getElementById('languageNavTrigger').addEventListener('click', function(event) {
         event.preventDefault();
-        document.getElementById('langModal').classList.remove('hidden');
+        showLanguageModal();
       });
       document.getElementById('wechatTipClose').addEventListener('click', function() {
         document.getElementById('wechatTip').style.display = 'none';
@@ -177,6 +177,17 @@
           });
         }
       }
+      syncPageScrollLock();
+      document.addEventListener('keydown', function(event) {
+        if (event.key !== 'Escape') return;
+        if (document.getElementById('timePickerOverlay') && document.getElementById('timePickerOverlay').classList.contains('active') && typeof closeTimePicker === 'function') {
+          closeTimePicker();
+        } else if (!document.getElementById('onboardModal').classList.contains('hidden')) {
+          closeOnboard();
+        } else if (!document.getElementById('langModal').classList.contains('hidden')) {
+          hideLanguageModal();
+        }
+      });
     });
   </script>
 </head>
@@ -332,9 +343,80 @@
 <script nonce="{{ csp_nonce }}">
 function showLoading() {
   document.getElementById('loadingOverlay').classList.add('active');
+  syncPageScrollLock();
 }
 function hideLoading() {
   document.getElementById('loadingOverlay').classList.remove('active');
+  syncPageScrollLock();
+}
+
+// ========================
+// 移动端交互壳：遮罩打开时固定底层页面，关闭后准确回到原滚动位置。
+// ========================
+var pageScrollLockState = { locked: false, scrollY: 0, styles: null };
+
+function setPageScrollLocked(shouldLock) {
+  var body = document.body;
+  if (!body || shouldLock === pageScrollLockState.locked) return;
+
+  if (shouldLock) {
+    pageScrollLockState.scrollY = window.scrollY || window.pageYOffset || 0;
+    pageScrollLockState.styles = {
+      position: body.style.position,
+      top: body.style.top,
+      left: body.style.left,
+      right: body.style.right,
+      width: body.style.width,
+      overflow: body.style.overflow
+    };
+    pageScrollLockState.locked = true;
+    document.documentElement.classList.add('is-scroll-locked');
+    body.classList.add('is-scroll-locked');
+    body.style.position = 'fixed';
+    body.style.top = '-' + pageScrollLockState.scrollY + 'px';
+    body.style.left = '0';
+    body.style.right = '0';
+    body.style.width = '100%';
+    body.style.overflow = 'hidden';
+    return;
+  }
+
+  var styles = pageScrollLockState.styles || {};
+  body.style.position = styles.position || '';
+  body.style.top = styles.top || '';
+  body.style.left = styles.left || '';
+  body.style.right = styles.right || '';
+  body.style.width = styles.width || '';
+  body.style.overflow = styles.overflow || '';
+  document.documentElement.classList.remove('is-scroll-locked');
+  body.classList.remove('is-scroll-locked');
+  pageScrollLockState.locked = false;
+  window.scrollTo(0, pageScrollLockState.scrollY);
+}
+
+function syncPageScrollLock() {
+  var overlayIsOpen = document.querySelector('.loading-overlay.active, .time-picker-overlay.active, .lang-modal-overlay:not(.hidden), .onboard-overlay:not(.hidden)');
+  setPageScrollLocked(Boolean(overlayIsOpen));
+}
+
+function showLanguageModal() {
+  document.getElementById('langModal').classList.remove('hidden');
+  syncPageScrollLock();
+}
+
+function hideLanguageModal() {
+  document.getElementById('langModal').classList.add('hidden');
+  syncPageScrollLock();
+}
+
+function showOnboardModal() {
+  document.getElementById('onboardModal').classList.remove('hidden');
+  syncPageScrollLock();
+}
+
+function hideOnboardModal() {
+  document.getElementById('onboardModal').classList.add('hidden');
+  syncPageScrollLock();
 }
 
 // ========================
@@ -372,10 +454,10 @@ function confirmLangModal() {
   localStorage.setItem('lang', selectedLangVal);
   localStorage.setItem('lang_selected', '1');
   loadLang(selectedLangVal);
-  document.getElementById('langModal').classList.add('hidden');
+  hideLanguageModal();
   if (!localStorage.getItem('onboard_done')) {
     setTimeout(function() {
-      document.getElementById('onboardModal').classList.remove('hidden');
+      showOnboardModal();
     }, 400);
   }
 }
@@ -392,6 +474,7 @@ function confirmLangModal() {
   if (localStorage.getItem('lang_selected')) {
     document.getElementById('langModal').classList.add('hidden');
   }
+  syncPageScrollLock();
 })();
 
 // Scroll to top on navigation
@@ -603,10 +686,21 @@ function nextOnboardStep() {
 }
 
 function closeOnboard() {
-  document.getElementById('onboardModal').classList.add('hidden');
+  hideOnboardModal();
   localStorage.setItem('onboard_done', '1');
   localStorage.setItem('lang_selected', '1');
 }
+
+// Prevent browser-level pinch zoom while allowing ordinary one-finger page scroll.
+(function() {
+  function preventPinch(event) {
+    if (event.touches && event.touches.length > 1) event.preventDefault();
+  }
+  document.addEventListener('gesturestart', function(event) { event.preventDefault(); }, { passive: false });
+  document.addEventListener('gesturechange', function(event) { event.preventDefault(); }, { passive: false });
+  document.addEventListener('gestureend', function(event) { event.preventDefault(); }, { passive: false });
+  document.addEventListener('touchmove', preventPinch, { passive: false });
+})();
 </script>
 
 </body>

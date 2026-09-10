@@ -7,6 +7,7 @@ var tpPeriod = (function() { var h = new Date().getHours(); return h >= 12 ? 'PM
 function openTimePicker() {
   var overlay = document.getElementById('timePickerOverlay');
   overlay.classList.add('active');
+  if (typeof syncPageScrollLock === 'function') syncPageScrollLock();
   tpMode = 'hour';
   renderTimePickerClock();
   updateTpSelected();
@@ -14,6 +15,7 @@ function openTimePicker() {
 
 function closeTimePicker() {
   document.getElementById('timePickerOverlay').classList.remove('active');
+  if (typeof syncPageScrollLock === 'function') syncPageScrollLock();
 }
 
 function selectAMPM(period) {
