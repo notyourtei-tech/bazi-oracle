@@ -566,7 +566,7 @@ function refreshDateInputs() {
 {% endif %}
 
 </script>
-<script src="{{ url_for('static', filename='timepicker.js') }}"></script>
+<script src="{{ url_for('static', filename='timepicker.js') }}?v=7"></script>
 <script nonce="{{ csp_nonce }}">
 document.getElementById('timePickerOverlay').addEventListener('click', function(e) {
   if (e.target === this) closeTimePicker();

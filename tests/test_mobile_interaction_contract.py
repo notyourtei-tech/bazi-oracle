@@ -30,8 +30,10 @@ def test_mobile_shell_locks_background_and_preserves_normal_single_touch_scroll(
 def test_every_fullscreen_overlay_participates_in_scroll_locking():
     base = (ROOT / "templates" / "base.html").read_text(encoding="utf-8")
     picker = (ROOT / "static" / "timepicker.js").read_text(encoding="utf-8")
+    index = (ROOT / "templates" / "index.html").read_text(encoding="utf-8")
 
     assert ".loading-overlay.active, .time-picker-overlay.active" in base
     assert "showLanguageModal();" in base
     assert "showOnboardModal();" in base
     assert picker.count("syncPageScrollLock()") == 2
+    assert "timepicker.js') }}?v=7" in index

@@ -9,7 +9,7 @@
   <link rel="manifest" href="{{ url_for('static', filename='manifest.json') }}">
   <script nonce="{{ csp_nonce }}">
     if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('{{ url_for('static', filename='sw.js') }}?v=7');
+      navigator.serviceWorker.register('{{ url_for('static', filename='sw.js') }}?v=8');
     }
   </script>
   <title data-i18n="app_title"></title>

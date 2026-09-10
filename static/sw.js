@@ -1,8 +1,8 @@
 // sw.js - Service Worker for PWA
-var CACHE_NAME = 'bazi-v7';
+var CACHE_NAME = 'bazi-v8';
 var STATIC_ASSETS = [
   '/static/style.css',
-  '/static/timepicker.js',
+  '/static/timepicker.js?v=7',
   '/static/i18n/zh.json',
   '/static/i18n/en.json',
   '/static/i18n/ja.json',
