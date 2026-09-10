@@ -52,9 +52,19 @@ def _get_secret_key():
     return key
 
 
+def _get_database_url():
+    """Use SQLAlchemy's modern psycopg driver for Render PostgreSQL URLs."""
+    url = os.environ.get('DATABASE_URL', 'sqlite:///db.sqlite3')
+    if url.startswith('postgres://'):
+        return 'postgresql+psycopg://' + url.removeprefix('postgres://')
+    if url.startswith('postgresql://'):
+        return 'postgresql+psycopg://' + url.removeprefix('postgresql://')
+    return url
+
+
 class Config:
     SECRET_KEY = _get_secret_key()
-    SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL', 'sqlite:///db.sqlite3')
+    SQLALCHEMY_DATABASE_URI = _get_database_url()
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     SQLALCHEMY_ENGINE_OPTIONS = {
         'pool_pre_ping': True,

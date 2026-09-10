@@ -33,6 +33,11 @@ def test_secret_key_falls_back_to_memory_when_the_filesystem_is_read_only():
     assert re.fullmatch(r"[0-9a-f]{64}", generated)
 
 
+def test_render_postgres_url_uses_the_installed_psycopg_driver():
+    with patch.dict(os.environ, {"DATABASE_URL": "postgresql://user:pass@db:5432/bazi"}, clear=False):
+        assert config._get_database_url() == "postgresql+psycopg://user:pass@db:5432/bazi"
+
+
 def test_render_blueprint_declares_postgres_and_production_start_command():
     content = (ROOT / "render.yaml").read_text(encoding="utf-8")
 
