@@ -1,8 +1,7 @@
 // sw.js - Service Worker for PWA
-var CACHE_NAME = 'bazi-v2';
+var CACHE_NAME = 'bazi-v6';
 var STATIC_ASSETS = [
-  '/',
-  '/static/style.css?v=8.0',
+  '/static/style.css',
   '/static/timepicker.js',
   '/static/i18n/zh.json',
   '/static/i18n/en.json',
@@ -42,18 +41,10 @@ self.addEventListener('fetch', function(event) {
     return;
   }
 
-  // HTML pages: network first, fallback to cache
+  // HTML pages: network only (dynamic content like daily fortune should not be cached)
   var accept = event.request.headers.get('accept') || '';
   if (accept.indexOf('text/html') !== -1) {
-    event.respondWith(
-      fetch(event.request).then(function(response) {
-        var clone = response.clone();
-        caches.open(CACHE_NAME).then(function(cache) { cache.put(event.request, clone); });
-        return response;
-      }).catch(function() {
-        return caches.match(event.request);
-      })
-    );
+    event.respondWith(fetch(event.request));
     return;
   }
 

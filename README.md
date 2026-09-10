@@ -90,6 +90,16 @@ set OPENROUTER_API_KEY=your_api_key_here
 set FORCE_HTTPS=1
 ```
 
+## ☁️ 部署
+
+### Render（推荐作为完整应用）
+
+仓库根目录的 `render.yaml` 已定义 Flask Web Service、PostgreSQL 数据库、生产环境密钥和自动部署。将 GitHub 仓库导入 Render Blueprint 后，选择该文件即可创建服务；`main` 分支的新提交会自动触发部署。
+
+### Vercel
+
+仓库根目录的 `.python-version` 与 `vercel.json` 已为 Flask Function 准备好运行时和打包排除项。导入 GitHub 仓库时，Vercel 会自动识别根目录的 `app.py`。在 Vercel 项目中设置 `SECRET_KEY`、`FLASK_ENV=production` 和一个可从 Vercel 访问的 PostgreSQL `DATABASE_URL`；不要依赖函数内的 SQLite 文件保存用户数据或排盘历史。
+
 ## 📁 项目结构
 
 ```

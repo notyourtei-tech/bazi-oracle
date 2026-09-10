@@ -8,7 +8,7 @@
     <div class="card-header">
       <div class="card-title">
         <span class="card-title-icon">🌟</span>
-        <span data-i18n="my_fortune">我的今日运势</span>
+        <span data-i18n="my_fortune"></span>
       </div>
     </div>
     <div id="myFortuneDashboard">
@@ -21,15 +21,15 @@
     <div class="card-header">
       <div class="card-title">
         <span class="card-title-icon">☯</span>
-        <span data-i18n="my_own_bazi">我的八字</span>
+        <span data-i18n="my_own_bazi"></span>
       </div>
-      <a href="/history" style="color: var(--gold); font-size: 13px; text-decoration: none;" data-i18n="select_from_history">从历史选择 →</a>
+      <a href="/history" style="color: var(--gold); font-size: 13px; text-decoration: none;" data-i18n="select_from_history"></a>
     </div>
     {% if own_chart %}
       {% set res = own_chart.get_result() %}
       <div style="display: flex; gap: 16px; flex-wrap: wrap; align-items: center;">
         <div style="flex: 1; min-width: 180px;">
-          <div style="font-size: 15px; font-weight: 600; margin-bottom: 4px;">{% if own_chart.name %}{{ own_chart.name }}{% else %}<span data-i18n="unnamed">未命名</span>{% endif %}</div>
+          <div style="font-size: 15px; font-weight: 600; margin-bottom: 4px;">{% if own_chart.name %}{{ own_chart.name }}{% else %}<span data-i18n="unnamed"></span>{% endif %}</div>
           <div style="font-size: 12px; color: var(--text-muted);">{{ own_chart.birth_date }} {% if own_chart.gender == 'male' %}♂{% else %}♀{% endif %} {% if own_chart.birth_time %}{{ own_chart.birth_time }}{% endif %}</div>
         </div>
         <div style="display: flex; gap: 12px; flex-wrap: wrap;">
@@ -45,30 +45,30 @@
         </div>
       </div>
     {% else %}
-      <div style="text-align: center; padding: 16px; color: var(--text-muted); font-size: 13px;" data-i18n="no_own_bazi_hint">暂未设置自己的八字，可从历史记录中选择</div>
+      <div style="text-align: center; padding: 16px; color: var(--text-muted); font-size: 13px;" data-i18n="no_own_bazi_hint"></div>
     {% endif %}
   </div>
   {% endif %}
 
   <!-- 英雄区域 - 品牌介绍 -->
   <div class="hero-section animate-fade">
-    <div class="hero-badge">BaZi</div>
-    <h1 class="hero-title" data-i18n="app_title">八字自动排盘系统</h1>
-    <p class="hero-subtitle" data-i18n="intro">基于真太阳时的专业排盘，深度解读您的命盘</p>
+    <div class="hero-badge" data-i18n="app_title_short"></div>
+    <h1 class="hero-title" data-i18n="app_title"></h1>
+    <p class="hero-subtitle" data-i18n="intro"></p>
     <div class="hero-stats">
       <div class="hero-stat">
-        <span class="hero-stat-num">90+</span>
-        <span class="hero-stat-label" data-i18n="hero_stat_countries">国家支持</span>
+        <span class="hero-stat-num" data-i18n="hero_countries_total"></span>
+        <span class="hero-stat-label" data-i18n="hero_stat_countries"></span>
       </div>
       <div class="hero-stat-divider"></div>
       <div class="hero-stat">
-        <span class="hero-stat-num">5</span>
-        <span class="hero-stat-label" data-i18n="hero_stat_languages">语言</span>
+        <span class="hero-stat-num" data-i18n="hero_languages_total"></span>
+        <span class="hero-stat-label" data-i18n="hero_stat_languages"></span>
       </div>
       <div class="hero-stat-divider"></div>
       <div class="hero-stat">
-        <span class="hero-stat-num">∞</span>
-        <span class="hero-stat-label" data-i18n="hero_stat_free">免费使用</span>
+        <span class="hero-stat-num" data-i18n="hero_free_total"></span>
+        <span class="hero-stat-label" data-i18n="hero_stat_free"></span>
       </div>
     </div>
   </div>
@@ -77,7 +77,7 @@
   <div class="error-toast" id="errorToast">
     <span class="error-icon">⚠️</span>
     <span data-i18n="{{ error }}">{{ error }}</span>
-    <button class="error-close" onclick="this.parentElement.remove()">×</button>
+    <button class="error-close">×</button>
   </div>
   {% endif %}
 
@@ -86,16 +86,16 @@
     <a href="/history" class="bento-card">
       <div class="bento-icon">📋</div>
       <div class="bento-content">
-        <div class="bento-title" data-i18n="nav_history">历史记录</div>
-        <div class="bento-desc" data-i18n="bazi_history_desc">查看过去的排盘记录</div>
+        <div class="bento-title" data-i18n="nav_history"></div>
+        <div class="bento-desc" data-i18n="bazi_history_desc"></div>
       </div>
       <span class="bento-arrow">→</span>
     </a>
     <a href="/explain" class="bento-card">
       <div class="bento-icon">📖</div>
       <div class="bento-content">
-        <div class="bento-title" data-i18n="nav_learn">了解八字</div>
-        <div class="bento-desc" data-i18n="bazi_learn_desc">探索命理知识</div>
+        <div class="bento-title" data-i18n="nav_learn"></div>
+        <div class="bento-desc" data-i18n="bazi_learn_desc"></div>
       </div>
       <span class="bento-arrow">→</span>
     </a>
@@ -106,30 +106,30 @@
     <div class="card-header">
       <div class="card-title">
         <span class="card-title-icon">✦</span>
-        <span data-i18n="start_analysis">开始排盘</span>
+        <span data-i18n="start_analysis"></span>
       </div>
     </div>
 
-    <form method="post" onsubmit="return validateForm()">
+    <form id="birthChartForm" method="post">
       <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
       <div class="form-section">
         <div class="form-row">
           <div class="form-group">
-            <label class="form-label" data-i18n="name">姓名</label>
-            <input type="text" name="name" class="form-input" data-i18n-placeholder="name_placeholder" placeholder="请输入您的姓名">
+            <label class="form-label" data-i18n="name"></label>
+            <input type="text" name="name" class="form-input" data-i18n-placeholder="name_placeholder">
           </div>
           <div class="form-group" id="genderGroupWrap">
-            <label class="form-label" data-i18n="gender">性别</label>
+            <label class="form-label" data-i18n="gender"></label>
             <div class="form-radio-group" id="genderGroup">
-              <label class="form-radio" onclick="selectRadio(this, 'gender', 'male')">
+              <label class="form-radio">
                 <input type="radio" name="gender" value="male">
                 <span style="font-size: 20px;">♂</span>
-                <span data-i18n="male">男</span>
+                <span data-i18n="male"></span>
               </label>
-              <label class="form-radio" onclick="selectRadio(this, 'gender', 'female')">
+              <label class="form-radio">
                 <input type="radio" name="gender" value="female">
                 <span style="font-size: 20px;">♀</span>
-                <span data-i18n="female">女</span>
+                <span data-i18n="female"></span>
               </label>
             </div>
             <div id="genderFeedback" class="gender-feedback"></div>
@@ -139,142 +139,142 @@
 
         <div class="form-row">
           <div class="form-group" id="countryGroupWrap">
-            <label class="form-label" data-i18n="birth_country">出生国家</label>
+            <label class="form-label" data-i18n="birth_country"></label>
             <input type="hidden" name="birth_country" id="birthCountryHidden" value="CN">
             <div class="custom-select" id="countrySelect">
-              <div class="custom-select-trigger" onclick="toggleCountryDropdown()">
-                <span id="countrySelectText" data-i18n="country_CN">中国</span>
+              <div class="custom-select-trigger">
+                <span id="countrySelectText" data-i18n="country_CN"></span>
                 <span class="custom-select-arrow">▾</span>
               </div>
               <div class="custom-select-dropdown" id="countryDropdown">
                 <div class="cs-group">
-                  <div class="cs-group-header" onclick="toggleCsGroup(this)"><span data-i18n="optgroup_eastasia">东亚</span> <span class="cs-arrow">▸</span></div>
+                  <div class="cs-group-header"><span data-i18n="optgroup_eastasia"></span> <span class="cs-arrow">▸</span></div>
                   <div class="cs-options">
-                    <div class="cs-option" data-val="CN" onclick="selectCountry(this)" data-i18n="country_CN">中国</div>
-                    <div class="cs-option" data-val="JP" onclick="selectCountry(this)" data-i18n="country_JP">日本</div>
-                    <div class="cs-option" data-val="KR" onclick="selectCountry(this)" data-i18n="country_KR">韩国</div>
-                    <div class="cs-option" data-val="TW" onclick="selectCountry(this)" data-i18n="country_TW">台湾</div>
-                    <div class="cs-option" data-val="HK" onclick="selectCountry(this)" data-i18n="country_HK">香港</div>
-                    <div class="cs-option" data-val="MO" onclick="selectCountry(this)" data-i18n="country_MO">澳门</div>
-                    <div class="cs-option" data-val="MN" onclick="selectCountry(this)" data-i18n="country_MN">蒙古</div>
+                    <div class="cs-option" data-val="CN" data-i18n="country_CN"></div>
+                    <div class="cs-option" data-val="JP" data-i18n="country_JP"></div>
+                    <div class="cs-option" data-val="KR" data-i18n="country_KR"></div>
+                    <div class="cs-option" data-val="TW" data-i18n="country_TW"></div>
+                    <div class="cs-option" data-val="HK" data-i18n="country_HK"></div>
+                    <div class="cs-option" data-val="MO" data-i18n="country_MO"></div>
+                    <div class="cs-option" data-val="MN" data-i18n="country_MN"></div>
                   </div>
                 </div>
                 <div class="cs-group">
-                  <div class="cs-group-header" onclick="toggleCsGroup(this)"><span data-i18n="optgroup_southeast">东南亚</span> <span class="cs-arrow">▸</span></div>
+                  <div class="cs-group-header"><span data-i18n="optgroup_southeast"></span> <span class="cs-arrow">▸</span></div>
                   <div class="cs-options">
-                    <div class="cs-option" data-val="VN" onclick="selectCountry(this)" data-i18n="country_VN">越南</div>
-                    <div class="cs-option" data-val="TH" onclick="selectCountry(this)" data-i18n="country_TH">泰国</div>
-                    <div class="cs-option" data-val="PH" onclick="selectCountry(this)" data-i18n="country_PH">菲律宾</div>
-                    <div class="cs-option" data-val="MY" onclick="selectCountry(this)" data-i18n="country_MY">马来西亚</div>
-                    <div class="cs-option" data-val="SG" onclick="selectCountry(this)" data-i18n="country_SG">新加坡</div>
-                    <div class="cs-option" data-val="ID" onclick="selectCountry(this)" data-i18n="country_ID">印度尼西亚</div>
-                    <div class="cs-option" data-val="MM" onclick="selectCountry(this)" data-i18n="country_MM">缅甸</div>
-                    <div class="cs-option" data-val="KH" onclick="selectCountry(this)" data-i18n="country_KH">柬埔寨</div>
-                    <div class="cs-option" data-val="LA" onclick="selectCountry(this)" data-i18n="country_LA">老挝</div>
-                    <div class="cs-option" data-val="BN" onclick="selectCountry(this)" data-i18n="country_BN">文莱</div>
+                    <div class="cs-option" data-val="VN" data-i18n="country_VN"></div>
+                    <div class="cs-option" data-val="TH" data-i18n="country_TH"></div>
+                    <div class="cs-option" data-val="PH" data-i18n="country_PH"></div>
+                    <div class="cs-option" data-val="MY" data-i18n="country_MY"></div>
+                    <div class="cs-option" data-val="SG" data-i18n="country_SG"></div>
+                    <div class="cs-option" data-val="ID" data-i18n="country_ID"></div>
+                    <div class="cs-option" data-val="MM" data-i18n="country_MM"></div>
+                    <div class="cs-option" data-val="KH" data-i18n="country_KH"></div>
+                    <div class="cs-option" data-val="LA" data-i18n="country_LA"></div>
+                    <div class="cs-option" data-val="BN" data-i18n="country_BN"></div>
                   </div>
                 </div>
                 <div class="cs-group">
-                  <div class="cs-group-header" onclick="toggleCsGroup(this)"><span data-i18n="optgroup_southasia">南亚</span> <span class="cs-arrow">▸</span></div>
+                  <div class="cs-group-header"><span data-i18n="optgroup_southasia"></span> <span class="cs-arrow">▸</span></div>
                   <div class="cs-options">
-                    <div class="cs-option" data-val="IN" onclick="selectCountry(this)" data-i18n="country_IN">印度</div>
-                    <div class="cs-option" data-val="PK" onclick="selectCountry(this)" data-i18n="country_PK">巴基斯坦</div>
-                    <div class="cs-option" data-val="BD" onclick="selectCountry(this)" data-i18n="country_BD">孟加拉国</div>
-                    <div class="cs-option" data-val="LK" onclick="selectCountry(this)" data-i18n="country_LK">斯里兰卡</div>
-                    <div class="cs-option" data-val="NP" onclick="selectCountry(this)" data-i18n="country_NP">尼泊尔</div>
-                    <div class="cs-option" data-val="MV" onclick="selectCountry(this)" data-i18n="country_MV">马尔代夫</div>
+                    <div class="cs-option" data-val="IN" data-i18n="country_IN"></div>
+                    <div class="cs-option" data-val="PK" data-i18n="country_PK"></div>
+                    <div class="cs-option" data-val="BD" data-i18n="country_BD"></div>
+                    <div class="cs-option" data-val="LK" data-i18n="country_LK"></div>
+                    <div class="cs-option" data-val="NP" data-i18n="country_NP"></div>
+                    <div class="cs-option" data-val="MV" data-i18n="country_MV"></div>
                   </div>
                 </div>
                 <div class="cs-group">
-                  <div class="cs-group-header" onclick="toggleCsGroup(this)"><span data-i18n="optgroup_westasia">西亚/中亚</span> <span class="cs-arrow">▸</span></div>
+                  <div class="cs-group-header"><span data-i18n="optgroup_westasia"></span> <span class="cs-arrow">▸</span></div>
                   <div class="cs-options">
-                    <div class="cs-option" data-val="TR" onclick="selectCountry(this)" data-i18n="country_TR">土耳其</div>
-                    <div class="cs-option" data-val="SA" onclick="selectCountry(this)" data-i18n="country_SA">沙特阿拉伯</div>
-                    <div class="cs-option" data-val="AE" onclick="selectCountry(this)" data-i18n="country_AE">阿联酋</div>
-                    <div class="cs-option" data-val="QA" onclick="selectCountry(this)" data-i18n="country_QA">卡塔尔</div>
-                    <div class="cs-option" data-val="KW" onclick="selectCountry(this)" data-i18n="country_KW">科威特</div>
-                    <div class="cs-option" data-val="BH" onclick="selectCountry(this)" data-i18n="country_BH">巴林</div>
-                    <div class="cs-option" data-val="OM" onclick="selectCountry(this)" data-i18n="country_OM">阿曼</div>
-                    <div class="cs-option" data-val="IL" onclick="selectCountry(this)" data-i18n="country_IL">以色列</div>
-                    <div class="cs-option" data-val="JO" onclick="selectCountry(this)" data-i18n="country_JO">约旦</div>
-                    <div class="cs-option" data-val="LB" onclick="selectCountry(this)" data-i18n="country_LB">黎巴嫩</div>
-                    <div class="cs-option" data-val="IQ" onclick="selectCountry(this)" data-i18n="country_IQ">伊拉克</div>
-                    <div class="cs-option" data-val="IR" onclick="selectCountry(this)" data-i18n="country_IR">伊朗</div>
-                    <div class="cs-option" data-val="KZ" onclick="selectCountry(this)" data-i18n="country_KZ">哈萨克斯坦</div>
-                    <div class="cs-option" data-val="UZ" onclick="selectCountry(this)" data-i18n="country_UZ">乌兹别克斯坦</div>
+                    <div class="cs-option" data-val="TR" data-i18n="country_TR"></div>
+                    <div class="cs-option" data-val="SA" data-i18n="country_SA"></div>
+                    <div class="cs-option" data-val="AE" data-i18n="country_AE"></div>
+                    <div class="cs-option" data-val="QA" data-i18n="country_QA"></div>
+                    <div class="cs-option" data-val="KW" data-i18n="country_KW"></div>
+                    <div class="cs-option" data-val="BH" data-i18n="country_BH"></div>
+                    <div class="cs-option" data-val="OM" data-i18n="country_OM"></div>
+                    <div class="cs-option" data-val="IL" data-i18n="country_IL"></div>
+                    <div class="cs-option" data-val="JO" data-i18n="country_JO"></div>
+                    <div class="cs-option" data-val="LB" data-i18n="country_LB"></div>
+                    <div class="cs-option" data-val="IQ" data-i18n="country_IQ"></div>
+                    <div class="cs-option" data-val="IR" data-i18n="country_IR"></div>
+                    <div class="cs-option" data-val="KZ" data-i18n="country_KZ"></div>
+                    <div class="cs-option" data-val="UZ" data-i18n="country_UZ"></div>
                   </div>
                 </div>
                 <div class="cs-group">
-                  <div class="cs-group-header" onclick="toggleCsGroup(this)"><span data-i18n="optgroup_europe">欧洲</span> <span class="cs-arrow">▸</span></div>
+                  <div class="cs-group-header"><span data-i18n="optgroup_europe"></span> <span class="cs-arrow">▸</span></div>
                   <div class="cs-options">
-                    <div class="cs-option" data-val="GB" onclick="selectCountry(this)" data-i18n="country_GB">英国</div>
-                    <div class="cs-option" data-val="DE" onclick="selectCountry(this)" data-i18n="country_DE">德国</div>
-                    <div class="cs-option" data-val="FR" onclick="selectCountry(this)" data-i18n="country_FR">法国</div>
-                    <div class="cs-option" data-val="IT" onclick="selectCountry(this)" data-i18n="country_IT">意大利</div>
-                    <div class="cs-option" data-val="ES" onclick="selectCountry(this)" data-i18n="country_ES">西班牙</div>
-                    <div class="cs-option" data-val="PT" onclick="selectCountry(this)" data-i18n="country_PT">葡萄牙</div>
-                    <div class="cs-option" data-val="NL" onclick="selectCountry(this)" data-i18n="country_NL">荷兰</div>
-                    <div class="cs-option" data-val="BE" onclick="selectCountry(this)" data-i18n="country_BE">比利时</div>
-                    <div class="cs-option" data-val="CH" onclick="selectCountry(this)" data-i18n="country_CH">瑞士</div>
-                    <div class="cs-option" data-val="AT" onclick="selectCountry(this)" data-i18n="country_AT">奥地利</div>
-                    <div class="cs-option" data-val="SE" onclick="selectCountry(this)" data-i18n="country_SE">瑞典</div>
-                    <div class="cs-option" data-val="NO" onclick="selectCountry(this)" data-i18n="country_NO">挪威</div>
-                    <div class="cs-option" data-val="DK" onclick="selectCountry(this)" data-i18n="country_DK">丹麦</div>
-                    <div class="cs-option" data-val="FI" onclick="selectCountry(this)" data-i18n="country_FI">芬兰</div>
-                    <div class="cs-option" data-val="PL" onclick="selectCountry(this)" data-i18n="country_PL">波兰</div>
-                    <div class="cs-option" data-val="CZ" onclick="selectCountry(this)" data-i18n="country_CZ">捷克</div>
-                    <div class="cs-option" data-val="GR" onclick="selectCountry(this)" data-i18n="country_GR">希腊</div>
-                    <div class="cs-option" data-val="IE" onclick="selectCountry(this)" data-i18n="country_IE">爱尔兰</div>
-                    <div class="cs-option" data-val="RO" onclick="selectCountry(this)" data-i18n="country_RO">罗马尼亚</div>
-                    <div class="cs-option" data-val="UA" onclick="selectCountry(this)" data-i18n="country_UA">乌克兰</div>
-                    <div class="cs-option" data-val="HU" onclick="selectCountry(this)" data-i18n="country_HU">匈牙利</div>
-                    <div class="cs-option" data-val="RU" onclick="selectCountry(this)" data-i18n="country_RU">俄罗斯</div>
+                    <div class="cs-option" data-val="GB" data-i18n="country_GB"></div>
+                    <div class="cs-option" data-val="DE" data-i18n="country_DE"></div>
+                    <div class="cs-option" data-val="FR" data-i18n="country_FR"></div>
+                    <div class="cs-option" data-val="IT" data-i18n="country_IT"></div>
+                    <div class="cs-option" data-val="ES" data-i18n="country_ES"></div>
+                    <div class="cs-option" data-val="PT" data-i18n="country_PT"></div>
+                    <div class="cs-option" data-val="NL" data-i18n="country_NL"></div>
+                    <div class="cs-option" data-val="BE" data-i18n="country_BE"></div>
+                    <div class="cs-option" data-val="CH" data-i18n="country_CH"></div>
+                    <div class="cs-option" data-val="AT" data-i18n="country_AT"></div>
+                    <div class="cs-option" data-val="SE" data-i18n="country_SE"></div>
+                    <div class="cs-option" data-val="NO" data-i18n="country_NO"></div>
+                    <div class="cs-option" data-val="DK" data-i18n="country_DK"></div>
+                    <div class="cs-option" data-val="FI" data-i18n="country_FI"></div>
+                    <div class="cs-option" data-val="PL" data-i18n="country_PL"></div>
+                    <div class="cs-option" data-val="CZ" data-i18n="country_CZ"></div>
+                    <div class="cs-option" data-val="GR" data-i18n="country_GR"></div>
+                    <div class="cs-option" data-val="IE" data-i18n="country_IE"></div>
+                    <div class="cs-option" data-val="RO" data-i18n="country_RO"></div>
+                    <div class="cs-option" data-val="UA" data-i18n="country_UA"></div>
+                    <div class="cs-option" data-val="HU" data-i18n="country_HU"></div>
+                    <div class="cs-option" data-val="RU" data-i18n="country_RU"></div>
                   </div>
                 </div>
                 <div class="cs-group">
-                  <div class="cs-group-header" onclick="toggleCsGroup(this)"><span data-i18n="optgroup_namerica">北美洲</span> <span class="cs-arrow">▸</span></div>
+                  <div class="cs-group-header"><span data-i18n="optgroup_namerica"></span> <span class="cs-arrow">▸</span></div>
                   <div class="cs-options">
-                    <div class="cs-option" data-val="US" onclick="selectCountry(this)" data-i18n="country_US">美国</div>
-                    <div class="cs-option" data-val="CA" onclick="selectCountry(this)" data-i18n="country_CA">加拿大</div>
-                    <div class="cs-option" data-val="MX" onclick="selectCountry(this)" data-i18n="country_MX">墨西哥</div>
-                    <div class="cs-option" data-val="GT" onclick="selectCountry(this)" data-i18n="country_GT">危地马拉</div>
-                    <div class="cs-option" data-val="CU" onclick="selectCountry(this)" data-i18n="country_CU">古巴</div>
-                    <div class="cs-option" data-val="JM" onclick="selectCountry(this)" data-i18n="country_JM">牙买加</div>
-                    <div class="cs-option" data-val="PA" onclick="selectCountry(this)" data-i18n="country_PA">巴拿马</div>
+                    <div class="cs-option" data-val="US" data-i18n="country_US"></div>
+                    <div class="cs-option" data-val="CA" data-i18n="country_CA"></div>
+                    <div class="cs-option" data-val="MX" data-i18n="country_MX"></div>
+                    <div class="cs-option" data-val="GT" data-i18n="country_GT"></div>
+                    <div class="cs-option" data-val="CU" data-i18n="country_CU"></div>
+                    <div class="cs-option" data-val="JM" data-i18n="country_JM"></div>
+                    <div class="cs-option" data-val="PA" data-i18n="country_PA"></div>
                   </div>
                 </div>
                 <div class="cs-group">
-                  <div class="cs-group-header" onclick="toggleCsGroup(this)"><span data-i18n="optgroup_samerica">南美洲</span> <span class="cs-arrow">▸</span></div>
+                  <div class="cs-group-header"><span data-i18n="optgroup_samerica"></span> <span class="cs-arrow">▸</span></div>
                   <div class="cs-options">
-                    <div class="cs-option" data-val="BR" onclick="selectCountry(this)" data-i18n="country_BR">巴西</div>
-                    <div class="cs-option" data-val="AR" onclick="selectCountry(this)" data-i18n="country_AR">阿根廷</div>
-                    <div class="cs-option" data-val="CL" onclick="selectCountry(this)" data-i18n="country_CL">智利</div>
-                    <div class="cs-option" data-val="CO" onclick="selectCountry(this)" data-i18n="country_CO">哥伦比亚</div>
-                    <div class="cs-option" data-val="PE" onclick="selectCountry(this)" data-i18n="country_PE">秘鲁</div>
-                    <div class="cs-option" data-val="VE" onclick="selectCountry(this)" data-i18n="country_VE">委内瑞拉</div>
-                    <div class="cs-option" data-val="EC" onclick="selectCountry(this)" data-i18n="country_EC">厄瓜多尔</div>
+                    <div class="cs-option" data-val="BR" data-i18n="country_BR"></div>
+                    <div class="cs-option" data-val="AR" data-i18n="country_AR"></div>
+                    <div class="cs-option" data-val="CL" data-i18n="country_CL"></div>
+                    <div class="cs-option" data-val="CO" data-i18n="country_CO"></div>
+                    <div class="cs-option" data-val="PE" data-i18n="country_PE"></div>
+                    <div class="cs-option" data-val="VE" data-i18n="country_VE"></div>
+                    <div class="cs-option" data-val="EC" data-i18n="country_EC"></div>
                   </div>
                 </div>
                 <div class="cs-group">
-                  <div class="cs-group-header" onclick="toggleCsGroup(this)"><span data-i18n="optgroup_africa">非洲</span> <span class="cs-arrow">▸</span></div>
+                  <div class="cs-group-header"><span data-i18n="optgroup_africa"></span> <span class="cs-arrow">▸</span></div>
                   <div class="cs-options">
-                    <div class="cs-option" data-val="EG" onclick="selectCountry(this)" data-i18n="country_EG">埃及</div>
-                    <div class="cs-option" data-val="ZA" onclick="selectCountry(this)" data-i18n="country_ZA">南非</div>
-                    <div class="cs-option" data-val="NG" onclick="selectCountry(this)" data-i18n="country_NG">尼日利亚</div>
-                    <div class="cs-option" data-val="KE" onclick="selectCountry(this)" data-i18n="country_KE">肯尼亚</div>
-                    <div class="cs-option" data-val="GH" onclick="selectCountry(this)" data-i18n="country_GH">加纳</div>
-                    <div class="cs-option" data-val="MA" onclick="selectCountry(this)" data-i18n="country_MA">摩洛哥</div>
-                    <div class="cs-option" data-val="ET" onclick="selectCountry(this)" data-i18n="country_ET">埃塞俄比亚</div>
-                    <div class="cs-option" data-val="TZ" onclick="selectCountry(this)" data-i18n="country_TZ">坦桑尼亚</div>
-                    <div class="cs-option" data-val="DZ" onclick="selectCountry(this)" data-i18n="country_DZ">阿尔及利亚</div>
+                    <div class="cs-option" data-val="EG" data-i18n="country_EG"></div>
+                    <div class="cs-option" data-val="ZA" data-i18n="country_ZA"></div>
+                    <div class="cs-option" data-val="NG" data-i18n="country_NG"></div>
+                    <div class="cs-option" data-val="KE" data-i18n="country_KE"></div>
+                    <div class="cs-option" data-val="GH" data-i18n="country_GH"></div>
+                    <div class="cs-option" data-val="MA" data-i18n="country_MA"></div>
+                    <div class="cs-option" data-val="ET" data-i18n="country_ET"></div>
+                    <div class="cs-option" data-val="TZ" data-i18n="country_TZ"></div>
+                    <div class="cs-option" data-val="DZ" data-i18n="country_DZ"></div>
                   </div>
                 </div>
                 <div class="cs-group">
-                  <div class="cs-group-header" onclick="toggleCsGroup(this)"><span data-i18n="optgroup_oceania">大洋洲</span> <span class="cs-arrow">▸</span></div>
+                  <div class="cs-group-header"><span data-i18n="optgroup_oceania"></span> <span class="cs-arrow">▸</span></div>
                   <div class="cs-options">
-                    <div class="cs-option" data-val="AU" onclick="selectCountry(this)" data-i18n="country_AU">澳大利亚</div>
-                    <div class="cs-option" data-val="NZ" onclick="selectCountry(this)" data-i18n="country_NZ">新西兰</div>
-                    <div class="cs-option" data-val="FJ" onclick="selectCountry(this)" data-i18n="country_FJ">斐济</div>
+                    <div class="cs-option" data-val="AU" data-i18n="country_AU"></div>
+                    <div class="cs-option" data-val="NZ" data-i18n="country_NZ"></div>
+                    <div class="cs-option" data-val="FJ" data-i18n="country_FJ"></div>
                   </div>
                 </div>
               </div>
@@ -282,27 +282,27 @@
             <div class="field-error" id="countryError"></div>
           </div>
           <div class="form-group" id="cityGroupWrap">
-            <label class="form-label" data-i18n="birth_city">出生城市</label>
-            <input type="text" name="birth_city" class="form-input" data-i18n-placeholder="birth_city_placeholder" placeholder="选填，提高精度">
+            <label class="form-label" data-i18n="birth_city"></label>
+            <input type="text" name="birth_city" class="form-input" data-i18n-placeholder="birth_city_placeholder">
           </div>
         </div>
 
         <div class="form-row">
           <div class="form-group" id="dateGroupWrap">
-            <label class="form-label" data-i18n="birth_date">出生日期</label>
+            <label class="form-label" data-i18n="birth_date"></label>
             <input type="hidden" name="birth_date" id="birthDateHidden" required>
             <div style="display:flex;gap:8px;">
-              <input type="number" id="birthYear" class="form-input" style="flex:1;" min="1" max="9999" data-i18n-placeholder="year_placeholder" placeholder="年" oninput="syncBirthDate()">
-              <select id="birthMonth" class="form-input" style="flex:1;" onchange="syncBirthDate();updateBirthDayOptions()"></select>
-              <select id="birthDay" class="form-input" style="flex:1;" onchange="syncBirthDate()"></select>
+              <input type="number" id="birthYear" class="form-input" style="flex:1;" min="1" max="9999" data-i18n-placeholder="year_placeholder">
+              <select id="birthMonth" class="form-input" style="flex:1;"></select>
+              <select id="birthDay" class="form-input" style="flex:1;"></select>
             </div>
             <div class="field-error" id="dateError"></div>
           </div>
           <div class="form-group">
-            <label class="form-label" data-i18n="birth_time">出生时间</label>
+            <label class="form-label" data-i18n="birth_time"></label>
             <input type="hidden" name="birth_time" id="birthTimeHidden">
-            <div class="time-picker-display" onclick="openTimePicker()">
-              <span class="time-display-placeholder" id="timePickerDisplay" data-i18n="time_picker_placeholder">点击选择时间</span>
+            <div class="time-picker-display">
+              <span class="time-display-placeholder" id="timePickerDisplay" data-i18n="time_picker_placeholder"></span>
               <span class="time-display-icon">🕐</span>
             </div>
           </div>
@@ -310,12 +310,12 @@
 
         <label class="form-checkbox">
           <input type="checkbox" name="unknown_time">
-          <span data-i18n="unknown_birth_time">不知道具体出生时间</span>
+          <span data-i18n="unknown_birth_time"></span>
         </label>
       </div>
 
       <button type="submit" class="btn btn-primary btn-block btn-lg">
-        <span data-i18n="start">开始排盘</span>
+        <span data-i18n="start"></span>
         <span>→</span>
       </button>
     </form>
@@ -327,15 +327,15 @@
 <div class="time-picker-overlay" id="timePickerOverlay">
   <div class="time-picker-modal">
     <div class="time-picker-header">
-      <div class="time-picker-title" data-i18n="time_picker_title">选择时间</div>
+      <div class="time-picker-title" data-i18n="time_picker_title"></div>
       <div class="time-picker-selected">
-        <span class="time-picker-selected-digit active" id="tpHour" onclick="switchTimeMode('hour')">00</span>
+        <span class="time-picker-selected-digit active" id="tpHour">00</span>
         <span class="time-picker-separator">:</span>
-        <span class="time-picker-selected-digit" id="tpMinute" onclick="switchTimeMode('minute')">00</span>
+        <span class="time-picker-selected-digit" id="tpMinute">00</span>
       </div>
       <div class="time-picker-ampm">
-        <button class="time-picker-ampm-btn active" id="tpAM" onclick="selectAMPM('AM')">AM</button>
-        <button class="time-picker-ampm-btn" id="tpPM" onclick="selectAMPM('PM')">PM</button>
+        <button class="time-picker-ampm-btn active" id="tpAM">AM</button>
+        <button class="time-picker-ampm-btn" id="tpPM">PM</button>
       </div>
     </div>
     <div class="time-picker-clock" id="tpClock">
@@ -344,13 +344,13 @@
       <div class="time-picker-clock-hand minute-hand" id="tpMinuteHand" style="display:none;"></div>
     </div>
     <div class="time-picker-actions">
-      <button class="time-picker-btn time-picker-btn-cancel" onclick="closeTimePicker()" data-i18n="time_picker_cancel">取消</button>
-      <button class="time-picker-btn time-picker-btn-confirm" onclick="confirmTimePicker()" data-i18n="time_picker_confirm">确认</button>
+      <button class="time-picker-btn time-picker-btn-cancel" data-i18n="time_picker_cancel"></button>
+      <button class="time-picker-btn time-picker-btn-confirm" data-i18n="time_picker_confirm"></button>
     </div>
   </div>
 </div>
 
-<script>
+<script nonce="{{ csp_nonce }}">
 function escapeHtml(text) {
   if (!text) return '';
   return text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#039;');
@@ -529,9 +529,12 @@ var _homeFortune = {{ daily_fortune | tojson }};
 function renderHomeFortune() {
   var container = document.getElementById('myFortuneDashboard');
   if (!container || !_homeFortune) return;
+  // 颜色值白名单校验（仅允许合法的 hex 颜色）
+  var validColor = /^#[0-9a-fA-F]{6}$/;
+  var safeColor = validColor.test(_homeFortune.color || '') ? _homeFortune.color : '#e0c36b';
   container.innerHTML = `
     <div class="fortune-card" style="background:transparent;border:none;">
-      <div class="fortune-score" style="background:${escapeHtml(String(_homeFortune.color || ''))}20;color:${escapeHtml(String(_homeFortune.color || ''))};width:72px;height:72px;">
+      <div class="fortune-score" style="background:${escapeHtml(safeColor)}20;color:${escapeHtml(safeColor)};width:72px;height:72px;">
         <div class="fortune-score-num" style="font-size:28px;">${escapeHtml(String(_homeFortune.score || ''))}</div>
         <div class="fortune-score-label" style="font-size:11px;">${escapeHtml(I18N[_homeFortune.level_text_key] || _homeFortune.level_text || '')}</div>
       </div>
@@ -564,9 +567,55 @@ function refreshDateInputs() {
 
 </script>
 <script src="{{ url_for('static', filename='timepicker.js') }}"></script>
-<script>
+<script nonce="{{ csp_nonce }}">
 document.getElementById('timePickerOverlay').addEventListener('click', function(e) {
   if (e.target === this) closeTimePicker();
+});
+
+document.addEventListener('DOMContentLoaded', function() {
+  var form = document.getElementById('birthChartForm');
+  if (form) {
+    form.addEventListener('submit', function(event) {
+      if (!validateForm()) event.preventDefault();
+    });
+  }
+
+  var birthYear = document.getElementById('birthYear');
+  var birthMonth = document.getElementById('birthMonth');
+  var birthDay = document.getElementById('birthDay');
+  if (birthYear) birthYear.addEventListener('input', syncBirthDate);
+  if (birthMonth) birthMonth.addEventListener('change', function() {
+    syncBirthDate();
+    updateBirthDayOptions();
+  });
+  if (birthDay) birthDay.addEventListener('change', syncBirthDate);
+
+  document.querySelectorAll('.form-radio').forEach(function(option) {
+    option.addEventListener('click', function() {
+      var input = option.querySelector('input[name="gender"]');
+      if (input) selectRadio(option, input.name, input.value);
+    });
+  });
+  var countryTrigger = document.querySelector('#countrySelect .custom-select-trigger');
+  if (countryTrigger) countryTrigger.addEventListener('click', toggleCountryDropdown);
+  document.querySelectorAll('.cs-group-header').forEach(function(header) {
+    header.addEventListener('click', function() { toggleCsGroup(header); });
+  });
+  document.querySelectorAll('.cs-option').forEach(function(option) {
+    option.addEventListener('click', function() { selectCountry(option); });
+  });
+
+  var timeDisplay = document.querySelector('.time-picker-display');
+  if (timeDisplay) timeDisplay.addEventListener('click', openTimePicker);
+  document.getElementById('tpHour').addEventListener('click', function() { switchTimeMode('hour'); });
+  document.getElementById('tpMinute').addEventListener('click', function() { switchTimeMode('minute'); });
+  document.getElementById('tpAM').addEventListener('click', function() { selectAMPM('AM'); });
+  document.getElementById('tpPM').addEventListener('click', function() { selectAMPM('PM'); });
+  document.querySelector('.time-picker-btn-cancel').addEventListener('click', closeTimePicker);
+  document.querySelector('.time-picker-btn-confirm').addEventListener('click', confirmTimePicker);
+  document.querySelectorAll('.error-close').forEach(function(button) {
+    button.addEventListener('click', function() { button.parentElement.remove(); });
+  });
 });
 </script>
 {% endblock %}

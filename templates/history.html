@@ -3,23 +3,23 @@
 
 <div class="container">
   <div class="page-header animate-fade">
-    <h1 class="page-title" data-i18n="history_title">历史记录</h1>
+    <h1 class="page-title" data-i18n="history_title"></h1>
   </div>
 
   {% if history %}
     {% for h in history %}
-      {% set res = h.get_result() %}
+      {% set bazi = h.get_bazi_overview() %}
       <div class="card animate-slide">
         <div style="display: flex; justify-content: space-between; align-items: flex-start;">
-          <div style="cursor: pointer; flex: 1;" onclick="location.href='/?load={{ h.id }}'">
+          <div class="history-load-target" data-load-url="/?load={{ h.id }}" style="cursor: pointer; flex: 1;">
             <div style="font-size: 16px; font-weight: 600; margin-bottom: 4px;">
               {% if h.name %}
                 {{ h.name }}
               {% else %}
-                <span data-i18n="unnamed">未命名</span>
+                <span data-i18n="unnamed"></span>
               {% endif %}
               {% if h.is_own %}
-                <span style="font-size: 11px; color: var(--gold); background: rgba(212,168,67,0.15); padding: 2px 8px; border-radius: 10px; margin-left: 8px; font-weight: 600;" data-i18n="my_bazi_tag">我的八字</span>
+                <span style="font-size: 11px; color: var(--gold); background: rgba(212,168,67,0.15); padding: 2px 8px; border-radius: 10px; margin-left: 8px; font-weight: 600;" data-i18n="my_bazi_tag"></span>
               {% endif %}
             </div>
             <div style="font-size: 12px; color: var(--text-muted); margin-bottom: 2px;">
@@ -31,25 +31,25 @@
           </div>
           <div style="display: flex; gap: 8px; align-items: center; flex-shrink: 0;">
             {% if h.is_own %}
-              <button class="own-btn own-btn-active" onclick="event.stopPropagation(); toggleOwn({{ h.id }}, false)" data-i18n="cancel_my_bazi">取消</button>
+              <button class="own-btn own-btn-active" data-chart-id="{{ h.id }}" data-set-own="false" data-i18n="cancel_my_bazi"></button>
             {% else %}
-              <button class="own-btn" onclick="event.stopPropagation(); toggleOwn({{ h.id }}, true)" data-i18n="set_as_my_bazi">设为我的八字</button>
+              <button class="own-btn" data-chart-id="{{ h.id }}" data-set-own="true" data-i18n="set_as_my_bazi"></button>
             {% endif %}
-            <span style="color: var(--text-muted); font-size: 14px; cursor: pointer;" onclick="location.href='/?load={{ h.id }}'">→</span>
+            <span class="history-load-target" data-load-url="/?load={{ h.id }}" style="color: var(--text-muted); font-size: 14px; cursor: pointer;">→</span>
           </div>
         </div>
-        <div style="display: flex; gap: 12px; margin-top: 12px; flex-wrap: wrap; cursor: pointer;" onclick="location.href='/?load={{ h.id }}'">
+        <div class="history-load-target" data-load-url="/?load={{ h.id }}" style="display: flex; gap: 12px; margin-top: 12px; flex-wrap: wrap; cursor: pointer;">
           <div style="font-size: 13px; color: var(--text-secondary);">
-            <span data-i18n="year_pillar">年柱</span>: <strong>{{ res.bazi.year }}</strong>
+            <span data-i18n="year_pillar"></span>: <strong>{{ bazi.year }}</strong>
           </div>
           <div style="font-size: 13px; color: var(--text-secondary);">
-            <span data-i18n="month_pillar">月柱</span>: <strong>{{ res.bazi.month }}</strong>
+            <span data-i18n="month_pillar"></span>: <strong>{{ bazi.month }}</strong>
           </div>
           <div style="font-size: 13px; color: var(--text-secondary);">
-            <span data-i18n="day_pillar">日柱</span>: <strong>{{ res.bazi.day }}</strong>
+            <span data-i18n="day_pillar"></span>: <strong>{{ bazi.day }}</strong>
           </div>
           <div style="font-size: 13px; color: var(--text-secondary);">
-            <span data-i18n="hour_pillar">时柱</span>: <strong>{{ res.bazi.hour }}</strong>
+            <span data-i18n="hour_pillar"></span>: <strong>{{ bazi.hour }}</strong>
           </div>
         </div>
       </div>
@@ -57,14 +57,14 @@
   {% else %}
     <div class="card animate-slide" style="text-align: center; padding: 40px 20px;">
       <div style="font-size: 32px; margin-bottom: 12px;">📭</div>
-      <p style="color: var(--text-muted); font-size: 14px;" data-i18n="no_history">暂无历史记录</p>
+      <p style="color: var(--text-muted); font-size: 14px;" data-i18n="no_history"></p>
     </div>
   {% endif %}
 
   {% if pagination and pagination.pages > 1 %}
   <div style="display: flex; justify-content: center; gap: 8px; margin: 20px 0; flex-wrap: wrap;">
     {% if pagination.has_prev %}
-      <a href="/history?page={{ pagination.prev_num }}" class="btn btn-secondary" style="padding: 8px 14px; font-size: 13px;">← 上一页</a>
+      <a href="/history?page={{ pagination.prev_num }}" class="btn btn-secondary" style="padding: 8px 14px; font-size: 13px;"><span data-i18n="prev_page"></span></a>
     {% endif %}
     {% for p in pagination.iter_pages(left_edge=1, right_edge=1, left_current=2, right_current=2) %}
       {% if p %}
@@ -74,16 +74,25 @@
       {% endif %}
     {% endfor %}
     {% if pagination.has_next %}
-      <a href="/history?page={{ pagination.next_num }}" class="btn btn-secondary" style="padding: 8px 14px; font-size: 13px;">下一页 →</a>
+      <a href="/history?page={{ pagination.next_num }}" class="btn btn-secondary" style="padding: 8px 14px; font-size: 13px;"><span data-i18n="next_page"></span></a>
     {% endif %}
   </div>
-  <div style="text-align: center; font-size: 12px; color: var(--text-muted); margin-bottom: 12px;">
-    共 {{ pagination.total }} 条记录，第 {{ pagination.page }}/{{ pagination.pages }} 页
-  </div>
+  <div style="text-align: center; font-size: 12px; color: var(--text-muted); margin-bottom: 12px;" id="pageInfo"></div>
+  <script nonce="{{ csp_nonce }}">
+    function renderPageInfo() {
+      var el = document.getElementById('pageInfo');
+      if (el && I18N.page_info) {
+        el.textContent = I18N.page_info.replace('{total}', '{{ pagination.total }}').replace('{page}', '{{ pagination.page }}').replace('{pages}', '{{ pagination.pages }}');
+      }
+    }
+    document.addEventListener('DOMContentLoaded', function() {
+      renderPageInfo();
+    });
+  </script>
   {% endif %}
 
   <a href="/" class="btn btn-secondary" style="display: inline-flex; margin-top: 16px;">
-    ← <span data-i18n="back">重新排盘</span>
+    ← <span data-i18n="back"></span>
   </a>
 </div>
 
@@ -111,7 +120,7 @@
 }
 </style>
 
-<script>
+<script nonce="{{ csp_nonce }}">
 async function toggleOwn(chartId, setOwn) {
   if (!/^\d+$/.test(String(chartId))) return;
   const url = setOwn ? '/api/set-own/' + chartId : '/api/unset-own/' + chartId;
@@ -122,6 +131,17 @@ async function toggleOwn(chartId, setOwn) {
     console.error('toggleOwn error:', e);
   }
 }
+
+document.addEventListener('DOMContentLoaded', function() {
+  document.querySelectorAll('.history-load-target').forEach(function(target) {
+    target.addEventListener('click', function() { location.href = target.dataset.loadUrl; });
+  });
+  document.querySelectorAll('.own-btn[data-chart-id]').forEach(function(button) {
+    button.addEventListener('click', function() {
+      toggleOwn(Number(button.dataset.chartId), button.dataset.setOwn === 'true');
+    });
+  });
+});
 </script>
 
 {% endblock %}

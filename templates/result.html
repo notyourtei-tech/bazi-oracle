@@ -3,15 +3,16 @@
 <div class="container">
   
   <div class="page-header animate-fade">
-    <h1 class="page-title" data-i18n="result_title">八字分析结果</h1>
+    <h1 class="page-title" data-i18n="result_title"></h1>
   </div>
 
   <!-- 标签导航 -->
   <div class="tab-nav">
-    <button class="tab-btn active" onclick="switchTab('chart')" data-i18n="tab_chart">命盘</button>
-    <button class="tab-btn" onclick="switchTab('analysis')" data-i18n="tab_analysis">分析</button>
-    <button class="tab-btn" onclick="switchTab('fortune')" data-i18n="tab_fortune">运势</button>
-    <button class="tab-btn" onclick="switchTab('advice')" data-i18n="tab_advice">建议</button>
+    <button class="tab-btn active" data-tab="chart" data-i18n="tab_chart"></button>
+    <button class="tab-btn" data-tab="analysis" data-i18n="tab_analysis"></button>
+    <button class="tab-btn" data-tab="fortune" data-i18n="tab_fortune"></button>
+    <button class="tab-btn" data-tab="advice" data-i18n="tab_advice"></button>
+    <button class="tab-btn" data-tab="glossary" data-i18n="glossary_title"></button>
   </div>
 
   <!-- Tab 1: 命盘 -->
@@ -21,7 +22,7 @@
       <div class="card-header">
         <div class="card-title">
           <span class="card-title-icon">☯</span>
-          <span data-i18n="bazi_overview">四柱八字</span>
+          <span data-i18n="bazi_overview"></span>
         </div>
       </div>
       <div id="baziWrap">
@@ -32,8 +33,8 @@
               <div class="pillar-label" data-i18n="{{ pillar_key }}_pillar"></div>
               {% if pillar.gan != '-' %}
                 <div class="pillar-nayin" data-i18n="{{ pillar.nayin_key }}"></div>
-                <div class="pillar-gan {{ 'wx-' + (pillar.gan_wx or '') }}">{{ pillar.gan }}</div>
-                <div class="pillar-zhi {{ 'wx-' + (pillar.zhi_wx or '') }}">{{ pillar.zhi }}</div>
+                <div class="pillar-gan {{ 'wx-' + (pillar.gan_wx or '') }}">{{ pillar.gan }}<div class="char-reading" data-i18n="stem_reading_{{ pillar.gan }}"></div></div>
+                <div class="pillar-zhi {{ 'wx-' + (pillar.zhi_wx or '') }}">{{ pillar.zhi }}<div class="char-reading" data-i18n="branch_reading_{{ pillar.zhi }}"></div></div>
                 <div class="shensha-tags">
                   {% for s in pillar.shensha %}
                     <span class="shensha-tag" data-i18n="{{ s.name_key }}" title-i18n="{{ s.desc_key }}"></span>
@@ -54,7 +55,7 @@
       <div class="card-header">
         <div class="card-title">
           <span class="card-title-icon">📊</span>
-          <span data-i18n="wuxing_strength_title">五行强弱</span>
+          <span data-i18n="wuxing_strength_title"></span>
         </div>
       </div>
       <div class="wuxing-bars">
@@ -81,12 +82,12 @@
       <div class="card-header">
         <div class="card-title">
           <span class="card-title-icon">👤</span>
-          <span data-i18n="personality_title">性格与用神</span>
+          <span data-i18n="personality_title"></span>
         </div>
       </div>
       <div style="display: flex; flex-direction: column; gap: 14px;">
         <div>
-          <div style="color: var(--text-muted); font-size: 12px; margin-bottom: 4px;" data-i18n="body_strength_label">身强身弱</div>
+          <div style="color: var(--text-muted); font-size: 12px; margin-bottom: 4px;" data-i18n="body_strength_label"></div>
           <div style="font-size: 15px;">
             <span data-i18n="{{ result.personality.body_strength_key }}"></span>
             <span style="color: var(--text-muted);"> — </span>
@@ -94,15 +95,15 @@
           </div>
         </div>
         <div>
-          <div style="color: var(--text-muted); font-size: 12px; margin-bottom: 4px;" data-i18n="personality_label">性格特征</div>
+          <div style="color: var(--text-muted); font-size: 12px; margin-bottom: 4px;" data-i18n="personality_label"></div>
           <div style="font-size: 15px;" data-i18n="{{ result.personality.personality_key }}"></div>
         </div>
         <div>
-          <div style="color: var(--text-muted); font-size: 12px; margin-bottom: 4px;" data-i18n="strength_label">优势</div>
+          <div style="color: var(--text-muted); font-size: 12px; margin-bottom: 4px;" data-i18n="strength_label"></div>
           <div style="font-size: 15px;" data-i18n="{{ result.personality.strength_key }}"></div>
         </div>
         <div>
-          <div style="color: var(--text-muted); font-size: 12px; margin-bottom: 4px;" data-i18n="core_risk_label">核心风险</div>
+          <div style="color: var(--text-muted); font-size: 12px; margin-bottom: 4px;" data-i18n="core_risk_label"></div>
           <div style="font-size: 15px;" data-i18n="{{ result.personality.risk_key }}"></div>
         </div>
       </div>
@@ -114,7 +115,7 @@
       <div class="card-header">
         <div class="card-title">
           <span class="card-title-icon">⭐</span>
-          <span data-i18n="shensha_detail_title">神煞详解</span>
+          <span data-i18n="shensha_detail_title"></span>
         </div>
       </div>
       <div style="margin-bottom: 16px; padding: 14px; background: rgba(212,168,67,0.08); border-radius: var(--radius-md); border-left: 3px solid var(--gold);">
@@ -133,7 +134,7 @@
         <div style="margin-bottom: 16px;">
           <div style="font-size: 15px; font-weight: 600; color: {{ color }}; margin-bottom: 12px;">{{ icon }} <span data-i18n="{{ star_type }}"></span></div>
           {% for star in stars %}
-          <div style="margin-bottom: 12px; padding: 14px; background: rgba({{ '74,222,128' if loop.cycle0 == 0 else '248,113,113' if loop.cycle0 == 1 else '96,165,250' }},0.06); border-radius: var(--radius-md); border-left: 3px solid {{ color }};">
+          <div style="margin-bottom: 12px; padding: 14px; background: rgba({{ '74,222,128' if loop.index0 == 0 else '248,113,113' if loop.index0 == 1 else '96,165,250' }},0.06); border-radius: var(--radius-md); border-left: 3px solid {{ color }};">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
               <div style="font-size: 15px; font-weight: 700;">
                 {% if star.name_key %}<span data-i18n="{{ star.name_key }}"></span>{% elif star.name %}{{ star.name }}{% endif %}
@@ -161,7 +162,7 @@
       <div class="card-header">
         <div class="card-title">
           <span class="card-title-icon">🔮</span>
-          <span data-i18n="wuxing_detail_title">五行详解</span>
+          <span data-i18n="wuxing_detail_title"></span>
         </div>
       </div>
       <div style="margin-bottom: 16px; padding: 14px; background: rgba(212,168,67,0.08); border-radius: var(--radius-md); border-left: 3px solid var(--gold);">
@@ -171,7 +172,7 @@
       <div style="padding: 14px; background: var(--bg-secondary); border-radius: var(--radius-md); border: 1px solid var(--border); margin-bottom: 10px;">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
           <div style="font-size: 15px; font-weight: 700;" class="wx-{{ wx_key }}" data-i18n="{{ wx_data.name }}"></div>
-          <span style="font-size: 12px; color: var(--text-muted);">{{ wx_data.score|int }}<span data-i18n="score_unit">分</span> · {{ wx_data.percentage }}%</span>
+          <span style="font-size: 12px; color: var(--text-muted);">{{ wx_data.score|int }}<span data-i18n="score_unit"></span> · {{ wx_data.percentage }}%</span>
         </div>
         <div style="font-size: 13px; color: var(--text); line-height: 1.5;" data-i18n="{{ wx_data.personality_key }}"></div>
         <div style="font-size: 12px; color: var(--text-muted); margin-top: 4px;">💼 <span data-i18n="{{ wx_data.career_key }}"></span></div>
@@ -186,7 +187,7 @@
       <div class="card-header">
         <div class="card-title">
           <span class="card-title-icon">🎭</span>
-          <span data-i18n="shishen_detail_title">十神详解</span>
+          <span data-i18n="shishen_detail_title"></span>
         </div>
       </div>
       <div style="margin-bottom: 16px; padding: 14px; background: rgba(212,168,67,0.08); border-radius: var(--radius-md); border-left: 3px solid var(--gold);">
@@ -211,7 +212,7 @@
       <div class="card-header">
         <div class="card-title">
           <span class="card-title-icon">🧠</span>
-          <span data-i18n="personality_detail_title">性格深度分析</span>
+          <span data-i18n="personality_detail_title"></span>
         </div>
       </div>
       <div style="padding: 14px; background: rgba(212,168,67,0.08); border-radius: var(--radius-md); border-left: 3px solid var(--gold); margin-bottom: 16px;">
@@ -223,11 +224,11 @@
       </div>
       <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
         <div style="padding: 12px; background: var(--bg-secondary); border-radius: var(--radius-sm);">
-          <div style="font-size: 12px; color: var(--text-muted); margin-bottom: 4px;" data-i18n="personality_analysis">性格特征</div>
+          <div style="font-size: 12px; color: var(--text-muted); margin-bottom: 4px;" data-i18n="personality_analysis"></div>
           <div style="font-size: 14px;" data-i18n="{{ result.personality.personality_key }}"></div>
         </div>
         <div style="padding: 12px; background: var(--bg-secondary); border-radius: var(--radius-sm);">
-          <div style="font-size: 12px; color: var(--text-muted); margin-bottom: 4px;" data-i18n="strength_analysis">优势</div>
+          <div style="font-size: 12px; color: var(--text-muted); margin-bottom: 4px;" data-i18n="strength_analysis"></div>
           <div style="font-size: 14px;" data-i18n="{{ result.personality.strength_key }}"></div>
         </div>
       </div>
@@ -242,7 +243,7 @@
       <div class="card-header">
         <div class="card-title">
           <span class="card-title-icon">📅</span>
-          <span data-i18n="daily_fortune_title">每日运势</span>
+          <span data-i18n="daily_fortune_title"></span>
         </div>
       </div>
       <div id="dailyFortune">
@@ -255,11 +256,11 @@
       <div class="card-header">
         <div class="card-title">
           <span class="card-title-icon">📈</span>
-          <span data-i18n="dayun_detail_title">大运流年详解</span>
+          <span data-i18n="dayun_detail_title"></span>
         </div>
       </div>
       <div style="margin-bottom: 16px; font-size: 14px;">
-        <span data-i18n="qiyun_start">起运</span>: {{ result.qiyun.qiyun_time }}, <span data-i18n="direction">方向</span>:
+        <span data-i18n="qiyun_start"></span>: {{ result.qiyun.qiyun_time }}, <span data-i18n="direction"></span>:
         <span data-i18n="{{ 'direction_forward' if result.qiyun.direction=='forward' else 'direction_backward' }}"></span>
       </div>
       <div style="margin-bottom: 20px; overflow-x: auto; -webkit-overflow-scrolling: touch;">
@@ -269,13 +270,13 @@
       <div style="margin-bottom: 20px; padding: 16px; background: var(--bg-secondary); border-radius: var(--radius-md); border: 1px solid var(--border);">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
           <div>
-            <div style="font-size: 18px; font-weight: 700; color: var(--gold);">{{ d.gz }} <span data-i18n="dayun_title">大运</span></div>
-            <div style="font-size: 13px; color: var(--text-muted);">{{ d.start_year }}-{{ d.end_year }}<span data-i18n="year_suffix">年</span></div>
+            <div style="font-size: 18px; font-weight: 700; color: var(--gold);">{{ d.gz }} <span class="char-reading" data-i18n="stem_reading_{{ d.gz[0] }}"></span> <span class="char-reading" data-i18n="branch_reading_{{ d.gz[1] }}"></span> <span data-i18n="dayun_title"></span></div>
+            <div style="font-size: 13px; color: var(--text-muted);">{{ d.start_year }}-{{ d.end_year }}<span data-i18n="year_suffix"></span></div>
           </div>
           {% if result.dayun_comprehensive and loop.index0 < result.dayun_comprehensive|length %}
           <div style="text-align: center; padding: 8px 12px; background: rgba(212,168,67,0.1); border-radius: 8px;">
             <div style="font-size: 20px; font-weight: 700; color: var(--gold);">{{ result.dayun_comprehensive[loop.index0].overall_score }}</div>
-            <div style="font-size: 10px; color: var(--text-muted);" data-i18n="overall_score_label">综合评分</div>
+            <div style="font-size: 10px; color: var(--text-muted);" data-i18n="overall_score_label"></div>
           </div>
           {% endif %}
         </div>
@@ -293,13 +294,13 @@
         </div>
         {% endif %}
         <div style="margin-top: 10px;">
-          <div style="font-size: 13px; font-weight: 600; margin-bottom: 6px;" data-i18n="liunian_yearly">流年运势</div>
+          <div style="font-size: 13px; font-weight: 600; margin-bottom: 6px;" data-i18n="liunian_yearly"></div>
           {% for ln in d.liunian_list %}
-          <div class="liunian-card" onclick="toggleLiunian(this)">
+          <div class="liunian-card">
             <div class="liunian-header">
               <div style="display:flex;align-items:center;gap:8px;">
                 <span class="liunian-year">{{ ln.year }}</span>
-                <span class="liunian-gz">{{ ln.gz }}</span>
+                <span class="liunian-gz">{{ ln.gz }} <span class="char-reading" data-i18n="stem_reading_{{ ln.gz[0] }}"></span> <span class="char-reading" data-i18n="branch_reading_{{ ln.gz[1] }}"></span></span>
                 <span style="color:var(--text-muted);font-size:12px;" data-i18n="{{ ln.theme_key }}"></span>
               </div>
               <span class="liunian-arrow">▸</span>
@@ -310,7 +311,7 @@
                 <div class="liunian-section-text" data-i18n="{{ ln.desc_key }}"></div>
               </div>
               <div class="liunian-section">
-                <div class="liunian-section-title">📅 <span data-i18n="event_hint_label">可能事件</span></div>
+                <div class="liunian-section-title">📅 <span data-i18n="event_hint_label"></span></div>
                 <div class="liunian-section-text" data-i18n="{{ ln.event_hint_key }}"></div>
               </div>
             </div>
@@ -329,13 +330,13 @@
       <div class="card-header">
         <div class="card-title">
           <span class="card-title-icon">👤</span>
-          <span data-i18n="personality_title">性格与用神</span>
+          <span data-i18n="personality_title"></span>
         </div>
       </div>
       <div style="display: flex; flex-direction: column; gap: 10px; font-size: 14px;">
-        <div>💼 <span data-i18n="career_advice_label">事业建议</span>: <span data-i18n="{{ result.personality.career_advice_key }}"></span></div>
-        <div>💕 <span data-i18n="relationship_advice_label">感情建议</span>: <span data-i18n="{{ result.personality.relationship_advice_key }}"></span></div>
-        <div>⚠️ <span data-i18n="risk_advice_label">风险提示</span>: <span data-i18n="{{ result.personality.risk_advice_key }}"></span></div>
+        <div>💼 <span data-i18n="career_advice_label"></span>: <span data-i18n="{{ result.personality.career_advice_key }}"></span></div>
+        <div>💕 <span data-i18n="relationship_advice_label"></span>: <span data-i18n="{{ result.personality.relationship_advice_key }}"></span></div>
+        <div>⚠️ <span data-i18n="risk_advice_label"></span>: <span data-i18n="{{ result.personality.risk_advice_key }}"></span></div>
       </div>
     </div>
 
@@ -345,7 +346,7 @@
       <div class="card-header">
         <div class="card-title">
           <span class="card-title-icon">💡</span>
-          <span data-i18n="life_advice_title">人生综合建议</span>
+          <span data-i18n="life_advice_title"></span>
         </div>
       </div>
       {% set advice = result.interpretation.life_advice %}
@@ -370,7 +371,7 @@
         <div style="padding: 16px; background: rgba(212,168,67,0.08); border-radius: var(--radius-md); border-left: 3px solid var(--gold); margin-top: 4px;">
           <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 6px;">
             <span style="font-size: 16px;">🌟</span>
-            <span style="font-size: 14px; font-weight: 700; color: var(--gold);" data-i18n="overall_message">综合寄语</span>
+            <span style="font-size: 14px; font-weight: 700; color: var(--gold);" data-i18n="overall_message"></span>
           </div>
           <div style="font-size: 14px; color: var(--text); line-height: 1.8;" data-i18n="{{ advice.overall }}"></div>
         </div>
@@ -380,43 +381,129 @@
 
     <!-- 功能按钮 -->
     <div class="actions-grid animate-slide">
-      <div class="action-card" onclick="exportPDF()">
+      <div id="exportPdfAction" class="action-card">
         <div class="action-icon">📄</div>
-        <span class="action-label" data-i18n="export_pdf">导出PDF</span>
+        <span class="action-label" data-i18n="export_pdf"></span>
       </div>
-      <div class="action-card" onclick="downloadShareCard()">
+      <div id="saveImageAction" class="action-card">
         <div class="action-icon">🖼️</div>
-        <span class="action-label" data-i18n="save_image">保存图片</span>
+        <span class="action-label" data-i18n="save_image"></span>
       </div>
       <a href="/" class="action-card">
         <div class="action-icon">🔄</div>
-        <span class="action-label" data-i18n="back">重新排盘</span>
+        <span class="action-label" data-i18n="back"></span>
       </a>
     </div>
 
     <!-- 社交分享 -->
     <div class="share-buttons" style="display:flex;gap:10px;justify-content:center;margin:16px 0;flex-wrap:wrap;">
-      <button class="share-btn" onclick="shareToWechat()" style="padding:8px 16px;border-radius:20px;border:1px solid var(--border);background:var(--bg-secondary);color:var(--text);font-size:13px;cursor:pointer;" data-i18n="share_wechat">微信</button>
-      <button class="share-btn" onclick="shareToLine()" style="padding:8px 16px;border-radius:20px;border:1px solid var(--border);background:var(--bg-secondary);color:var(--text);font-size:13px;cursor:pointer;">LINE</button>
-      <button class="share-btn" onclick="shareToWhatsApp()" style="padding:8px 16px;border-radius:20px;border:1px solid var(--border);background:var(--bg-secondary);color:var(--text);font-size:13px;cursor:pointer;">WhatsApp</button>
+      <button class="share-btn" data-share="wechat" style="padding:8px 16px;border-radius:20px;border:1px solid var(--border);background:var(--bg-secondary);color:var(--text);font-size:13px;cursor:pointer;" data-i18n="share_wechat"></button>
+      <button class="share-btn" data-share="line" style="padding:8px 16px;border-radius:20px;border:1px solid var(--border);background:var(--bg-secondary);color:var(--text);font-size:13px;cursor:pointer;" data-i18n="share_line"></button>
+      <button class="share-btn" data-share="whatsapp" style="padding:8px 16px;border-radius:20px;border:1px solid var(--border);background:var(--bg-secondary);color:var(--text);font-size:13px;cursor:pointer;" data-i18n="share_whatsapp"></button>
     </div>
 
     <!-- 咨询卡片 -->
     <div class="consult-card animate-slide">
       <div class="consult-card-inner">
         <div class="consult-text">
-          <div class="consult-title" data-i18n="consult_card_title">觉得分析准？想了解更多？</div>
-          <div class="consult-desc" data-i18n="consult_card_desc">如果大部分内容与现实吻合，想要更深入、更细致的个人命理咨询，可以添加作者好友进行一对一付费分析。</div>
-          <a href="/consult" class="consult-link" data-i18n="consult_card_link">了解咨询详情 →</a>
+          <div class="consult-title" data-i18n="consult_card_title"></div>
+          <div class="consult-desc" data-i18n="consult_card_desc"></div>
+          <a href="/consult" class="consult-link" data-i18n="consult_card_link"></a>
         </div>
         <div class="consult-icon">💬</div>
       </div>
     </div>
   </div>
 
+  <!-- Tab 5: 术语表 -->
+  <div class="tab-content" id="tab-glossary">
+    <div class="card animate-slide">
+      <div class="card-header">
+        <div class="card-title">
+          <span class="card-title-icon">📖</span>
+          <span data-i18n="glossary_title"></span>
+        </div>
+      </div>
+      <div style="font-size: 13px; color: var(--text-secondary); margin-bottom: 16px; line-height: 1.6;" data-i18n="glossary_intro"></div>
+
+      <!-- 天干 -->
+      <div style="margin-bottom: 20px;">
+        <div style="font-size: 15px; font-weight: 600; color: var(--gold); margin-bottom: 10px;" data-i18n="glossary_stems_title"></div>
+        <div style="display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px;">
+          {% for stem in ['甲','乙','丙','丁','戊','己','庚','辛','壬','癸'] %}
+          <div style="padding: 8px; background: var(--bg-secondary); border-radius: 6px; text-align: center;">
+            <div style="font-size: 20px; font-weight: 700; color: var(--text);">{{ stem }}</div>
+            <div style="font-size: 11px; color: var(--text-muted);" data-i18n="stem_reading_{{ stem }}"></div>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+
+      <!-- 地支 -->
+      <div style="margin-bottom: 20px;">
+        <div style="font-size: 15px; font-weight: 600; color: var(--gold); margin-bottom: 10px;" data-i18n="glossary_branches_title"></div>
+        <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px;">
+          {% for branch in ['子','丑','寅','卯','辰','巳','午','未','申','酉','戌','亥'] %}
+          <div style="padding: 8px; background: var(--bg-secondary); border-radius: 6px; text-align: center;">
+            <div style="font-size: 20px; font-weight: 700; color: var(--text);">{{ branch }}</div>
+            <div style="font-size: 11px; color: var(--text-muted);" data-i18n="branch_reading_{{ branch }}"></div>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+
+      <!-- 核心术语 -->
+      <div>
+        <div style="font-size: 15px; font-weight: 600; color: var(--gold); margin-bottom: 10px;" data-i18n="glossary_terms_title"></div>
+        <div style="display: flex; flex-direction: column; gap: 10px;">
+          <div style="padding: 10px; background: var(--bg-secondary); border-radius: 6px; font-size: 13px; line-height: 1.6;">
+            <div style="font-weight: 600; color: var(--text); margin-bottom: 4px;" data-i18n="glossary_bazi_card_title"></div>
+            <div style="color: var(--text-secondary);" data-i18n="glossary_bazi"></div>
+          </div>
+          <div style="padding: 10px; background: var(--bg-secondary); border-radius: 6px; font-size: 13px; line-height: 1.6;">
+            <div style="font-weight: 600; color: var(--text); margin-bottom: 4px;" data-i18n="glossary_wuxing_card_title"></div>
+            <div style="color: var(--text-secondary);" data-i18n="glossary_wuxing"></div>
+          </div>
+          <div style="padding: 10px; background: var(--bg-secondary); border-radius: 6px; font-size: 13px; line-height: 1.6;">
+            <div style="font-weight: 600; color: var(--text); margin-bottom: 4px;" data-i18n="glossary_shishen_card_title"></div>
+            <div style="color: var(--text-secondary);" data-i18n="glossary_shishen"></div>
+          </div>
+          <div style="padding: 10px; background: var(--bg-secondary); border-radius: 6px; font-size: 13px; line-height: 1.6;">
+            <div style="font-weight: 600; color: var(--text); margin-bottom: 4px;" data-i18n="glossary_shensha_card_title"></div>
+            <div style="color: var(--text-secondary);" data-i18n="glossary_shensha"></div>
+          </div>
+          <div style="padding: 10px; background: var(--bg-secondary); border-radius: 6px; font-size: 13px; line-height: 1.6;">
+            <div style="font-weight: 600; color: var(--text); margin-bottom: 4px;" data-i18n="glossary_dayun_card_title"></div>
+            <div style="color: var(--text-secondary);" data-i18n="glossary_dayun"></div>
+          </div>
+          <div style="padding: 10px; background: var(--bg-secondary); border-radius: 6px; font-size: 13px; line-height: 1.6;">
+            <div style="font-weight: 600; color: var(--text); margin-bottom: 4px;" data-i18n="glossary_liunian_card_title"></div>
+            <div style="color: var(--text-secondary);" data-i18n="glossary_liunian"></div>
+          </div>
+          <div style="padding: 10px; background: var(--bg-secondary); border-radius: 6px; font-size: 13px; line-height: 1.6;">
+            <div style="font-weight: 600; color: var(--text); margin-bottom: 4px;" data-i18n="glossary_nayin_card_title"></div>
+            <div style="color: var(--text-secondary);" data-i18n="glossary_nayin"></div>
+          </div>
+          <div style="padding: 10px; background: var(--bg-secondary); border-radius: 6px; font-size: 13px; line-height: 1.6;">
+            <div style="font-weight: 600; color: var(--text); margin-bottom: 4px;" data-i18n="glossary_kongwang_card_title"></div>
+            <div style="color: var(--text-secondary);" data-i18n="glossary_kongwang"></div>
+          </div>
+          <div style="padding: 10px; background: var(--bg-secondary); border-radius: 6px; font-size: 13px; line-height: 1.6;">
+            <div style="font-weight: 600; color: var(--text); margin-bottom: 4px;" data-i18n="glossary_qiyun_card_title"></div>
+            <div style="color: var(--text-secondary);" data-i18n="glossary_qiyun"></div>
+          </div>
+          <div style="padding: 10px; background: var(--bg-secondary); border-radius: 6px; font-size: 13px; line-height: 1.6;">
+            <div style="font-weight: 600; color: var(--text); margin-bottom: 4px;" data-i18n="glossary_yongshen_card_title"></div>
+            <div style="color: var(--text-secondary);" data-i18n="glossary_yongshen"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
 </div>
 
-<script>
+  <script nonce="{{ csp_nonce }}">
   const baziResult = {{ result | tojson }};
 
   // Tab switching
@@ -506,7 +593,7 @@
 
   function shareToWechat() {
     if (navigator.share) {
-      navigator.share({ title: 'BaZi', text: I18N.app_title_short || 'BaZi', url: window.location.href });
+      navigator.share({ title: I18N.app_title_short || '', text: I18N.app_title_short || '', url: window.location.href });
     } else {
       alert(I18N.share_copy_link || '');
     }
@@ -516,16 +603,31 @@
     window.open(url, '_blank');
   }
   function shareToWhatsApp() {
-    var url = 'https://wa.me/?text=' + encodeURIComponent((I18N.app_title_short || 'BaZi') + ' ' + window.location.href);
+    var url = 'https://wa.me/?text=' + encodeURIComponent((I18N.app_title_short || '') + ' ' + window.location.href);
     window.open(url, '_blank');
   }
+
+  document.addEventListener('DOMContentLoaded', function() {
+    document.querySelectorAll('.tab-btn[data-tab]').forEach(function(button) {
+      button.addEventListener('click', function() { switchTab(button.dataset.tab); });
+    });
+    document.querySelectorAll('.liunian-card').forEach(function(card) {
+      card.addEventListener('click', function() { toggleLiunian(card); });
+    });
+    document.getElementById('exportPdfAction').addEventListener('click', exportPDF);
+    document.getElementById('saveImageAction').addEventListener('click', downloadShareCard);
+    document.querySelectorAll('.share-btn[data-share]').forEach(function(button) {
+      var handlers = { wechat: shareToWechat, line: shareToLine, whatsapp: shareToWhatsApp };
+      button.addEventListener('click', handlers[button.dataset.share]);
+    });
+  });
 
   // ========================
   // 五行雷达图
   // ========================
   // 五行雷达图（响应式）
   // ========================
-  (function() {
+  window.renderWuxingRadar = function() {
     var canvas = document.getElementById('wuxingRadar');
     if (!canvas) return;
     var container = canvas.parentElement;
@@ -591,7 +693,13 @@
     ctx.stroke();
 
     // 数据点 + 标签
-    var zhLabels = {wood: '木', fire: '火', earth: '土', metal: '金', water: '水'};
+    var zhLabels = {
+      wood: I18N.canvas_wx_wood,
+      fire: I18N.canvas_wx_fire,
+      earth: I18N.canvas_wx_earth,
+      metal: I18N.canvas_wx_metal,
+      water: I18N.canvas_wx_water
+    };
     for (var i = 0; i < n; i++) {
       var a = startAngle + i * angleStep;
       var val = (wuxing[labels[i]] || 0) / 100;
@@ -611,12 +719,12 @@
       ctx.textBaseline = 'middle';
       ctx.fillText(zhLabels[labels[i]], lx, ly);
     }
-  })();
+  };
 
   // ========================
   // 大运时间线（响应式）
   // ========================
-  (function() {
+  window.renderDayunTimeline = function() {
     var canvas = document.getElementById('dayunTimeline');
     if (!canvas) return;
     var dayun = baziResult.dayun || [];
@@ -684,11 +792,17 @@
       ctx.fillText(d.start_year + '-' + d.end_year, x + segW / 2, y + 33);
 
       // 上方年龄
-      var ageLabel = (qiyunAge + i * 10) + '岁';
+      var ageLabel = (qiyunAge + i * 10) + (I18N.age_suffix || '');
       ctx.fillStyle = '#c9a84c';
       ctx.font = '11px system-ui, sans-serif';
       ctx.fillText(ageLabel, x + segW / 2, y - 6);
     }
-  })();
+  };
+
+  window.renderResultCanvases = function() {
+    window.renderWuxingRadar();
+    window.renderDayunTimeline();
+  };
+  window.renderResultCanvases();
 </script>
 {% endblock %}

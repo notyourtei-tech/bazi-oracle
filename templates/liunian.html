@@ -2,7 +2,7 @@
 {% block content %}
 <div class="container" style="max-width:720px;margin:0 auto;padding:24px 16px;">
 
-    <h1 class="page-title" data-i18n="liunian">流年运势</h1>
+    <h1 class="page-title" data-i18n="liunian"></h1>
     <p data-i18n="liunian_intro" style="color:var(--text-secondary);margin-bottom:20px;"></p>
 
     {% if overview %}
@@ -10,10 +10,10 @@
     <div class="card {{ y.risk.level }}" style="margin-bottom:16px;padding:16px;">
         <h2 style="color:var(--gold);">{{ y.year }}</h2>
 
-        <p><strong data-i18n="career_label">事业</strong>: <span data-i18n="{{ y.event.career_key }}"></span></p>
-        <p><strong data-i18n="wealth_label">财运</strong>: <span data-i18n="{{ y.event.wealth_key }}"></span></p>
-        <p><strong data-i18n="relationship_label">感情</strong>: <span data-i18n="{{ y.event.relationship_key }}"></span></p>
-        <p><strong data-i18n="health_label">健康</strong>: <span data-i18n="{{ y.event.health_key }}"></span></p>
+        <p><strong data-i18n="career_label"></strong>: <span data-i18n="{{ y.event.career }}"></span></p>
+        <p><strong data-i18n="wealth_label"></strong>: <span data-i18n="{{ y.event.wealth }}"></span></p>
+        <p><strong data-i18n="relationship_label"></strong>: <span data-i18n="{{ y.event.relationship }}"></span></p>
+        <p><strong data-i18n="health_label"></strong>: <span data-i18n="{{ y.event.health }}"></span></p>
 
         <p class="risk {{ y.risk.level }}">
             <span data-i18n="risk_{{ y.risk.level }}"></span>
@@ -30,10 +30,10 @@
     {% endfor %}
     {% else %}
     <div class="card" style="padding:24px;text-align:center;">
-        <p data-i18n="liunian_empty">暂无流年数据</p>
+        <p data-i18n="liunian_empty"></p>
     </div>
     {% endif %}
 
-    <a href="{{ url_for('index') }}" class="btn" data-i18n="back">重新排盘</a>
+    <a href="{{ url_for('index') }}" class="btn" data-i18n="back"></a>
 </div>
 {% endblock %}

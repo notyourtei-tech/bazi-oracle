@@ -7,15 +7,15 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <link rel="manifest" href="{{ url_for('static', filename='manifest.json') }}">
-  <script>
+  <script nonce="{{ csp_nonce }}">
     if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('{{ url_for('static', filename='sw.js') }}');
+      navigator.serviceWorker.register('{{ url_for('static', filename='sw.js') }}?v=6');
     }
   </script>
-  <title data-i18n="app_title">BaZi</title>
-  <meta name="description" content="专业八字排盘系统，真太阳时计算，支持全球90+国家，多语言。免费在线四柱排盘与运势分析。">
-  <meta property="og:title" content="BaZi Oracle - 专业八字排盘">
-  <meta property="og:description" content="真太阳时精准排盘，支持全球90+国家，多语言八字分析系统">
+  <title data-i18n="app_title"></title>
+  <meta name="description" data-i18n-content="meta_description" content="">
+  <meta property="og:title" data-i18n-content="meta_og_title" content="">
+  <meta property="og:description" data-i18n-content="meta_og_description" content="">
   <meta property="og:type" content="website">
   <link rel="icon" href="{{ url_for('static', filename='favicon.ico') }}" type="image/x-icon">
   <meta name="csrf-token" content="{{ csrf_token() }}">
@@ -23,86 +23,98 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}?v=8.0">
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}?v=9.1">
 
-  <script>
+  <script nonce="{{ csp_nonce }}">
     function escapeHtml(text) {
       if (!text) return '';
       return text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#039;');
     }
 
+    const SUPPORTED_LANGUAGES = ['zh', 'en', 'ja', 'ko', 'vi', 'my'];
+    const I18N_ASSET_VERSION = '9.4';
+    const languagePacks = new Map();
     let I18N = {};
-    let currentLang = localStorage.getItem("lang") || "zh";
+    let currentLang = localStorage.getItem('lang') || preferredBrowserLanguage();
 
-    async function loadLang(lang) {
-      try {
-        const res = await fetch('/static/i18n/' + lang + '.json?t=' + Date.now());
-        if (!res.ok) throw new Error('Failed to load ' + lang);
-        I18N = await res.json();
-        currentLang = lang;
-        localStorage.setItem("lang", lang);
-        document.documentElement.lang = lang;
-        applyI18N();
-        if (typeof renderHomeFortune === 'function') renderHomeFortune();
-        if (typeof renderResultFortune === 'function') renderResultFortune();
-        if (typeof refreshDateSelects === 'function') refreshDateSelects();
-        document.querySelectorAll('.lang-btn').forEach(btn => {
-          btn.classList.toggle('active', btn.dataset.lang === lang);
-        });
-        // Show brief toast
-        showToast(I18N.app_title_short || lang.toUpperCase());
-      } catch(e) {
-        console.error('loadLang error:', e);
-      }
+    function preferredBrowserLanguage() {
+      const browserLanguage = (navigator.language || 'zh').toLowerCase();
+      return SUPPORTED_LANGUAGES.find(function(language) {
+        return browserLanguage === language || browserLanguage.indexOf(language + '-') === 0;
+      }) || 'zh';
     }
 
-    function showToast(msg) {
-      var old = document.getElementById('langToast');
-      if (old) old.remove();
-      var t = document.createElement('div');
-      t.id = 'langToast';
-      t.textContent = msg;
-      t.style.cssText = 'position:fixed;top:70px;left:50%;transform:translateX(-50%);background:rgba(212,168,67,0.95);color:#000;padding:8px 20px;border-radius:20px;font-size:13px;font-weight:700;z-index:9999;transition:opacity 0.3s;opacity:1;';
-      document.body.appendChild(t);
-      setTimeout(function(){ t.style.opacity='0'; }, 1200);
-      setTimeout(function(){ t.remove(); }, 1500);
+    function isSupportedLanguage(lang) {
+      return SUPPORTED_LANGUAGES.indexOf(lang) !== -1;
+    }
+
+    async function getLanguagePack(lang) {
+      const safeLang = isSupportedLanguage(lang) ? lang : 'zh';
+      if (languagePacks.has(safeLang)) return languagePacks.get(safeLang);
+      const response = await fetch('/static/i18n/' + safeLang + '.json?v=' + I18N_ASSET_VERSION);
+      if (!response.ok) throw new Error('Unable to load language pack: ' + safeLang);
+      const pack = await response.json();
+      languagePacks.set(safeLang, pack);
+      return pack;
+    }
+
+    function translationFor(key) {
+      if (Object.prototype.hasOwnProperty.call(I18N, key)) return I18N[key];
+      return '';
     }
 
     function applyI18N() {
-      // Translate text content
-      document.querySelectorAll("[data-i18n]").forEach(el => {
-        const key = el.getAttribute("data-i18n");
-        if (I18N[key]) {
-          let text = I18N[key];
-          // Handle {remaining} placeholder for rate limit errors
-          if (text.indexOf('{remaining}') !== -1) {
-            var remainingEl = document.getElementById('rateLimitRemaining');
-            if (remainingEl) text = text.replace('{remaining}', remainingEl.textContent);
-          }
-          el.textContent = text;
-        } else if (el.classList.contains('shensha-tag') && key) {
-          el.textContent = key.replace('shensha_','').replace('_name','').replace(/_/g,' ');
+      document.querySelectorAll('[data-i18n]').forEach(function(el) {
+        const key = el.getAttribute('data-i18n');
+        let text = translationFor(key);
+        if (text.indexOf('{remaining}') !== -1) {
+          const remainingEl = document.getElementById('rateLimitRemaining');
+          if (remainingEl) text = text.replace('{remaining}', remainingEl.textContent);
         }
+        el.textContent = text;
       });
-      // Translate placeholders
-      document.querySelectorAll("[data-i18n-placeholder]").forEach(el => {
-        const key = el.getAttribute("data-i18n-placeholder");
-        if (I18N[key]) el.placeholder = I18N[key];
+
+      const attributeTargets = [
+        ['data-i18n-placeholder', 'placeholder'],
+        ['data-i18n-title', 'title'],
+        ['title-i18n', 'title'],
+        ['data-i18n-aria-label', 'aria-label'],
+        ['data-i18n-content', 'content']
+      ];
+      attributeTargets.forEach(function(pair) {
+        document.querySelectorAll('[' + pair[0] + ']').forEach(function(el) {
+          const text = translationFor(el.getAttribute(pair[0]));
+          if (text) el.setAttribute(pair[1], text);
+        });
       });
-      // Translate titles
-      document.querySelectorAll("[title-i18n]").forEach(el => {
-        const key = el.getAttribute("title-i18n");
-        if (I18N[key]) el.title = I18N[key];
+
+      document.querySelectorAll('select optgroup[data-i18n]').forEach(function(el) {
+        const text = translationFor(el.getAttribute('data-i18n'));
+        if (text) el.label = text;
       });
-      // Translate select options
-      document.querySelectorAll("select [data-i18n]").forEach(el => {
-        const key = el.getAttribute("data-i18n");
-        if (I18N[key]) el.textContent = I18N[key];
-      });
-      // Translate optgroups
-      document.querySelectorAll("select optgroup[data-i18n]").forEach(el => {
-        const key = el.getAttribute("data-i18n");
-        if (I18N[key]) el.label = I18N[key];
+    }
+
+    async function loadLang(lang) {
+      const safeLang = isSupportedLanguage(lang) ? lang : 'zh';
+      try {
+        I18N = await getLanguagePack(safeLang);
+      } catch (error) {
+        console.error('loadLang error:', error);
+        if (safeLang !== 'zh') return loadLang('zh');
+        return;
+      }
+      currentLang = safeLang;
+      localStorage.setItem('lang', safeLang);
+      document.documentElement.lang = safeLang;
+      applyI18N();
+      document.body.dataset.i18nReady = 'true';
+      if (typeof renderHomeFortune === 'function') renderHomeFortune();
+      if (typeof renderResultFortune === 'function') renderResultFortune();
+      if (typeof renderResultCanvases === 'function') renderResultCanvases();
+      if (typeof refreshDateSelects === 'function') refreshDateSelects();
+      if (typeof renderPageInfo === 'function') renderPageInfo();
+      document.querySelectorAll('.lang-btn').forEach(function(btn) {
+        btn.classList.toggle('active', btn.dataset.lang === safeLang);
       });
     }
 
@@ -129,9 +141,31 @@
     window.addEventListener("DOMContentLoaded", function() {
       window.scrollTo(0, 0);
       loadLang(currentLang);
+      Promise.all(SUPPORTED_LANGUAGES.map(getLanguagePack)).catch(function(error) {
+        console.warn('Language prefetch skipped:', error);
+      });
       document.querySelectorAll('.lang-btn').forEach(btn => {
         btn.classList.toggle('active', btn.dataset.lang === currentLang);
       });
+      document.querySelectorAll('.lang-btn').forEach(function(button) {
+        button.addEventListener('click', function() { loadLang(button.dataset.lang); });
+      });
+      document.querySelectorAll('.lang-option').forEach(function(option) {
+        option.addEventListener('click', function() { selectLangModal(option); });
+      });
+      document.getElementById('langModalConfirm').addEventListener('click', confirmLangModal);
+      document.getElementById('themeToggle').addEventListener('click', toggleTheme);
+      document.getElementById('languageNavTrigger').addEventListener('click', function(event) {
+        event.preventDefault();
+        document.getElementById('langModal').classList.remove('hidden');
+      });
+      document.getElementById('wechatTipClose').addEventListener('click', function() {
+        document.getElementById('wechatTip').style.display = 'none';
+        localStorage.setItem('wechat_tip_closed', '1');
+      });
+      document.getElementById('onboardClose').addEventListener('click', closeOnboard);
+      document.getElementById('onboardSkip').addEventListener('click', closeOnboard);
+      document.getElementById('onboardNext').addEventListener('click', nextOnboardStep);
       // 微信浏览器检测
       if (/MicroMessenger/i.test(navigator.userAgent)) {
         var tip = document.getElementById('wechatTip');
@@ -147,67 +181,67 @@
   </script>
 </head>
 
-<body>
+<body data-i18n-ready="false">
 
 <canvas id="stars"></canvas>
 <div id="spotlight"></div>
 
-<a href="#main-content" class="skip-link" style="position:absolute;left:-9999px;top:auto;width:1px;height:1px;overflow:hidden;z-index:99999;background:var(--gold);color:#000;padding:8px 16px;font-weight:600;text-decoration:none;" onfocus="this.style.left='10px';this.style.top='10px'" onblur="this.style.left='-9999px'" data-i18n="skip_to_content">跳到主要内容</a>
+<a href="#main-content" class="skip-link" style="position:absolute;left:-9999px;top:auto;width:1px;height:1px;overflow:hidden;z-index:99999;background:var(--gold);color:#000;padding:8px 16px;font-weight:600;text-decoration:none;" data-i18n="skip_to_content"></a>
 
 <!-- 微信浏览器提示条 -->
 <div class="wechat-tip" id="wechatTip" style="display:none;">
   <div class="wechat-tip-inner">
     <span class="wechat-tip-icon">📱</span>
-    <span class="wechat-tip-text" data-i18n="wechat_tip_text">微信内置浏览器部分功能受限，建议点击右上角 ··· 选择"在浏览器中打开"以获得最佳体验</span>
-    <button class="wechat-tip-close" onclick="document.getElementById('wechatTip').style.display='none';localStorage.setItem('wechat_tip_closed','1')" aria-label="Close">×</button>
+    <span class="wechat-tip-text" data-i18n="wechat_tip_text"></span>
+    <button id="wechatTipClose" class="wechat-tip-close" data-i18n-aria-label="close">×</button>
   </div>
 </div>
 
 <!-- 语言选择弹窗 -->
-<div class="lang-modal-overlay" id="langModal">
+<div class="lang-modal-overlay hidden" id="langModal">
   <div class="lang-modal">
     <span class="lang-modal-icon">☯</span>
-    <div class="lang-modal-title" data-i18n="lang_select_title">选择语言</div>
-    <div class="lang-modal-desc" data-i18n="lang_select_desc">请选择您偏好的语言</div>
+    <div class="lang-modal-title" data-i18n="lang_select_title"></div>
+    <div class="lang-modal-desc" data-i18n="lang_select_desc"></div>
     <div class="lang-options">
-      <button class="lang-option" data-lang-val="zh" onclick="selectLangModal(this)">
+      <button class="lang-option" data-lang-val="zh">
         <span class="lang-option-flag">🇨🇳</span>
-        中文
+        <span data-i18n="lang_name_zh"></span>
       </button>
-      <button class="lang-option" data-lang-val="ja" onclick="selectLangModal(this)">
+      <button class="lang-option" data-lang-val="ja">
         <span class="lang-option-flag">🇯🇵</span>
-        日本語
+        <span data-i18n="lang_name_ja"></span>
       </button>
-      <button class="lang-option" data-lang-val="en" onclick="selectLangModal(this)">
+      <button class="lang-option" data-lang-val="en">
         <span class="lang-option-flag">🇬🇧</span>
-        English
+        <span data-i18n="lang_name_en"></span>
       </button>
-      <button class="lang-option" data-lang-val="ko" onclick="selectLangModal(this)">
+      <button class="lang-option" data-lang-val="ko">
         <span class="lang-option-flag">🇰🇷</span>
-        한국어
+        <span data-i18n="lang_name_ko"></span>
       </button>
-        <button class="lang-option" data-lang-val="vi" onclick="selectLangModal(this)">
+        <button class="lang-option" data-lang-val="vi">
           <span class="lang-option-flag">🇻🇳</span>
-          Tiếng Việt
+          <span data-i18n="lang_name_vi"></span>
         </button>
-        <button class="lang-option" data-lang-val="my" onclick="selectLangModal(this)">
+        <button class="lang-option" data-lang-val="my">
           <span class="lang-option-flag">🇲🇲</span>
-          မြန်မာ
+          <span data-i18n="lang_name_my"></span>
         </button>
     </div>
-    <button class="lang-modal-confirm" onclick="confirmLangModal()" data-i18n="lang_select_confirm" aria-label="Confirm language selection">确认</button>
+    <button id="langModalConfirm" class="lang-modal-confirm" data-i18n="lang_select_confirm" data-i18n-aria-label="lang_select_confirm"></button>
   </div>
 </div>
 
 <!-- 引导教程弹窗 -->
 <div class="onboard-overlay hidden" id="onboardModal">
   <div class="onboard-modal">
-    <button class="onboard-close" onclick="closeOnboard()" aria-label="Close tutorial">×</button>
+    <button id="onboardClose" class="onboard-close" data-i18n-aria-label="close">×</button>
     <span class="onboard-icon">☯</span>
-    <div class="onboard-title" data-i18n="onboard_title">欢迎使用八字排盘</div>
+    <div class="onboard-title" data-i18n="onboard_title"></div>
     <div id="onboardContent">
-      <div class="onboard-step-title" data-i18n="onboard_step1_title">什么是八字？</div>
-      <div class="onboard-step-desc" data-i18n="onboard_step1_desc">八字（四柱）是基于出生年月日时的天干地支，结合节气与真太阳时进行推演的传统命理系统。</div>
+      <div class="onboard-step-title" data-i18n="onboard_step1_title"></div>
+      <div class="onboard-step-desc" data-i18n="onboard_step1_desc"></div>
     </div>
     <div class="onboard-dots">
       <div class="onboard-dot active" data-step="0"></div>
@@ -218,8 +252,8 @@
       <div class="onboard-dot" data-step="5"></div>
     </div>
     <div class="onboard-actions">
-      <button class="onboard-btn onboard-btn-skip" onclick="closeOnboard()" data-i18n="onboard_skip">跳过教程</button>
-      <button class="onboard-btn onboard-btn-next" onclick="nextOnboardStep()" data-i18n="onboard_next">下一步</button>
+      <button id="onboardSkip" class="onboard-btn onboard-btn-skip" data-i18n="onboard_skip"></button>
+      <button id="onboardNext" class="onboard-btn onboard-btn-next" data-i18n="onboard_next"></button>
     </div>
   </div>
 </div>
@@ -227,32 +261,32 @@
 <!-- 加载动画 -->
 <div class="loading-overlay" id="loadingOverlay" role="status" aria-live="polite">
   <div class="loading-spinner"></div>
-  <div class="loading-text" data-i18n="loading_text">排盘中...</div>
+  <div class="loading-text" data-i18n="loading_text"></div>
 </div>
 
 <!-- 顶部导航 -->
 <nav class="top-nav">
   <a href="/" class="nav-brand">
     <div class="nav-brand-icon">☯</div>
-    <span class="nav-brand-text" data-i18n="app_title_short">八字排盘</span>
+    <span class="nav-brand-text" data-i18n="app_title_short"></span>
   </a>
   
   <div class="nav-actions">
-    <a href="/" class="nav-link {% if request.path == '/' %}active{% endif %}" data-i18n="nav_home">首页</a>
-    <a href="/history" class="nav-link {% if request.path == '/history' %}active{% endif %}" data-i18n="nav_history">历史</a>
-    <a href="/explain" class="nav-link {% if request.path == '/explain' %}active{% endif %}" data-i18n="nav_learn">了解</a>
+    <a href="/" class="nav-link {% if request.path == '/' %}active{% endif %}" data-i18n="nav_home"></a>
+    <a href="/history" class="nav-link {% if request.path == '/history' %}active{% endif %}" data-i18n="nav_history"></a>
+    <a href="/explain" class="nav-link {% if request.path == '/explain' %}active{% endif %}" data-i18n="nav_learn"></a>
     
-    <button class="theme-toggle" onclick="toggleTheme()" aria-label="Toggle theme" title="Toggle theme">
+    <button id="themeToggle" class="theme-toggle" data-i18n-aria-label="theme_toggle" data-i18n-title="theme_toggle">
       <span id="themeIcon">🌙</span>
     </button>
 
     <div class="lang-switch">
-      <button class="lang-btn" data-lang="zh" onclick="loadLang('zh')">中</button>
-      <button class="lang-btn" data-lang="ja" onclick="loadLang('ja')">日</button>
-      <button class="lang-btn" data-lang="en" onclick="loadLang('en')">EN</button>
-      <button class="lang-btn" data-lang="ko" onclick="loadLang('ko')">한</button>
-      <button class="lang-btn" data-lang="vi" onclick="loadLang('vi')">VI</button>
-      <button class="lang-btn" data-lang="my" onclick="loadLang('my')">မြန်မာ</button>
+      <button class="lang-btn" data-lang="zh">中</button>
+      <button class="lang-btn" data-lang="ja">日</button>
+      <button class="lang-btn" data-lang="en">EN</button>
+      <button class="lang-btn" data-lang="ko">한</button>
+      <button class="lang-btn" data-lang="vi">VI</button>
+      <button class="lang-btn" data-lang="my">မြန်မာ</button>
     </div>
   </div>
 </nav>
@@ -266,23 +300,23 @@
   <div class="bottom-nav-content">
     <a href="/" class="nav-item {% if request.path == '/' %}active{% endif %}">
       <span class="nav-item-icon">☰</span>
-      <span data-i18n="nav_home">首页</span>
+      <span data-i18n="nav_home"></span>
     </a>
     <a href="/" class="nav-item">
       <span class="nav-item-icon">☯</span>
-      <span data-i18n="nav_bazi">排盘</span>
+      <span data-i18n="nav_bazi"></span>
     </a>
     <a href="/history" class="nav-item {% if request.path == '/history' %}active{% endif %}">
       <span class="nav-item-icon">📋</span>
-      <span data-i18n="nav_history">历史</span>
+      <span data-i18n="nav_history"></span>
     </a>
     <a href="/explain" class="nav-item {% if request.path == '/explain' %}active{% endif %}">
       <span class="nav-item-icon">💡</span>
-      <span data-i18n="nav_learn">了解</span>
+      <span data-i18n="nav_learn"></span>
     </a>
-    <a href="javascript:void(0)" class="nav-item" onclick="document.getElementById('langModal').classList.remove('hidden')" role="button" aria-label="Change language">
+    <a id="languageNavTrigger" href="javascript:void(0)" class="nav-item" role="button" data-i18n-aria-label="nav_lang">
       <span class="nav-item-icon">🌐</span>
-      <span data-i18n="nav_lang">语言</span>
+      <span data-i18n="nav_lang"></span>
     </a>
   </div>
 </nav>
@@ -291,11 +325,11 @@
 <footer class="site-footer">
   <div class="footer-divider"></div>
   <div class="footer-bottom">
-    <div class="footer-powered" data-i18n="footer_powered_by">Powered by BaZi Auto Chart System</div>
+    <div class="footer-powered" data-i18n="footer_powered_by"></div>
   </div>
 </footer>
 
-<script>
+<script nonce="{{ csp_nonce }}">
 function showLoading() {
   document.getElementById('loadingOverlay').classList.add('active');
 }
@@ -326,7 +360,7 @@ function toggleTheme() {
 // ========================
 // 语言选择弹窗逻辑
 // ========================
-var selectedLangVal = localStorage.getItem('lang') || 'zh';
+var selectedLangVal = localStorage.getItem('lang') || preferredBrowserLanguage();
 
 function selectLangModal(el) {
   document.querySelectorAll('.lang-option').forEach(function(o) { o.classList.remove('selected'); });
@@ -347,7 +381,7 @@ function confirmLangModal() {
 }
 
 (function() {
-  var savedLang = localStorage.getItem('lang') || 'zh';
+  var savedLang = localStorage.getItem('lang') || preferredBrowserLanguage();
   var options = document.querySelectorAll('.lang-option');
   options.forEach(function(o) {
     if (o.getAttribute('data-lang-val') === savedLang) {
@@ -463,13 +497,14 @@ document.addEventListener('click', function(e) {
 })();
 
 // ========================
-// 卡片3D倾斜
+// 卡片3D倾斜（桌面鼠标 + 移动端陀螺仪）
 // ========================
 (function() {
   if (window.innerWidth <= 480) return;
   var cards = document.querySelectorAll('.card');
   cards.forEach(function(card) {
     card.classList.add('tilt-card');
+    // 桌面端：鼠标跟随
     card.addEventListener('mousemove', function(e) {
       var rect = card.getBoundingClientRect();
       var x = e.clientX - rect.left;
@@ -484,6 +519,18 @@ document.addEventListener('click', function(e) {
       card.style.transform = 'perspective(800px) rotateX(0deg) rotateY(0deg)';
     });
   });
+  // 移动端：陀螺仪倾斜
+  if (window.DeviceOrientationEvent) {
+    window.addEventListener('deviceorientation', function(e) {
+      var gamma = e.gamma || 0; // 左右倾斜 -90~90
+      var beta = e.beta || 0;   // 前后倾斜 -180~180
+      var rx = Math.max(-8, Math.min(8, beta * 0.1));
+      var ry = Math.max(-8, Math.min(8, gamma * 0.1));
+      cards.forEach(function(card) {
+        card.style.transform = 'perspective(800px) rotateX(' + (-rx) + 'deg) rotateY(' + ry + 'deg)';
+      });
+    });
+  }
 })();
 
 // ========================
@@ -529,8 +576,8 @@ function renderOnboardStep() {
   var content = document.getElementById('onboardContent');
   var icon = document.querySelector('.onboard-icon');
   icon.textContent = step.icon;
-  content.innerHTML = '<div class="onboard-step-title" data-i18n="' + escapeHtml(step.titleKey) + '">' + escapeHtml(I18N[step.titleKey] || '') + '</div>' +
-    '<div class="onboard-step-desc" data-i18n="' + escapeHtml(step.descKey) + '">' + escapeHtml(I18N[step.descKey] || '') + '</div>';
+  content.innerHTML = '<div class="onboard-step-title" data-i18n="' + escapeHtml(step.titleKey) + '"></div>' +
+    '<div class="onboard-step-desc" data-i18n="' + escapeHtml(step.descKey) + '"></div>';
   // 更新指示点
   document.querySelectorAll('.onboard-dot').forEach(function(d, i) {
     d.classList.toggle('active', i === currentOnboardStep);
